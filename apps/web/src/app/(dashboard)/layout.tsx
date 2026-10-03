@@ -67,24 +67,42 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <NavItem href="/operations/ambulance" icon="🚐" label="Ambulance Fleet" />
 
           <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Management
+            Workforce (HR & Payroll)
           </div>
-          <NavItem href="/hospitals" icon="🏥" label="Hospitals" />
-          <NavItem href="/branches" icon="🏢" label="Branches" />
-          <NavItem href="/departments" icon="📂" label="Departments" />
-          
-          <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Staff & Users
-          </div>
-          <NavItem href="/users" icon="👥" label="Users & Roles" />
-          <NavItem href="/doctors" icon="👨‍⚕️" label="Doctors" />
-          <NavItem href="/staff" icon="👩‍💼" label="Staff" />
+          <NavItem href="/hr/employees" icon="👩‍⚕️" label="Employee Master" />
+          <NavItem href="/hr/attendance" icon="📅" label="Attendance & Leave" />
+          <NavItem href="/hr/payroll" icon="💸" label="Payroll Processing" />
 
           <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            System
+            Finance & Assets
           </div>
-          <NavItem href="/audit" icon="🛡️" label="Audit Logs" />
-          <NavItem href="/settings" icon="⚙️" label="Settings" />
+          <NavItem href="/finance/ledger" icon="📒" label="General Ledger" />
+          <NavItem href="/finance/payables" icon="📤" label="Accounts Payable" />
+          <NavItem href="/finance/assets" icon="🖥️" label="Asset Management" />
+          <NavItem href="/finance/maintenance" icon="🔧" label="Maintenance (CMMS)" />
+
+          <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Patient Engagement
+          </div>
+          <NavItem href="/crm/feedback" icon="⭐" label="Feedback & Complaints" />
+          <NavItem href="/crm/communications" icon="📱" label="Communications" />
+
+          <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Enterprise Management
+          </div>
+          <NavItem href="/enterprise/admin" icon="🏢" label="Enterprise Admin" />
+          <NavItem href="/hospitals" icon="🏥" label="Hospital Master" />
+          <NavItem href="/branches" icon="📍" label="Branches" />
+          <NavItem href="/departments" icon="🏛️" label="Departments" />
+          
+          <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Intelligence & Security
+          </div>
+          <NavItem href="/analytics" icon="📈" label="BI & Analytics" />
+          <NavItem href="/integrations" icon="🔗" label="Integrations (FHIR/ABDM)" />
+          <NavItem href="/security" icon="🔐" label="Security & Audit Logs" />
+          <NavItem href="/settings" icon="⚙️" label="System Settings" />
+
         </nav>
         <div className="p-4 border-t border-slate-800">
           <div className="flex items-center space-x-3">
