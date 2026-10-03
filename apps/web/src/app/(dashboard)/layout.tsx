@@ -50,6 +50,23 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <NavItem href="/billing/insurance" icon="🛡️" label="Insurance & Claims" />
 
           <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Hospital Operations (Phase 7)
+          </div>
+          <NavItem href="/operations/emergency" icon="🚑" label="Emergency (ER)" />
+          <NavItem href="/operations/ot" icon="🔪" label="Operating Theatre (OT)" />
+          <NavItem href="/operations/icu" icon="🫀" label="ICU / Critical Care" />
+          <NavItem href="/operations/blood-bank" icon="🩸" label="Blood Bank" />
+          <NavItem href="/operations/cssd" icon="🧺" label="CSSD (Sterilization)" />
+          <NavItem href="/operations/dietary" icon="🍲" label="Dietary / Kitchen" />
+          
+          <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Support Services
+          </div>
+          <NavItem href="/operations/procurement" icon="🛒" label="Procurement" />
+          <NavItem href="/operations/housekeeping" icon="🧹" label="Housekeeping" />
+          <NavItem href="/operations/ambulance" icon="🚐" label="Ambulance Fleet" />
+
+          <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
             Management
           </div>
           <NavItem href="/hospitals" icon="🏥" label="Hospitals" />
