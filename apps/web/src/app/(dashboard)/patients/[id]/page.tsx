@@ -14,6 +14,14 @@ export default async function PatientProfile({ params }: { params: { id: string 
       encounters: {
         include: { doctor: { include: { user: true } }, department: true, diagnoses: true, prescriptions: true },
         orderBy: { startTime: 'desc' }
+      },
+      investigationOrders: {
+        include: { doctor: { include: { user: true } }, items: { include: { labSample: { include: { results: { include: { parameter: true } } } }, radiologyStudy: { include: { report: true } } } } },
+        orderBy: { createdAt: 'desc' }
+      },
+      dispensings: {
+        include: { items: { include: { product: true } }, location: true, dispensedBy: true },
+        orderBy: { createdAt: 'desc' }
       }
     }
   });
@@ -57,6 +65,78 @@ export default async function PatientProfile({ params }: { params: { id: string 
         </div>
 
         <div className="col-span-2 space-y-6">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+            <div className="p-4 border-b border-slate-100 bg-slate-50">
+              <h3 className="font-semibold text-slate-800">Diagnostics & Investigations (Phase 4)</h3>
+            </div>
+            <div className="p-6">
+              {patient.investigationOrders.length === 0 ? (
+                <p className="text-slate-500 text-sm text-center py-4">No diagnostic orders.</p>
+              ) : (
+                <div className="space-y-4">
+                  {patient.investigationOrders.map(order => (
+                    <div key={order.id} className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                      <div className="flex justify-between items-start mb-3">
+                        <span className="font-medium text-slate-900">Order {order.id.substring(0,8).toUpperCase()}</span>
+                        <span className="text-xs text-slate-500">{new Date(order.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {order.items.map(item => (
+                          <div key={item.id} className="flex justify-between items-center text-sm border-t border-slate-200 pt-3">
+                            <div>
+                              <span className="font-medium text-slate-700">{item.testName}</span>
+                              <span className="ml-2 text-xs text-slate-500">({item.category})</span>
+                            </div>
+                            
+                            {item.category === 'LABORATORY' && item.labSample?.status === 'COMPLETED' ? (
+                              <button className="text-blue-600 font-medium hover:underline">View Lab Report</button>
+                            ) : item.category === 'RADIOLOGY' && item.radiologyStudy?.status === 'VERIFIED' ? (
+                              <button className="text-blue-600 font-medium hover:underline">View Rad Report</button>
+                            ) : (
+                              <span className="text-slate-400 text-xs italic">Pending</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+            <div className="p-4 border-b border-slate-100 bg-slate-50">
+              <h3 className="font-semibold text-slate-800">Pharmacy & Medication History (Phase 5)</h3>
+            </div>
+            <div className="p-6">
+              {patient.dispensings.length === 0 ? (
+                <p className="text-slate-500 text-sm text-center py-4">No pharmacy records.</p>
+              ) : (
+                <div className="space-y-4">
+                  {patient.dispensings.map(disp => (
+                    <div key={disp.id} className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                      <div className="flex justify-between items-start mb-3">
+                        <span className="font-medium text-slate-900">Dispensing from {disp.location.name}</span>
+                        <span className="text-xs text-slate-500">{new Date(disp.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {disp.items.map(item => (
+                          <div key={item.id} className="flex justify-between items-center text-sm">
+                            <span className="text-slate-700">{item.product.name}</span>
+                            <span className="text-slate-600 font-medium">Qty: {item.quantity}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="p-4 border-b border-slate-100 bg-slate-50">
               <h3 className="font-semibold text-slate-800">Timeline & Encounters</h3>

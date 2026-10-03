@@ -46,6 +46,8 @@ model Hospital {
   tenant   Tenant            @relation(fields: [tenantId], references: [id])
   branches Branch[]
   settings HospitalSetting[]
+  tariffs  Tariff[]
+  bills    Bill[]
 
   @@map("hospitals")
 }
@@ -68,6 +70,8 @@ model Branch {
   Appointment Appointment[]
   Queue       Queue[]
   Encounter   Encounter[]
+  wards       Ward[]
+  bills       Bill[]
 
   @@map("branches")
 }
@@ -89,6 +93,8 @@ model Department {
   Appointment Appointment[]
   Queue       Queue[]
   Encounter   Encounter[]
+  admissions  Admission[]
+  wards       Ward[]
 
   @@map("departments")
 }
@@ -105,15 +111,43 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  tenant         Tenant           @relation(fields: [tenantId], references: [id])
-  roles          UserRole[]
-  staffRecord    Staff?
-  doctorRecord   Doctor?
-  sessions       Session[]
-  PatientAllergy PatientAllergy[]
-  PatientAlert   PatientAlert[]
-  EncounterNote  EncounterNote[]
-  VitalRecord    VitalRecord[]
+  tenant                    Tenant                         @relation(fields: [tenantId], references: [id])
+  roles                     UserRole[]
+  staffRecord               Staff?
+  doctorRecord              Doctor?
+  sessions                  Session[]
+  PatientAllergy            PatientAllergy[]
+  PatientAlert              PatientAlert[]
+  EncounterNote             EncounterNote[]
+  VitalRecord               VitalRecord[]
+  bedAllocations            BedAllocation[]                @relation("BedAllocatedBy")
+  bedReleases               BedAllocation[]                @relation("BedReleasedBy")
+  bedReservations           BedReservation[]
+  careTeamMembers           CareTeamMember[]
+  nurseAssignments          NurseAssignment[]
+  nursingAssessments        NursingAssessment[]
+  nursingNotes              NursingNote[]
+  intakeOutputRecords       IntakeOutputRecord[]
+  carePlans                 CarePlan[]
+  medicationAdministrations MedicationAdministration[]
+  transfersRequested        Transfer[]                     @relation("TransferRequestedBy")
+  transfersApproved         Transfer[]                     @relation("TransferApprovedBy")
+  dischargePlans            DischargePlan[]
+  dischargeSummaries        DischargeSummary[]
+  samplesCollected          LabSample[]                    @relation("SampleCollectedBy")
+  resultsEntered            LabResult[]                    @relation("ResultEnteredBy")
+  resultsVerified           LabResult[]                    @relation("ResultVerifiedBy")
+  criticalAcks              CriticalResultAcknowledgment[]
+  studiesPerformed          RadiologyStudy[]               @relation("StudyPerformedBy")
+  radiologyReports          RadiologyReport[]              @relation("RadiologyReportedBy")
+  radiologyVerifs           RadiologyReport[]              @relation("RadiologyVerifiedBy")
+  dispensingsDone           PharmacyDispensing[]           @relation
+  ledgerEntries             InventoryLedger[]
+  goodsReceived             GoodsReceipt[]
+  billsCreated              Bill[]                         @relation("BillCreatedBy")
+  paymentsReceived          Payment[]                      @relation("PaymentReceivedBy")
+  refundsProcessed          Refund[]                       @relation("PaymentRefundedBy")
+  claimSettlements          ClaimSettlement[]
 
   @@map("users")
 }
@@ -213,16 +247,22 @@ model Doctor {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  user               User                 @relation(fields: [userId], references: [id])
-  staff              Staff?               @relation(fields: [staffId], references: [id])
-  branch             Branch               @relation(fields: [branchId], references: [id])
-  department         Department?          @relation(fields: [departmentId], references: [id])
-  Appointment        Appointment[]
-  Queue              Queue[]
-  Encounter          Encounter[]
-  Prescription       Prescription[]
-  InvestigationOrder InvestigationOrder[]
-  FollowUp           FollowUp[]
+  user                User                 @relation(fields: [userId], references: [id])
+  staff               Staff?               @relation(fields: [staffId], references: [id])
+  branch              Branch               @relation(fields: [branchId], references: [id])
+  department          Department?          @relation(fields: [departmentId], references: [id])
+  Appointment         Appointment[]
+  Queue               Queue[]
+  Encounter           Encounter[]
+  Prescription        Prescription[]
+  InvestigationOrder  InvestigationOrder[]
+  FollowUp            FollowUp[]
+  admissionsAdmitting Admission[]          @relation("AdmittingDoctor")
+  admissionsAttending Admission[]          @relation("AttendingDoctor")
+  doctorRounds        DoctorRound[]
+  clinicalProcedures  ClinicalProcedure[]
+  inpatientOrders     InpatientOrder[]
+  medicationOrders    MedicationOrder[]
 
   @@map("doctors")
 }
@@ -317,6 +357,15 @@ model Patient {
   investigationOrders InvestigationOrder[]
   queues              Queue[]
   FollowUp            FollowUp[]
+  admissions          Admission[]
+  bedReservations     BedReservation[]
+  labSamples          LabSample[]
+  criticalResults     CriticalResult[]
+  radiologyStudies    RadiologyStudy[]
+  dispensings         PharmacyDispensing[]
+  bills               Bill[]
+  payments            Payment[]
+  patientInsurances   PatientInsurance[]
 
   @@index([tenantId, mrn])
   @@index([mobile])
@@ -471,6 +520,9 @@ model Encounter {
   prescriptions   Prescription[]
   investigations  InvestigationOrder[]
   followUps       FollowUp[]
+  admission       Admission?
+  careTeam        CareTeam?
+  bills           Bill[]
 
   @@index([patientId])
   @@index([doctorId])
@@ -579,10 +631,11 @@ model Prescription {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  patient   Patient            @relation(fields: [patientId], references: [id])
-  encounter Encounter          @relation(fields: [encounterId], references: [id])
-  doctor    Doctor             @relation(fields: [doctorId], references: [id])
-  items     PrescriptionItem[]
+  patient     Patient              @relation(fields: [patientId], references: [id])
+  encounter   Encounter            @relation(fields: [encounterId], references: [id])
+  doctor      Doctor               @relation(fields: [doctorId], references: [id])
+  items       PrescriptionItem[]
+  dispensings PharmacyDispensing[]
 
   @@map("prescriptions")
 }
@@ -650,7 +703,12 @@ model InvestigationOrderItem {
   category String // LABORATORY, RADIOLOGY
   status   String  @default("ORDERED")
 
-  order InvestigationOrder @relation(fields: [orderId], references: [id])
+  order           InvestigationOrder @relation(fields: [orderId], references: [id])
+  serviceId       String?
+  service         DiagnosticService? @relation(fields: [serviceId], references: [id])
+  labSample       LabSample?
+  radiologyStudy  RadiologyStudy?
+  criticalResults CriticalResult[]
 
   @@map("investigation_order_items")
 }
@@ -671,4 +729,1129 @@ model FollowUp {
   doctor    Doctor    @relation(fields: [doctorId], references: [id])
 
   @@map("follow_ups")
+}
+
+// ============================================================================
+// PHASE 3: INPATIENT / IPD MANAGEMENT
+// ============================================================================
+
+model Admission {
+  id                    String    @id @default(uuid())
+  tenantId              String
+  hospitalId            String
+  branchId              String
+  patientId             String
+  encounterId           String    @unique
+  admissionNumber       String    @unique
+  admissionDate         DateTime  @default(now())
+  admissionType         String // PLANNED, EMERGENCY, TRANSFER, DAY_CARE
+  admissionSource       String // OPD, EMERGENCY, DIRECT, TRANSFER
+  reason                String?   @db.Text
+  departmentId          String
+  admittingDocId        String
+  attendingDocId        String
+  status                String    @default("REQUESTED") // REQUESTED, APPROVED, ADMITTED, TRANSFERRED, DISCHARGE_PLANNED, DISCHARGED, CANCELLED
+  expectedDischargeDate DateTime?
+  actualDischargeDate   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient         Patient    @relation(fields: [patientId], references: [id])
+  encounter       Encounter  @relation(fields: [encounterId], references: [id])
+  department      Department @relation(fields: [departmentId], references: [id])
+  admittingDoctor Doctor     @relation("AdmittingDoctor", fields: [admittingDocId], references: [id])
+  attendingDoctor Doctor     @relation("AttendingDoctor", fields: [attendingDocId], references: [id])
+
+  bedAllocations     BedAllocation[]
+  transfers          Transfer[]
+  nursingAssessments NursingAssessment[]
+  nursingNotes       NursingNote[]
+  doctorRounds       DoctorRound[]
+  carePlans          CarePlan[]
+  inpatientOrders    InpatientOrder[]
+  medicationOrders   MedicationOrder[]
+  intakeOutputs      IntakeOutputRecord[]
+  procedures         ClinicalProcedure[]
+  dischargePlan      DischargePlan?
+  dischargeSummary   DischargeSummary?
+
+  @@index([patientId])
+  @@index([encounterId])
+  @@map("admissions")
+}
+
+model Ward {
+  id                String  @id @default(uuid())
+  tenantId          String
+  branchId          String
+  departmentId      String?
+  name              String
+  code              String
+  wardType          String // GENERAL, ICU, PRIVATE, MATERNITY
+  genderRestriction String? // MALE, FEMALE, null for any
+  capacity          Int
+  status            String  @default("ACTIVE") // ACTIVE, INACTIVE, MAINTENANCE
+  floor             String?
+  description       String?
+
+  branch     Branch      @relation(fields: [branchId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+
+  rooms Room[]
+  beds  Bed[]
+
+  @@map("wards")
+}
+
+model Room {
+  id         String @id @default(uuid())
+  wardId     String
+  name       String
+  roomNumber String
+  status     String @default("ACTIVE")
+
+  ward Ward  @relation(fields: [wardId], references: [id])
+  beds Bed[]
+
+  @@map("rooms")
+}
+
+model Bed {
+  id                String  @id @default(uuid())
+  wardId            String
+  roomId            String?
+  bedNumber         String
+  bedType           String // REGULAR, ICU, OXYGEN, VENTILATOR
+  status            String  @default("AVAILABLE") // AVAILABLE, RESERVED, OCCUPIED, CLEANING, MAINTENANCE, BLOCKED
+  genderRestriction String?
+
+  ward Ward  @relation(fields: [wardId], references: [id])
+  room Room? @relation(fields: [roomId], references: [id])
+
+  allocations   BedAllocation[]
+  reservations  BedReservation[]
+  transfersFrom Transfer[]       @relation("FromBed")
+  transfersTo   Transfer[]       @relation("ToBed")
+
+  @@map("beds")
+}
+
+model BedAllocation {
+  id            String    @id @default(uuid())
+  admissionId   String
+  bedId         String
+  startTime     DateTime  @default(now())
+  endTime       DateTime?
+  status        String    @default("ACTIVE") // ACTIVE, RELEASED
+  allocatedById String
+  releasedById  String?
+  reason        String?
+
+  admission   Admission @relation(fields: [admissionId], references: [id])
+  bed         Bed       @relation(fields: [bedId], references: [id])
+  allocatedBy User      @relation("BedAllocatedBy", fields: [allocatedById], references: [id])
+  releasedBy  User?     @relation("BedReleasedBy", fields: [releasedById], references: [id])
+
+  @@map("bed_allocations")
+}
+
+model BedReservation {
+  id              String   @id @default(uuid())
+  bedId           String
+  patientId       String
+  reservedById    String
+  expectedArrival DateTime
+  status          String   @default("RESERVED") // RESERVED, FULFILLED, CANCELLED
+  notes           String?
+
+  bed        Bed     @relation(fields: [bedId], references: [id])
+  patient    Patient @relation(fields: [patientId], references: [id])
+  reservedBy User    @relation(fields: [reservedById], references: [id])
+
+  @@map("bed_reservations")
+}
+
+model CareTeam {
+  id          String @id @default(uuid())
+  encounterId String @unique
+
+  encounter Encounter        @relation(fields: [encounterId], references: [id])
+  members   CareTeamMember[]
+
+  @@map("care_teams")
+}
+
+model CareTeamMember {
+  id         String    @id @default(uuid())
+  careTeamId String
+  userId     String
+  role       String // ATTENDING, CONSULTING, PRIMARY_NURSE
+  startDate  DateTime  @default(now())
+  endDate    DateTime?
+  status     String    @default("ACTIVE")
+
+  careTeam CareTeam @relation(fields: [careTeamId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@map("care_team_members")
+}
+
+model NurseAssignment {
+  id         String   @id @default(uuid())
+  nurseId    String
+  wardId     String?
+  patientId  String?
+  shiftStart DateTime
+  shiftEnd   DateTime
+  status     String   @default("ACTIVE")
+
+  nurse User @relation(fields: [nurseId], references: [id])
+
+  @@map("nurse_assignments")
+}
+
+model NursingAssessment {
+  id               String   @id @default(uuid())
+  admissionId      String
+  nurseId          String
+  generalCondition String?
+  painScore        Int?
+  mobility         String?
+  fallRisk         String?
+  nutrition        String?
+  skinCondition    String?
+  mentalStatus     String?
+  notes            String?  @db.Text
+  createdAt        DateTime @default(now())
+
+  admission Admission @relation(fields: [admissionId], references: [id])
+  nurse     User      @relation(fields: [nurseId], references: [id])
+
+  @@map("nursing_assessments")
+}
+
+model NursingNote {
+  id           String   @id @default(uuid())
+  admissionId  String
+  nurseId      String
+  observation  String   @db.Text
+  intervention String?  @db.Text
+  response     String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  admission Admission @relation(fields: [admissionId], references: [id])
+  nurse     User      @relation(fields: [nurseId], references: [id])
+
+  @@map("nursing_notes")
+}
+
+model IntakeOutputRecord {
+  id           String   @id @default(uuid())
+  admissionId  String
+  recordedById String
+  type         String // INTAKE, OUTPUT
+  category     String // ORAL, IV, URINE, DRAIN
+  amount       Float
+  unit         String   @default("ml")
+  notes        String?
+  recordedAt   DateTime @default(now())
+
+  admission  Admission @relation(fields: [admissionId], references: [id])
+  recordedBy User      @relation(fields: [recordedById], references: [id])
+
+  @@map("intake_output_records")
+}
+
+model CarePlan {
+  id           String    @id @default(uuid())
+  admissionId  String
+  problem      String
+  goal         String
+  assignedToId String?
+  startDate    DateTime  @default(now())
+  targetDate   DateTime?
+  status       String    @default("ACTIVE") // PLANNED, ACTIVE, COMPLETED, CANCELLED
+  outcome      String?
+
+  admission  Admission      @relation(fields: [admissionId], references: [id])
+  assignedTo User?          @relation(fields: [assignedToId], references: [id])
+  items      CarePlanItem[]
+
+  @@map("care_plans")
+}
+
+model CarePlanItem {
+  id           String @id @default(uuid())
+  carePlanId   String
+  intervention String
+  frequency    String
+  status       String @default("PENDING")
+
+  carePlan CarePlan @relation(fields: [carePlanId], references: [id])
+
+  @@map("care_plan_items")
+}
+
+model DoctorRound {
+  id             String   @id @default(uuid())
+  admissionId    String
+  doctorId       String
+  clinicalStatus String?
+  progressNote   String   @db.Text
+  assessment     String?  @db.Text
+  plan           String?  @db.Text
+  createdAt      DateTime @default(now())
+
+  admission Admission @relation(fields: [admissionId], references: [id])
+  doctor    Doctor    @relation(fields: [doctorId], references: [id])
+
+  @@map("doctor_rounds")
+}
+
+model ClinicalProcedure {
+  id            String   @id @default(uuid())
+  admissionId   String
+  doctorId      String
+  procedureName String
+  code          String?
+  indication    String?
+  notes         String?  @db.Text
+  outcome       String?
+  status        String   @default("COMPLETED")
+  performedAt   DateTime @default(now())
+
+  admission Admission @relation(fields: [admissionId], references: [id])
+  doctor    Doctor    @relation(fields: [doctorId], references: [id])
+
+  @@map("clinical_procedures")
+}
+
+model InpatientOrder {
+  id          String   @id @default(uuid())
+  admissionId String
+  doctorId    String
+  orderType   String // DIET, NURSING, LAB, RADIOLOGY
+  priority    String   @default("ROUTINE")
+  status      String   @default("ORDERED") // ORDERED, IN_PROGRESS, COMPLETED, CANCELLED
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  admission Admission            @relation(fields: [admissionId], references: [id])
+  doctor    Doctor               @relation(fields: [doctorId], references: [id])
+  items     InpatientOrderItem[]
+
+  @@map("inpatient_orders")
+}
+
+model InpatientOrderItem {
+  id          String @id @default(uuid())
+  orderId     String
+  instruction String
+  status      String @default("PENDING")
+
+  order InpatientOrder @relation(fields: [orderId], references: [id])
+
+  @@map("inpatient_order_items")
+}
+
+model MedicationOrder {
+  id             String   @id @default(uuid())
+  admissionId    String
+  doctorId       String
+  medicationName String
+  dose           String
+  route          String
+  frequency      String
+  instructions   String?
+  status         String   @default("ACTIVE") // ACTIVE, STOPPED, COMPLETED
+  createdAt      DateTime @default(now())
+
+  admission       Admission                  @relation(fields: [admissionId], references: [id])
+  doctor          Doctor                     @relation(fields: [doctorId], references: [id])
+  administrations MedicationAdministration[]
+
+  @@map("medication_orders")
+}
+
+model MedicationAdministration {
+  id            String    @id @default(uuid())
+  orderId       String
+  nurseId       String
+  scheduledTime DateTime
+  actualTime    DateTime?
+  status        String    @default("SCHEDULED") // SCHEDULED, GIVEN, HELD, REFUSED, MISSED
+  notes         String?
+
+  order MedicationOrder @relation(fields: [orderId], references: [id])
+  nurse User            @relation(fields: [nurseId], references: [id])
+
+  @@map("medication_administrations")
+}
+
+model Transfer {
+  id            String    @id @default(uuid())
+  admissionId   String
+  fromBedId     String?
+  toBedId       String
+  requestedById String
+  approvedById  String?
+  reason        String?
+  status        String    @default("REQUESTED") // REQUESTED, APPROVED, COMPLETED, CANCELLED
+  transferTime  DateTime?
+  createdAt     DateTime  @default(now())
+
+  admission   Admission @relation(fields: [admissionId], references: [id])
+  fromBed     Bed?      @relation("FromBed", fields: [fromBedId], references: [id])
+  toBed       Bed       @relation("ToBed", fields: [toBedId], references: [id])
+  requestedBy User      @relation("TransferRequestedBy", fields: [requestedById], references: [id])
+  approvedBy  User?     @relation("TransferApprovedBy", fields: [approvedById], references: [id])
+
+  @@map("transfers")
+}
+
+model DischargePlan {
+  id           String    @id @default(uuid())
+  admissionId  String    @unique
+  expectedDate DateTime?
+  readiness    String?
+  instructions String?   @db.Text
+  status       String    @default("PLANNED") // PLANNED, READY, COMPLETED
+  plannedById  String
+  createdAt    DateTime  @default(now())
+
+  admission Admission @relation(fields: [admissionId], references: [id])
+  plannedBy User      @relation(fields: [plannedById], references: [id])
+
+  @@map("discharge_plans")
+}
+
+model DischargeSummary {
+  id                 String   @id @default(uuid())
+  admissionId        String   @unique
+  finalDiagnosis     String   @db.Text
+  hospitalCourse     String   @db.Text
+  dischargeCondition String
+  medications        String?  @db.Text
+  followUpPlan       String?  @db.Text
+  completedById      String
+  createdAt          DateTime @default(now())
+
+  admission   Admission @relation(fields: [admissionId], references: [id])
+  completedBy User      @relation(fields: [completedById], references: [id])
+
+  @@map("discharge_summaries")
+}
+
+// ============================================================================
+// PHASE 4: DIAGNOSTICS MANAGEMENT
+// ============================================================================
+
+model DiagnosticCategory {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  description String?
+  type        String // LABORATORY, RADIOLOGY, PATHOLOGY
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+
+  services DiagnosticService[]
+
+  @@map("diagnostic_categories")
+}
+
+model DiagnosticService {
+  id             String   @id @default(uuid())
+  tenantId       String
+  categoryId     String
+  name           String
+  code           String
+  departmentId   String?
+  specimenTypeId String?
+  sampleRequired Boolean  @default(true)
+  turnaroundTime Int? // In minutes
+  price          Float?
+  status         String   @default("ACTIVE")
+  instructions   String?
+  resultType     String   @default("NUMERIC") // NUMERIC, TEXT, BOOLEAN, PANEL, ATTACHMENT
+  createdAt      DateTime @default(now())
+
+  category     DiagnosticCategory       @relation(fields: [categoryId], references: [id])
+  specimenType SpecimenType?            @relation(fields: [specimenTypeId], references: [id])
+  panels       DiagnosticPanel[]
+  orderItems   InvestigationOrderItem[]
+
+  @@map("diagnostic_services")
+}
+
+model DiagnosticPanel {
+  id           String @id @default(uuid())
+  serviceId    String
+  parameterId  String
+  displayOrder Int    @default(0)
+
+  service   DiagnosticService   @relation(fields: [serviceId], references: [id])
+  parameter DiagnosticParameter @relation(fields: [parameterId], references: [id])
+
+  @@map("diagnostic_panels")
+}
+
+model DiagnosticParameter {
+  id         String  @id @default(uuid())
+  tenantId   String
+  name       String
+  code       String
+  unit       String?
+  resultType String  @default("NUMERIC")
+  status     String  @default("ACTIVE")
+
+  panels  DiagnosticPanel[]
+  ranges  DiagnosticParameterRange[]
+  results LabResult[]
+
+  @@map("diagnostic_parameters")
+}
+
+model DiagnosticParameterRange {
+  id           String  @id @default(uuid())
+  parameterId  String
+  gender       String? // MALE, FEMALE, ANY
+  minAge       Int?
+  maxAge       Int?
+  minRange     Float?
+  maxRange     Float?
+  criticalLow  Float?
+  criticalHigh Float?
+  normalText   String? // For TEXT/BOOLEAN result types
+
+  parameter DiagnosticParameter @relation(fields: [parameterId], references: [id])
+
+  @@map("diagnostic_parameter_ranges")
+}
+
+model SpecimenType {
+  id       String @id @default(uuid())
+  tenantId String
+  name     String // Blood, Urine, Stool
+  code     String
+  status   String @default("ACTIVE")
+
+  services DiagnosticService[]
+  samples  LabSample[]
+
+  @@map("specimen_types")
+}
+
+model LabSample {
+  id              String    @id @default(uuid())
+  tenantId        String
+  sampleId        String    @unique // LAB-2026-000001
+  orderItemId     String    @unique
+  patientId       String
+  specimenTypeId  String
+  collectionTime  DateTime?
+  collectedById   String?
+  status          String    @default("PENDING") // PENDING, COLLECTED, RECEIVED, REJECTED, PROCESSING, COMPLETED, CANCELLED
+  rejectionReason String?
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  orderItem    InvestigationOrderItem @relation(fields: [orderItemId], references: [id])
+  patient      Patient                @relation(fields: [patientId], references: [id])
+  specimenType SpecimenType           @relation(fields: [specimenTypeId], references: [id])
+  collectedBy  User?                  @relation("SampleCollectedBy", fields: [collectedById], references: [id])
+  results      LabResult[]
+
+  @@map("lab_samples")
+}
+
+model LabResult {
+  id             String   @id @default(uuid())
+  sampleId       String
+  parameterId    String?
+  value          String
+  unit           String?
+  referenceRange String?
+  flag           String? // NORMAL, LOW, HIGH, CRITICAL_LOW, CRITICAL_HIGH, ABNORMAL, POSITIVE, NEGATIVE
+  method         String?
+  notes          String?
+  enteredById    String
+  verifiedById   String?
+  status         String   @default("DRAFT") // DRAFT, SUBMITTED, VERIFIED, REPORTED
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  sample     LabSample            @relation(fields: [sampleId], references: [id])
+  parameter  DiagnosticParameter? @relation(fields: [parameterId], references: [id])
+  enteredBy  User                 @relation("ResultEnteredBy", fields: [enteredById], references: [id])
+  verifiedBy User?                @relation("ResultVerifiedBy", fields: [verifiedById], references: [id])
+
+  @@map("lab_results")
+}
+
+model CriticalResult {
+  id          String   @id @default(uuid())
+  tenantId    String
+  patientId   String
+  orderItemId String
+  resultValue String
+  status      String   @default("PENDING") // PENDING, ACKNOWLEDGED
+  createdAt   DateTime @default(now())
+
+  patient         Patient                        @relation(fields: [patientId], references: [id])
+  orderItem       InvestigationOrderItem         @relation(fields: [orderItemId], references: [id])
+  acknowledgments CriticalResultAcknowledgment[]
+
+  @@map("critical_results")
+}
+
+model CriticalResultAcknowledgment {
+  id               String   @id @default(uuid())
+  criticalResultId String
+  acknowledgedById String
+  method           String
+  notes            String?
+  createdAt        DateTime @default(now())
+
+  criticalResult CriticalResult @relation(fields: [criticalResultId], references: [id])
+  acknowledgedBy User           @relation(fields: [acknowledgedById], references: [id])
+
+  @@map("critical_result_acknowledgments")
+}
+
+model RadiologyStudy {
+  id            String    @id @default(uuid())
+  tenantId      String
+  studyNumber   String    @unique // RAD-2026-000001
+  orderItemId   String    @unique
+  patientId     String
+  modality      String // X-Ray, MRI, CT
+  bodyPart      String?
+  priority      String    @default("ROUTINE")
+  scheduledTime DateTime?
+  performedTime DateTime?
+  technicianId  String?
+  status        String    @default("SCHEDULED") // SCHEDULED, ARRIVED, IN_PROGRESS, COMPLETED, REPORTED, VERIFIED, CANCELLED
+  pacsReference String? // Study UID
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  orderItem  InvestigationOrderItem @relation(fields: [orderItemId], references: [id])
+  patient    Patient                @relation(fields: [patientId], references: [id])
+  technician User?                  @relation("StudyPerformedBy", fields: [technicianId], references: [id])
+  report     RadiologyReport?
+
+  @@map("radiology_studies")
+}
+
+model RadiologyReport {
+  id                 String   @id @default(uuid())
+  studyId            String   @unique
+  clinicalIndication String?  @db.Text
+  technique          String?  @db.Text
+  findings           String   @db.Text
+  impression         String   @db.Text
+  recommendations    String?  @db.Text
+  status             String   @default("DRAFT") // DRAFT, SUBMITTED, VERIFIED
+  reportedById       String
+  verifiedById       String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  study      RadiologyStudy @relation(fields: [studyId], references: [id])
+  reportedBy User           @relation("RadiologyReportedBy", fields: [reportedById], references: [id])
+  verifiedBy User?          @relation("RadiologyVerifiedBy", fields: [verifiedById], references: [id])
+
+  @@map("radiology_reports")
+}
+
+// ============================================================================
+// PHASE 5: PHARMACY & INVENTORY MANAGEMENT
+// ============================================================================
+
+model ProductCategory {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@map("product_categories")
+}
+
+model GenericMedicine {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@map("generic_medicines")
+}
+
+model Unit {
+  id        String   @id @default(uuid())
+  tenantId  String
+  name      String   @unique // Tablet, Bottle, ml, mg
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  products Product[]
+
+  @@map("units")
+}
+
+model Supplier {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  code        String   @unique
+  contactName String?
+  phone       String?
+  email       String?
+  address     String?
+  taxInfo     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  receipts GoodsReceipt[]
+  batches  InventoryBatch[]
+
+  @@map("suppliers")
+}
+
+model Product {
+  id                   String   @id @default(uuid())
+  tenantId             String
+  name                 String
+  code                 String   @unique
+  categoryId           String
+  genericId            String?
+  unitId               String
+  dosageForm           String?
+  strength             String?
+  manufacturer         String?
+  requiresPrescription Boolean  @default(false)
+  reorderLevel         Int      @default(0)
+  taxRate              Float    @default(0)
+  isActive             Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  category ProductCategory  @relation(fields: [categoryId], references: [id])
+  generic  GenericMedicine? @relation(fields: [genericId], references: [id])
+  unit     Unit             @relation(fields: [unitId], references: [id])
+
+  batches         InventoryBatch[]
+  receiptItems    GoodsReceiptItem[]
+  dispensingItems PharmacyDispensingItem[]
+  ledgerEntries   InventoryLedger[]
+
+  @@map("products")
+}
+
+model InventoryLocation {
+  id           String   @id @default(uuid())
+  tenantId     String
+  hospitalId   String
+  branchId     String
+  departmentId String?
+  name         String
+  type         String // PHARMACY, MAIN_STORE, WARD_STORE
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  batches       InventoryBatch[]
+  ledgerEntries InventoryLedger[]
+  dispensings   PharmacyDispensing[]
+
+  @@map("inventory_locations")
+}
+
+model InventoryBatch {
+  id              String    @id @default(uuid())
+  tenantId        String
+  productId       String
+  locationId      String
+  batchNumber     String
+  expiryDate      DateTime
+  manufactureDate DateTime?
+  purchaseRate    Float
+  mrp             Float
+  sellingRate     Float
+  availableQty    Int       @default(0)
+  supplierId      String?
+  status          String    @default("ACTIVE") // ACTIVE, EXPIRED, QUARANTINED
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  product  Product           @relation(fields: [productId], references: [id])
+  location InventoryLocation @relation(fields: [locationId], references: [id])
+  supplier Supplier?         @relation(fields: [supplierId], references: [id])
+
+  ledgerEntries   InventoryLedger[]
+  dispensingItems PharmacyDispensingItem[]
+
+  @@unique([productId, locationId, batchNumber])
+  @@map("inventory_batches")
+}
+
+model InventoryLedger {
+  id              String   @id @default(uuid())
+  tenantId        String
+  productId       String
+  batchId         String
+  locationId      String
+  transactionType String // OPENING, PURCHASE, DISPENSE, ISSUE, TRANSFER_OUT, TRANSFER_IN, RETURN, ADJUSTMENT
+  quantity        Int // Positive for inward, negative for outward
+  referenceId     String? // ID of GRN, Dispensing, Transfer, etc.
+  userId          String
+  notes           String?
+  createdAt       DateTime @default(now())
+
+  product  Product           @relation(fields: [productId], references: [id])
+  batch    InventoryBatch    @relation(fields: [batchId], references: [id])
+  location InventoryLocation @relation(fields: [locationId], references: [id])
+  user     User              @relation(fields: [userId], references: [id])
+
+  @@map("inventory_ledgers")
+}
+
+model GoodsReceipt {
+  id            String   @id @default(uuid())
+  tenantId      String
+  supplierId    String
+  invoiceNumber String
+  invoiceDate   DateTime
+  totalAmount   Float
+  status        String   @default("DRAFT") // DRAFT, COMPLETED
+  receivedById  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  supplier   Supplier           @relation(fields: [supplierId], references: [id])
+  receivedBy User               @relation(fields: [receivedById], references: [id])
+  items      GoodsReceiptItem[]
+
+  @@map("goods_receipts")
+}
+
+model GoodsReceiptItem {
+  id           String   @id @default(uuid())
+  receiptId    String
+  productId    String
+  batchNumber  String
+  expiryDate   DateTime
+  quantity     Int
+  purchaseRate Float
+  mrp          Float
+  sellingRate  Float
+  taxAmount    Float    @default(0)
+  totalAmount  Float
+
+  receipt GoodsReceipt @relation(fields: [receiptId], references: [id])
+  product Product      @relation(fields: [productId], references: [id])
+
+  @@map("goods_receipt_items")
+}
+
+model PharmacyDispensing {
+  id             String   @id @default(uuid())
+  tenantId       String
+  locationId     String
+  prescriptionId String?
+  patientId      String
+  dispensedById  String
+  status         String   @default("COMPLETED") // COMPLETED, PARTIAL, RETURNED
+  totalAmount    Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  location     InventoryLocation        @relation(fields: [locationId], references: [id])
+  prescription Prescription?            @relation(fields: [prescriptionId], references: [id])
+  patient      Patient                  @relation(fields: [patientId], references: [id])
+  dispensedBy  User                     @relation(fields: [dispensedById], references: [id])
+  items        PharmacyDispensingItem[]
+
+  @@map("pharmacy_dispensings")
+}
+
+model PharmacyDispensingItem {
+  id           String @id @default(uuid())
+  dispensingId String
+  productId    String
+  batchId      String
+  quantity     Int
+  unitPrice    Float
+  totalPrice   Float
+
+  dispensing PharmacyDispensing @relation(fields: [dispensingId], references: [id])
+  product    Product            @relation(fields: [productId], references: [id])
+  batch      InventoryBatch     @relation(fields: [batchId], references: [id])
+
+  @@map("pharmacy_dispensing_items")
+}
+
+// ============================================================================
+// PHASE 6: REVENUE CYCLE MANAGEMENT & BILLING
+// ============================================================================
+
+model ChargeMaster {
+  id          String   @id @default(uuid())
+  tenantId    String
+  code        String   @unique
+  name        String
+  category    String // CONSULTATION, LABORATORY, RADIOLOGY, PHARMACY, PROCEDURE, ROOM, BED, NURSING, REGISTRATION, MISC
+  description String?
+  isActive    Boolean  @default(true)
+  isBillable  Boolean  @default(true)
+  taxRate     Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tariffItems TariffItem[]
+  billItems   BillItem[]
+
+  @@map("charge_masters")
+}
+
+model Tariff {
+  id         String    @id @default(uuid())
+  tenantId   String
+  hospitalId String
+  name       String
+  code       String    @unique
+  tariffType String // GENERAL, CORPORATE, INSURANCE, TPA
+  validFrom  DateTime
+  validTo    DateTime?
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  hospital Hospital     @relation(fields: [hospitalId], references: [id])
+  items    TariffItem[]
+  bills    Bill[]
+
+  @@map("tariffs")
+}
+
+model TariffItem {
+  id             String   @id @default(uuid())
+  tariffId       String
+  chargeMasterId String
+  price          Float
+  discount       Float    @default(0) // max discount allowed
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tariff       Tariff       @relation(fields: [tariffId], references: [id])
+  chargeMaster ChargeMaster @relation(fields: [chargeMasterId], references: [id])
+
+  @@unique([tariffId, chargeMasterId])
+  @@map("tariff_items")
+}
+
+model Bill {
+  id          String   @id @default(uuid())
+  tenantId    String
+  hospitalId  String
+  branchId    String
+  patientId   String
+  encounterId String?
+  billNumber  String   @unique
+  billType    String // OPD, IPD, PHARMACY
+  status      String   @default("DRAFT") // DRAFT, FINALIZED, PARTIALLY_PAID, PAID, CANCELLED
+  billDate    DateTime @default(now())
+  tariffId    String?
+
+  subTotal          Float @default(0)
+  totalDiscount     Float @default(0)
+  totalTax          Float @default(0)
+  grossTotal        Float @default(0)
+  payerExpected     Float @default(0) // Amount expected from Insurance/TPA
+  patientPayable    Float @default(0)
+  paidAmount        Float @default(0)
+  outstandingAmount Float @default(0)
+
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  patient   Patient    @relation(fields: [patientId], references: [id])
+  encounter Encounter? @relation(fields: [encounterId], references: [id])
+  hospital  Hospital   @relation(fields: [hospitalId], references: [id])
+  branch    Branch     @relation(fields: [branchId], references: [id])
+  tariff    Tariff?    @relation(fields: [tariffId], references: [id])
+  createdBy User       @relation("BillCreatedBy", fields: [createdById], references: [id])
+
+  items    BillItem[]
+  payments Payment[]
+  claims   Claim[]
+
+  @@map("bills")
+}
+
+model BillItem {
+  id             String  @id @default(uuid())
+  billId         String
+  chargeMasterId String
+  serviceName    String
+  quantity       Int     @default(1)
+  unitPrice      Float
+  discountAmount Float   @default(0)
+  taxAmount      Float   @default(0)
+  lineTotal      Float
+  sourceModule   String? // LAB, RAD, PHARMACY, OPD, IPD
+  sourceRefId    String? // ID of dispensing item, lab order item, etc.
+
+  bill         Bill         @relation(fields: [billId], references: [id])
+  chargeMaster ChargeMaster @relation(fields: [chargeMasterId], references: [id])
+
+  @@map("bill_items")
+}
+
+model Payment {
+  id             String   @id @default(uuid())
+  tenantId       String
+  billId         String?
+  patientId      String
+  receiptNumber  String   @unique
+  paymentMethod  String // CASH, CARD, UPI, BANK_TRANSFER, ONLINE, ADVANCE
+  amount         Float
+  transactionRef String?
+  paymentDate    DateTime @default(now())
+  status         String   @default("SUCCESS") // PENDING, SUCCESS, FAILED, REFUNDED
+  paymentType    String   @default("BILL_PAYMENT") // BILL_PAYMENT, ADVANCE
+  receivedById   String
+
+  bill       Bill?    @relation(fields: [billId], references: [id])
+  patient    Patient  @relation(fields: [patientId], references: [id])
+  receivedBy User     @relation("PaymentReceivedBy", fields: [receivedById], references: [id])
+  refunds    Refund[]
+
+  @@map("payments")
+}
+
+model Refund {
+  id             String   @id @default(uuid())
+  tenantId       String
+  paymentId      String
+  amount         Float
+  reason         String?
+  refundMethod   String
+  transactionRef String?
+  status         String   @default("COMPLETED")
+  refundedById   String
+  createdAt      DateTime @default(now())
+
+  payment    Payment @relation(fields: [paymentId], references: [id])
+  refundedBy User    @relation("PaymentRefundedBy", fields: [refundedById], references: [id])
+
+  @@map("refunds")
+}
+
+model InsuranceProvider {
+  id        String   @id @default(uuid())
+  tenantId  String
+  name      String
+  code      String   @unique
+  contact   String?
+  email     String?
+  address   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patientInsurances PatientInsurance[]
+  claims            Claim[]
+
+  @@map("insurance_providers")
+}
+
+model Tpa {
+  id        String   @id @default(uuid())
+  tenantId  String
+  name      String
+  code      String   @unique
+  contact   String?
+  email     String?
+  address   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patientInsurances PatientInsurance[]
+  claims            Claim[]
+
+  @@map("tpas")
+}
+
+model PatientInsurance {
+  id           String   @id @default(uuid())
+  patientId    String
+  providerId   String
+  tpaId        String?
+  policyNumber String
+  memberId     String?
+  validFrom    DateTime
+  validTo      DateTime
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  patient  Patient           @relation(fields: [patientId], references: [id])
+  provider InsuranceProvider @relation(fields: [providerId], references: [id])
+  tpa      Tpa?              @relation(fields: [tpaId], references: [id])
+
+  @@map("patient_insurance")
+}
+
+model Claim {
+  id                    String    @id @default(uuid())
+  tenantId              String
+  billId                String
+  providerId            String
+  tpaId                 String?
+  claimNumber           String    @unique
+  claimedAmount         Float
+  approvedAmount        Float?
+  patientResponsibility Float?
+  status                String    @default("SUBMITTED") // DRAFT, SUBMITTED, UNDER_REVIEW, APPROVED, PARTIALLY_APPROVED, REJECTED, SETTLED
+  submissionDate        DateTime  @default(now())
+  settlementDate        DateTime?
+  remarks               String?
+
+  bill        Bill              @relation(fields: [billId], references: [id])
+  provider    InsuranceProvider @relation(fields: [providerId], references: [id])
+  tpa         Tpa?              @relation(fields: [tpaId], references: [id])
+  settlements ClaimSettlement[]
+
+  @@map("claims")
+}
+
+model ClaimSettlement {
+  id             String   @id @default(uuid())
+  claimId        String
+  amount         Float
+  transactionRef String?
+  settlementDate DateTime @default(now())
+  recordedById   String
+
+  claim      Claim @relation(fields: [claimId], references: [id])
+  recordedBy User  @relation(fields: [recordedById], references: [id])
+
+  @@map("claim_settlements")
 }

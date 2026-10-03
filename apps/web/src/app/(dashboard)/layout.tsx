@@ -21,6 +21,35 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <NavItem href="/encounters" icon="🩺" label="Encounters" />
 
           <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Inpatient (Phase 3)
+          </div>
+          <NavItem href="/ipd" icon="🛏️" label="IPD Dashboard" />
+          <NavItem href="/ipd/admissions" icon="📝" label="Admissions" />
+          <NavItem href="/ipd/bed-board" icon="🏨" label="Bed Board" />
+          <NavItem href="/ipd/nursing" icon="👩‍⚕️" label="Nursing Station" />
+          <NavItem href="/ipd/rounds" icon="📋" label="Doctor Rounds" />
+
+          <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Diagnostics (Phase 4)
+          </div>
+          <NavItem href="/laboratory" icon="🔬" label="Laboratory" />
+          <NavItem href="/radiology" icon="🩻" label="Radiology" />
+
+          <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Pharmacy & Inventory (Phase 5)
+          </div>
+          <NavItem href="/pharmacy" icon="💊" label="Pharmacy" />
+          <NavItem href="/inventory" icon="📦" label="Inventory" />
+          
+          <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Billing & RCM (Phase 6)
+          </div>
+          <NavItem href="/billing" icon="💰" label="Billing Dashboard" />
+          <NavItem href="/billing/invoices" icon="🧾" label="Invoices & Bills" />
+          <NavItem href="/billing/payments" icon="💵" label="Payments & Receipts" />
+          <NavItem href="/billing/insurance" icon="🛡️" label="Insurance & Claims" />
+
+          <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
             Management
           </div>
           <NavItem href="/hospitals" icon="🏥" label="Hospitals" />
