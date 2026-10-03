@@ -1,0 +1,20 @@
+{
+  "name": "enterprise-hms",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "turbo": "^2.11.7",
+    "typescript": "^5.0.0"
+  }
+}
