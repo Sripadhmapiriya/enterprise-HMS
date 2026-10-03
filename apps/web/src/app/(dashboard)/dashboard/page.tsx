@@ -18,7 +18,7 @@ export default async function DashboardPage() {
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Dashboard Overview</h1>
-          <p className="text-slate-500 mt-1">Welcome back. Here is what's happening across your hospital network today.</p>
+          <p className="text-slate-500 mt-1">Welcome back. Here is what&apos;s happening across your hospital network today.</p>
         </div>
         <div className="flex space-x-3">
           <button className="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm">
@@ -79,8 +79,8 @@ export default async function DashboardPage() {
   );
 }
 
-function StatCard({ title, value, trend, icon, color }: any) {
-  const colorMap: any = {
+function StatCard({ title, value, trend, icon, color }: { title: string, value: string, trend: string, icon: React.ReactNode, color: string }) {
+  const colorMap: Record<string, string> = {
     blue: "bg-blue-50 text-blue-600 border-blue-100",
     indigo: "bg-indigo-50 text-indigo-600 border-indigo-100",
     emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",

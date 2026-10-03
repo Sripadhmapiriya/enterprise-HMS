@@ -41,7 +41,7 @@ export default async function PharmacyDashboard() {
           <p className="text-3xl font-bold text-slate-900">{dispensedToday}</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Today's Revenue</p>
+          <p className="text-sm font-medium text-slate-500">Today&apos;s Revenue</p>
           <p className="text-3xl font-bold text-emerald-600">${revenueToday.toFixed(2)}</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-amber-200 shadow-sm bg-amber-50/50">

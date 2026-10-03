@@ -34,7 +34,7 @@ export default async function OTDashboard() {
           <p className="text-3xl font-bold text-slate-900">{theaters.length}</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Today's Surgeries</p>
+          <p className="text-sm font-medium text-slate-500">Today&apos;s Surgeries</p>
           <p className="text-3xl font-bold text-indigo-600">
             {schedules.filter(s => new Date(s.scheduledStart).toDateString() === new Date().toDateString()).length}
           </p>
