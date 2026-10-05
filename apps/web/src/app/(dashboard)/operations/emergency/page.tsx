@@ -9,7 +9,7 @@ export default async function EmergencyDashboard() {
   // Since we use the existing Encounter model, we filter for EMERGENCY type
   const encounters = await prisma.encounter.findMany({
     where: { type: 'EMERGENCY' },
-    include: { patient: true, doctor: true, triageAssessment: true },
+    include: { patient: true, doctor: { include: { user: true } }, triageAssessment: true },
     orderBy: { startTime: 'desc' },
     take: 10
   });
