@@ -126,7 +126,7 @@ export default function ICUDashboard() {
           }`}
         >
           <span>{notice.text}</span>
-          <button onClick={() => setNotice(null)} className="font-bold">✕</button>
+          <button onClick={() => setNotice(null)} className="font-bold">x</button>
         </div>
       )}
 
@@ -346,7 +346,7 @@ export default function ICUDashboard() {
                 <h3 className="text-base font-bold text-slate-900">Record ICU Flowsheet Entry</h3>
                 <p className="text-xs text-slate-500">Comprehensive vital signs, ventilator telemetry, and fluid balance</p>
               </div>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
 
             <form onSubmit={handleSaveFlowsheet} className="space-y-4">

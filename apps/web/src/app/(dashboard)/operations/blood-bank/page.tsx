@@ -199,7 +199,7 @@ export default function BloodBankDashboard() {
           }`}
         >
           <span>{notice.text}</span>
-          <button onClick={() => setNotice(null)} className="font-bold">✕</button>
+          <button onClick={() => setNotice(null)} className="font-bold">x</button>
         </div>
       )}
 
@@ -588,7 +588,7 @@ export default function BloodBankDashboard() {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
               <h3 className="text-base font-bold text-slate-900">Register Blood Donor</h3>
-              <button onClick={() => setShowDonorModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowDonorModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
             <form onSubmit={handleRegisterDonor} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
@@ -690,7 +690,7 @@ export default function BloodBankDashboard() {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
               <h3 className="text-base font-bold text-slate-900">Record Blood Donation</h3>
-              <button onClick={() => setShowDonationModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowDonationModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
             <form onSubmit={handleRecordDonation} className="space-y-3">
               <div>
@@ -754,7 +754,7 @@ export default function BloodBankDashboard() {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
               <h3 className="text-base font-bold text-slate-900">Issue Blood Component</h3>
-              <button onClick={() => setShowIssueModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowIssueModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
             <form onSubmit={handleIssueBlood} className="space-y-3">
               <div>

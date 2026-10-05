@@ -183,7 +183,7 @@ export default function AmbulanceDashboard() {
           }`}
         >
           <span>{notice.text}</span>
-          <button onClick={() => setNotice(null)} className="font-bold">✕</button>
+          <button onClick={() => setNotice(null)} className="font-bold">x</button>
         </div>
       )}
 
@@ -415,7 +415,7 @@ export default function AmbulanceDashboard() {
                 <h3 className="text-base font-bold text-slate-900">Register Ambulance Vehicle</h3>
                 <p className="text-xs text-slate-500">Add emergency vehicle to active transport fleet</p>
               </div>
-              <button onClick={() => setShowVehicleModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowVehicleModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
 
             <form onSubmit={handleRegisterAmbulance} className="space-y-3">
@@ -474,7 +474,7 @@ export default function AmbulanceDashboard() {
                 <h3 className="text-base font-bold text-slate-900">Dispatch Ambulance</h3>
                 <p className="text-xs text-slate-500">Initiate emergency transport mission</p>
               </div>
-              <button onClick={() => setShowDispatchModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowDispatchModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
 
             <form onSubmit={handleDispatchTrip} className="space-y-3">

@@ -308,7 +308,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
           }`}
         >
           <span>{msg.text}</span>
-          <button onClick={() => setMsg(null)} className="font-bold text-sm">✕</button>
+          <button onClick={() => setMsg(null)} className="font-bold text-sm">x</button>
         </div>
       )}
 
@@ -835,7 +835,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
                 onClick={() => setAdministerOrder(null)}
                 className="text-slate-400 hover:text-slate-600 font-bold"
               >
-                ✕
+                x
               </button>
             </div>
 
@@ -939,7 +939,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
               <h3 className="text-base font-bold text-slate-900">Add Inpatient Medication Order</h3>
-              <button onClick={() => setShowMedModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowMedModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
             <form onSubmit={handleSaveMed} className="space-y-3">
               <div>
@@ -1028,7 +1028,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
               <h3 className="text-base font-bold text-slate-900">Record Nursing Assessment</h3>
-              <button onClick={() => setShowAssessmentModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowAssessmentModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
             <form onSubmit={handleSaveAssessment} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
@@ -1114,7 +1114,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
               <h3 className="text-base font-bold text-slate-900">Log Intake / Output</h3>
-              <button onClick={() => setShowIoModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowIoModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
             <form onSubmit={handleSaveIo} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
@@ -1177,7 +1177,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4">
             <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
               <h3 className="text-base font-bold text-slate-900">Document Daily Round</h3>
-              <button onClick={() => setShowRoundModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowRoundModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
             <form onSubmit={handleSaveRound} className="space-y-3">
               <div>

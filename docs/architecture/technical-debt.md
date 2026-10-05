@@ -1,21 +1,25 @@
-# Technical Debt Register
+# Architecture Technical Register & Remediation Status
 
-This register documents the technical debt accumulated during the rapid functional prototyping of Phases 1 through 8. It categorizes the debt and tracks remediation efforts.
+This register documents historical architecture considerations and tracks the hardening status of enterprise capabilities.
 
-## Critical (Must fix before production)
-* **API Validation:** Currently missing strong Zod schema validations on many generated Prisma API routes. 
-* **Database Indexes:** Most high-volume tables (`Patient`, `Encounter`, `Bill`) do not have composite indexes on `[tenantId, createdAt]` leading to full table scans.
-* **Authentication Hardening:** MFA and rate limiting are not fully enforced across the Next.js API layer.
-* **Tenant Isolation Checks:** Explicit E2E automation for tenant data leakage is missing. E2E isolation scripts must be written.
+---
 
-## High (Fix soon)
-* **Background Workers:** Cron jobs for reports and notifications are stubbed but not executing via a robust message queue (e.g., BullMQ + Redis).
-* **Connection Pooling:** Prisma Client instantiation in Next.js dev mode might exhaust connections. Needs PgBouncer or Prisma Accelerate validation for production.
-* **File Uploads:** Object storage mapping is mocked. Needs direct S3 integration with presigned URLs.
+## 1. Resolved Foundation Items
 
-## Medium
-* **E2E Testing:** Playwright tests are incomplete for some minor modules (like Dietary and Housekeeping).
-* **Caching:** Patient 360 could benefit from Redis caching rather than querying the DB heavily.
+| Domain | Historical Concern | Current Production Status | Verification Suite |
+|---|---|---|---|
+| **API Validation** | Loose request payload validation | Strictly enforced via Zod schemas across all routers; unified standard error envelope (`ApiErrorEnvelopeSchema`) | `tests/auth.test.ts`, `tests/patients.test.ts` |
+| **Tenant Isolation** | Potential cross-tenant data leakage | Enforced at Prisma client extension level (`packages/database/src/tenancy.ts`); auto-injects `tenantId` and blocks cross-tenant access | `tests/tenancy.test.ts`, `tests/entitlements.test.ts` |
+| **Authentication** | Demo tokens and weak hashing | Upgraded to Argon2id password hashing, rotating JWT access/refresh tokens in `Session` table, and 15-minute account lockout after 5 failed attempts | `tests/auth.test.ts` |
+| **Database Indexing** | Missing composite query indexes | Added composite indexes (`[tenantId, createdAt]`, `[tenantId, status]`, `[tenantId, mrn]`) across high-volume tables | `packages/database/prisma/schema.prisma` |
+| **Background Processing**| Mocked asynchronous tasks | Built dedicated `apps/worker` with BullMQ + Redis adapter and in-memory simulator fallback | `tests/platform-and-integrations.test.ts` |
+| **File Storage** | Unchecked local file handling | Built S3/MinIO presigned URL generator with 10MB ceiling, MIME validation, and ClamAV/EICAR malware rejection | `tests/platform-and-integrations.test.ts` |
+| **Interoperability** | Missing national health standards | Implemented ABDM Sandbox (M1/M2/M3), HL7 FHIR R4, and HL7 v2 ADT adapters | `tests/platform-and-integrations.test.ts` |
 
-## Low
-* **Code Splitting:** Next.js bundle sizes are large due to aggressive initial loading on dashboards.
+---
+
+## 2. Active Operational Considerations
+
+- **Redis Deployment**: In standalone environments without Redis, the platform automatically activates the `InMemoryWorkerSimulator`. For distributed clustering across multiple node instances, external Redis 7+ must be provisioned.
+- **S3 Storage Bucket**: The default fallback stores files in the local sandboxed directory. Live production deployments require S3 or MinIO credentials as outlined in `docs/KNOWN_LIMITATIONS.md`.
+- **ABDM Live Gateway**: Sandboxed test protocol uses OTP `123456`. Production cutover requires National Health Authority (NHA) production credentials and TLS certificates.

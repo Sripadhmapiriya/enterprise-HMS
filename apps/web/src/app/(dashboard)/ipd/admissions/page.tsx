@@ -270,7 +270,7 @@ export default function AdmissionsPage() {
                 onClick={() => setAllocatingAdm(null)}
                 className="text-slate-400 hover:text-slate-600 font-bold"
               >
-                ✕
+                x
               </button>
             </div>
 
@@ -332,7 +332,7 @@ export default function AdmissionsPage() {
                 onClick={() => setShowNewModal(false)}
                 className="text-slate-400 hover:text-slate-600 font-bold"
               >
-                ✕
+                x
               </button>
             </div>
 

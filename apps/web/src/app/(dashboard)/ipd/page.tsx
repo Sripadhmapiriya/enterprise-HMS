@@ -291,7 +291,7 @@ export default function IpdDashboard() {
                 onClick={() => setShowAdmitModal(false)}
                 className="text-slate-400 hover:text-slate-600 text-lg font-bold"
               >
-                ✕
+                x
               </button>
             </div>
 

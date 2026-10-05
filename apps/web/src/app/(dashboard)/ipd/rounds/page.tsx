@@ -102,7 +102,7 @@ export default function DoctorRoundsPage() {
           }`}
         >
           <span>{notice.text}</span>
-          <button onClick={() => setNotice(null)} className="font-bold">✕</button>
+          <button onClick={() => setNotice(null)} className="font-bold">x</button>
         </div>
       )}
 
@@ -225,7 +225,7 @@ export default function DoctorRoundsPage() {
                 </h3>
                 <p className="text-xs text-slate-500">MRN: {selectedAdmission.patient?.mrn}</p>
               </div>
-              <button onClick={() => setRoundModalOpen(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setRoundModalOpen(false)} className="text-slate-400 font-bold">x</button>
             </div>
 
             <form onSubmit={handleSubmitRound} className="space-y-3">

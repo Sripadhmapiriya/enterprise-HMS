@@ -74,4 +74,61 @@ describe('Workstream D: Edition Build & Physical Route Pruning (patients-only)',
     restoreOriginalRoutes();
     expect(fs.existsSync(path.join(DASHBOARD_DIR, 'laboratory'))).toBe(true);
   });
+
+  it('3. Preset matrix: pharmacy-er (verifies pharmacy, emergency, inventory present; ipd, billing absent)', () => {
+    const manifest = buildEdition({
+      preset: 'pharmacy-er',
+      dryRun: true,
+    });
+
+    expect(manifest.presetName).toBe('pharmacy-er');
+    expect(manifest.enabledModules).toContain('pharmacy');
+    expect(manifest.enabledModules).toContain('emergency');
+    expect(manifest.enabledModules).toContain('inventory');
+    expect(manifest.enabledModules).toContain('patients');
+    expect(manifest.disabledModules).toContain('ipd');
+    expect(manifest.disabledModules).toContain('billing');
+    expect(manifest.disabledModules).toContain('laboratory');
+
+    // Pharmacy and emergency routes are preserved
+    expect(fs.existsSync(path.join(DASHBOARD_DIR, 'pharmacy', 'page.tsx'))).toBe(true);
+    expect(fs.existsSync(path.join(DASHBOARD_DIR, 'operations', 'emergency', 'page.tsx'))).toBe(true);
+    expect(fs.existsSync(path.join(DASHBOARD_DIR, 'inventory', 'page.tsx'))).toBe(true);
+
+    // IPD and billing routes are pruned
+    expect(fs.existsSync(path.join(DASHBOARD_DIR, 'ipd'))).toBe(false);
+    expect(fs.existsSync(path.join(DASHBOARD_DIR, 'billing'))).toBe(false);
+
+    restoreOriginalRoutes();
+    expect(fs.existsSync(path.join(DASHBOARD_DIR, 'ipd'))).toBe(true);
+    expect(fs.existsSync(path.join(DASHBOARD_DIR, 'billing'))).toBe(true);
+  });
+
+  it('4. Preset matrix: opd-clinic, diagnostic-centre, hospital-standard & full-enterprise', () => {
+    // opd-clinic
+    const opdManifest = buildEdition({ preset: 'opd-clinic', dryRun: true });
+    expect(opdManifest.enabledModules).toContain('opd');
+    expect(opdManifest.disabledModules).toContain('ipd');
+    restoreOriginalRoutes();
+
+    // diagnostic-centre
+    const diagManifest = buildEdition({ preset: 'diagnostic-centre', dryRun: true });
+    expect(diagManifest.enabledModules).toContain('laboratory');
+    expect(diagManifest.enabledModules).toContain('radiology');
+    expect(diagManifest.disabledModules).toContain('ot');
+    restoreOriginalRoutes();
+
+    // hospital-standard
+    const hospManifest = buildEdition({ preset: 'hospital-standard', dryRun: true });
+    expect(hospManifest.enabledModules).toContain('ipd');
+    expect(hospManifest.enabledModules).toContain('emergency');
+    expect(hospManifest.disabledModules).toContain('ambulance');
+    restoreOriginalRoutes();
+
+    // full-enterprise
+    const fullManifest = buildEdition({ preset: 'full-enterprise', dryRun: true });
+    expect(fullManifest.disabledModules).toHaveLength(0);
+    expect(fullManifest.prunedRoutes).toHaveLength(0);
+    restoreOriginalRoutes();
+  });
 });

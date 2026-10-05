@@ -119,7 +119,7 @@ export default function CSSDDashboard() {
           }`}
         >
           <span>{notice.text}</span>
-          <button onClick={() => setNotice(null)} className="font-bold">✕</button>
+          <button onClick={() => setNotice(null)} className="font-bold">x</button>
         </div>
       )}
 
@@ -269,7 +269,7 @@ export default function CSSDDashboard() {
                 <h3 className="text-base font-bold text-slate-900">Start Sterilization Cycle</h3>
                 <p className="text-xs text-slate-500">Initiate chamber load sterilization process.</p>
               </div>
-              <button onClick={() => setShowNewModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowNewModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
 
             <form onSubmit={handleStartCycle} className="space-y-3">
@@ -341,7 +341,7 @@ export default function CSSDDashboard() {
                 <h3 className="text-base font-bold text-slate-900">Certify Sterilization Quality Check</h3>
                 <p className="text-xs text-slate-500">Verify chemical strip and biological spore indicators.</p>
               </div>
-              <button onClick={() => setCompleteCycleId(null)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setCompleteCycleId(null)} className="text-slate-400 font-bold">x</button>
             </div>
 
             <form onSubmit={handleCompleteCycle} className="space-y-4 text-xs">

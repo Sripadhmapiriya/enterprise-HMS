@@ -133,7 +133,7 @@ export default function HousekeepingDashboard() {
           }`}
         >
           <span>{notice.text}</span>
-          <button onClick={() => setNotice(null)} className="font-bold">✕</button>
+          <button onClick={() => setNotice(null)} className="font-bold">x</button>
         </div>
       )}
 
@@ -323,7 +323,7 @@ export default function HousekeepingDashboard() {
                 <h3 className="text-base font-bold text-slate-900">Request Cleaning Task</h3>
                 <p className="text-xs text-slate-500">Dispatch housekeeping for terminal or routine sanitation</p>
               </div>
-              <button onClick={() => setShowNewModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowNewModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
 
             <form onSubmit={handleCreateTask} className="space-y-3">

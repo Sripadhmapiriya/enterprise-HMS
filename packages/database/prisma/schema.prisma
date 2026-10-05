@@ -1318,7 +1318,7 @@ model DischargeSummary {
 }
 
 // ============================================================================
-// PHASE 4: DIAGNOSTICS MANAGEMENT
+// DIAGNOSTICS MANAGEMENT
 // ============================================================================
 
 model DiagnosticCategory {
@@ -1543,7 +1543,7 @@ model RadiologyReport {
 }
 
 // ============================================================================
-// PHASE 5: PHARMACY & INVENTORY MANAGEMENT
+// PHARMACY & INVENTORY MANAGEMENT
 // ============================================================================
 
 model ProductCategory {
@@ -1783,7 +1783,7 @@ model PharmacyDispensingItem {
 }
 
 // ============================================================================
-// PHASE 6: REVENUE CYCLE MANAGEMENT & BILLING
+// REVENUE CYCLE MANAGEMENT & BILLING
 // ============================================================================
 
 model ChargeMaster {
@@ -2034,7 +2034,7 @@ model ClaimSettlement {
 }
 
 // ============================================================================
-// PHASE 7: HOSPITAL OPERATIONS
+// HOSPITAL OPERATIONS
 // ============================================================================
 
 // --- EMERGENCY ---

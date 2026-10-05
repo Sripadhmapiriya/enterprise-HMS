@@ -14,9 +14,9 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 async function main() {
-  console.log('Seeding Phase 1, 2 & 3 database...');
+  console.log('Seeding enterprise database...');
 
-  // Tenants, Roles, Hospitals (from Phase 1)
+  // Tenants, Roles, Hospitals
   const tenant = await prisma.tenant.upsert({
     where: { code: 'DEMO-TENANT' },
     update: {},
@@ -70,7 +70,7 @@ async function main() {
     }
   });
 
-  // Phase 2: Patient Seeding
+  // Patient Seeding
   const patient = await prisma.patient.upsert({
     where: { mrn: 'MRN-000001' },
     update: {},
@@ -127,7 +127,7 @@ async function main() {
   }
 
   // ==========================================
-  // PHASE 3: IPD Seeding
+  // Inpatient Operations (IPD) Seeding
   // ==========================================
 
   // Create Ward
@@ -324,7 +324,7 @@ async function main() {
   }
 
   // ============================================================================
-  // PHASE 4: DIAGNOSTICS Seeding
+  // Diagnostics & Laboratory Seeding
   // ============================================================================
 
   // 1. Categories
@@ -482,7 +482,7 @@ async function main() {
   }
 
   // ============================================================================
-  // PHASE 5: PHARMACY & INVENTORY Seeding
+  // Pharmacy & Inventory Seeding
   // ============================================================================
 
   // 1. Units & Categories
@@ -627,7 +627,7 @@ async function main() {
   }
 
   // ============================================================================
-  // PHASE 6: REVENUE CYCLE MANAGEMENT & BILLING Seeding
+  // Revenue Cycle Management & Billing Seeding
   // ============================================================================
 
   // 1. Charge Master
@@ -742,7 +742,7 @@ async function main() {
     });
   }
 
-  console.log('Phase 1 to 6 Database seeded successfully!');
+  console.log('Enterprise Database seeded successfully!');
 }
 
 main()

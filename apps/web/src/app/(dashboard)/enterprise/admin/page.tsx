@@ -305,7 +305,7 @@ export default function EnterpriseAdminPage() {
                 onClick={() => setRegisterModalOpen(false)}
                 className="text-slate-400 hover:text-slate-600"
               >
-                ✕
+                x
               </button>
             </div>
 

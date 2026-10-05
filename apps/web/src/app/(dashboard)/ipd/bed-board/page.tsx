@@ -86,13 +86,13 @@ export default function BedBoardPage() {
       {actionSuccess && (
         <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-lg flex justify-between items-center">
           <span>{actionSuccess}</span>
-          <button onClick={() => setActionSuccess('')} className="text-emerald-600 font-bold">✕</button>
+          <button onClick={() => setActionSuccess('')} className="text-emerald-600 font-bold">x</button>
         </div>
       )}
       {actionError && (
         <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-lg flex justify-between items-center">
           <span>{actionError}</span>
-          <button onClick={() => setActionError('')} className="text-rose-600 font-bold">✕</button>
+          <button onClick={() => setActionError('')} className="text-rose-600 font-bold">x</button>
         </div>
       )}
 

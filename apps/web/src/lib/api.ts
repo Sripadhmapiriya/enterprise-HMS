@@ -1195,4 +1195,17 @@ export const platformApi = {
   listJobs: async () => request('/platform/jobs'),
 };
 
+// ==========================================
+// CORE USERS & HOSPITALS API
+// ==========================================
+
+export const userApi = {
+  getUsers: async () => request('/users'),
+};
+
+export const hospitalsApi = {
+  getHospitals: async () => request('/hospitals'),
+};
+
+
 

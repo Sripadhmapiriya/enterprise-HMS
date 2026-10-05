@@ -230,7 +230,7 @@ export default function OTDashboard() {
           }`}
         >
           <span>{notice.text}</span>
-          <button onClick={() => setNotice(null)} className="font-bold">✕</button>
+          <button onClick={() => setNotice(null)} className="font-bold">x</button>
         </div>
       )}
 
@@ -444,7 +444,7 @@ export default function OTDashboard() {
                 <h3 className="text-base font-bold text-slate-900">Schedule Operating Theatre Slot</h3>
                 <p className="text-xs text-slate-500">Automated conflict detection prevents overlapping bookings.</p>
               </div>
-              <button onClick={() => setShowScheduleModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowScheduleModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
 
             <form onSubmit={handleScheduleSurgery} className="space-y-3">
@@ -540,7 +540,7 @@ export default function OTDashboard() {
                 <h3 className="text-base font-bold text-slate-900">WHO Surgical Safety Checklist</h3>
                 <p className="text-xs text-slate-500">Sign In • Time Out • Sign Out verification</p>
               </div>
-              <button onClick={() => setChecklistSchedule(null)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setChecklistSchedule(null)} className="text-slate-400 font-bold">x</button>
             </div>
 
             <form onSubmit={handleSaveWhoChecklist} className="space-y-4 text-xs">
@@ -649,7 +649,7 @@ export default function OTDashboard() {
                 <h3 className="text-base font-bold text-slate-900">Operative Procedure Note</h3>
                 <p className="text-xs text-slate-500">Document surgical findings, technique, and estimated blood loss.</p>
               </div>
-              <button onClick={() => setNoteSchedule(null)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setNoteSchedule(null)} className="text-slate-400 font-bold">x</button>
             </div>
 
             <form onSubmit={handleSaveNote} className="space-y-3">
@@ -747,7 +747,7 @@ export default function OTDashboard() {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
               <h3 className="text-base font-bold text-slate-900">New Surgery Request</h3>
-              <button onClick={() => setShowRequestModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowRequestModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
             <form onSubmit={handleCreateRequest} className="space-y-3">
               <div>

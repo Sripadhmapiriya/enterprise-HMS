@@ -126,7 +126,7 @@ export default function DietaryDashboard() {
           }`}
         >
           <span>{notice.text}</span>
-          <button onClick={() => setNotice(null)} className="font-bold">✕</button>
+          <button onClick={() => setNotice(null)} className="font-bold">x</button>
         </div>
       )}
 
@@ -381,7 +381,7 @@ export default function DietaryDashboard() {
                 <h3 className="text-base font-bold text-slate-900">Prescribe Clinical Diet Order</h3>
                 <p className="text-xs text-slate-500">Therapeutic diet profile and restrictions</p>
               </div>
-              <button onClick={() => setShowOrderModal(false)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setShowOrderModal(false)} className="text-slate-400 font-bold">x</button>
             </div>
 
             <form onSubmit={handleCreateOrder} className="space-y-3">
