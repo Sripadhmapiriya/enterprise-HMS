@@ -39,6 +39,7 @@ import {
   Settings,
   Wrench,
   MessageSquare,
+  FileSpreadsheet,
   ChevronDown,
   Search,
   Bell,
@@ -87,6 +88,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Settings,
   Wrench,
   MessageSquare,
+  FileSpreadsheet,
 };
 
 interface NavItemDef {
@@ -172,6 +174,9 @@ const NAV_SECTIONS: NavSectionDef[] = [
       { id: 'hr', label: 'Employee Master', route: '/hr/employees', icon: 'UserCheck' },
       { id: 'finance', label: 'General Ledger', route: '/finance/ledger', icon: 'BookOpen' },
       { id: 'crm', label: 'Patient CRM & Feedback', route: '/crm/feedback', icon: 'MessageSquare' },
+      { id: 'analytics', label: 'Analytics & MIS', route: '/analytics', icon: 'BarChart3' },
+      { id: 'integrations', label: 'Integrations Hub', route: '/integrations', icon: 'Network' },
+      { id: 'import', label: 'Onboarding Import', route: '/settings/import', icon: 'FileSpreadsheet' },
       { id: 'enterprise', label: 'Enterprise Admin', route: '/enterprise/admin', icon: 'Building' },
       { id: 'module-manager', label: 'Module Manager', route: '/enterprise/modules', icon: 'ShieldCheck' },
       { id: 'hospitals', label: 'Hospital Master', route: '/hospitals', icon: 'Building' },

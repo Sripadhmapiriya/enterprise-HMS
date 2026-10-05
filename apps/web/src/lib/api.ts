@@ -353,6 +353,12 @@ export const enterpriseApi = {
       body: JSON.stringify({ presetId }),
     });
   },
+
+  getHospitals: async () => request('/enterprise/hospitals'),
+  registerHospital: async (data: any) =>
+    request('/enterprise/hospitals', { method: 'POST', body: JSON.stringify(data) }),
+  getCrossSiteMetrics: async () => request('/enterprise/cross-site-metrics'),
+  getSubscriptions: async () => request('/enterprise/subscriptions'),
 };
 
 // ==========================================
@@ -1102,4 +1108,91 @@ export const crmApi = {
   getEscalations: async () => request('/crm/escalations'),
   getAnalytics: async () => request('/crm/analytics'),
 };
+
+
+
+// ==========================================
+// ANALYTICS & MIS API
+// ==========================================
+
+export const analyticsApi = {
+  getKpis: async () => request('/analytics/kpis'),
+  getMisPack: async () => request('/analytics/mis-pack'),
+  getTrends: async (days: number = 7) => request('/analytics/trends?days=' + days),
+  exportReport: async (data: { reportType: string; format?: string; async?: boolean }) =>
+    request('/analytics/export', { method: 'POST', body: JSON.stringify(data) }),
+};
+
+// ==========================================
+// INTEGRATIONS & INTEROPERABILITY API
+// ==========================================
+
+export const integrationsApi = {
+  getStatus: async () => request('/integrations/status'),
+  generateAbha: async (data: any) =>
+    request('/integrations/abdm/generate-abha', { method: 'POST', body: JSON.stringify(data) }),
+  verifyAbhaOtp: async (data: any) =>
+    request('/integrations/abdm/verify-otp', { method: 'POST', body: JSON.stringify(data) }),
+  linkCareContext: async (data: any) =>
+    request('/integrations/abdm/link-care-context', { method: 'POST', body: JSON.stringify(data) }),
+  getFhirPatient: async (id: string) => request('/integrations/fhir/r4/Patient/' + id),
+  getFhirEncounter: async (id: string) => request('/integrations/fhir/r4/Encounter/' + id),
+  submitFhirBundle: async (bundle: any) =>
+    request('/integrations/fhir/r4/Bundle', { method: 'POST', body: JSON.stringify(bundle) }),
+  parseHl7Message: async (message: string) =>
+    request('/integrations/hl7/v2/parse', { method: 'POST', body: JSON.stringify({ message }) }),
+  generateHl7Adt: async (data: any) =>
+    request('/integrations/hl7/v2/generate-adt', { method: 'POST', body: JSON.stringify(data) }),
+  feedAnalyzerResults: async (data: any) =>
+    request('/integrations/analyzers/feed', { method: 'POST', body: JSON.stringify(data) }),
+  createPaymentOrder: async (data: any) =>
+    request('/integrations/payments/create-order', { method: 'POST', body: JSON.stringify(data) }),
+  verifyPayment: async (data: any) =>
+    request('/integrations/payments/verify', { method: 'POST', body: JSON.stringify(data) }),
+  logBiometricPunch: async (data: any) =>
+    request('/integrations/biometric/punch', { method: 'POST', body: JSON.stringify(data) }),
+};
+
+// ==========================================
+// PLATFORM SERVICES API (FILES, NOTIFS, IMPORT, PRINT, JOBS)
+// ==========================================
+
+export const platformApi = {
+  // Files
+  getUploadUrl: async (data: { filename: string; mimeType: string; sizeBytes: number }) =>
+    request('/platform/files/upload-url', { method: 'POST', body: JSON.stringify(data) }),
+  uploadFileDirect: async (data: { filename: string; mimeType: string; content: string }) =>
+    request('/platform/files/upload', { method: 'POST', body: JSON.stringify(data) }),
+  getDownloadUrl: async (key: string) => request('/platform/files/download-url?key=' + encodeURIComponent(key)),
+
+  // Notifications
+  sendNotification: async (data: any) =>
+    request('/platform/notifications/send', { method: 'POST', body: JSON.stringify(data) }),
+  getNotifications: async (params?: { recipientId?: string; unreadOnly?: boolean }) => {
+    const qs = params ? '?' + new URLSearchParams(params as any).toString() : '';
+    return request('/platform/notifications' + qs);
+  },
+  getUnreadCount: async () => request('/platform/notifications/unread-count'),
+  markNotificationRead: async (id: string) =>
+    request('/platform/notifications/' + id + '/read', { method: 'PUT' }),
+  getSimulatorOutbox: async () => request('/platform/notifications/simulator-outbox'),
+
+  // CSV Import
+  validateCsv: async (domain: string, csvContent: string) =>
+    request('/platform/import/validate', { method: 'POST', body: JSON.stringify({ domain, csvContent }) }),
+  commitCsv: async (domain: string, csvContent: string, hospitalId?: string) =>
+    request('/platform/import/commit', { method: 'POST', body: JSON.stringify({ domain, csvContent, hospitalId }) }),
+
+  // Print & PDF
+  getPrintTemplates: async () => request('/platform/print/templates'),
+  generatePdf: async (data: { template: string; hospitalName?: string; data: any; returnFormat?: string }) =>
+    request('/platform/print/generate', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Worker Jobs
+  enqueueJob: async (jobType: string, payload: any) =>
+    request('/platform/jobs/enqueue', { method: 'POST', body: JSON.stringify({ jobType, payload }) }),
+  getJobStatus: async (id: string) => request('/platform/jobs/' + id),
+  listJobs: async () => request('/platform/jobs'),
+};
+
 

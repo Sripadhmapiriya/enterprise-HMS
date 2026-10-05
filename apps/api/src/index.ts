@@ -43,6 +43,9 @@ import hrRoutes from './routes/hr';
 import financeRoutes from './routes/finance';
 import assetRoutes from './routes/assets';
 import crmRoutes from './routes/crm';
+import analyticsRoutes from './routes/analytics';
+import integrationRoutes from './routes/integrations';
+import platformRoutes from './routes/platform';
 
 dotenv.config();
 
@@ -140,6 +143,9 @@ app.use('/api/v1/hr', hrRoutes);
 app.use('/api/v1/finance', financeRoutes);
 app.use('/api/v1/assets', assetRoutes);
 app.use('/api/v1/crm', crmRoutes);
+app.use('/api/v1/analytics', analyticsRoutes);
+app.use('/api/v1/integrations', integrationRoutes);
+app.use('/api/v1/platform', platformRoutes);
 
 // Fallback 404 handler
 app.use((req, res) => {

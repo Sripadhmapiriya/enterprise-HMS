@@ -1,0 +1,24 @@
+{
+  "name": "@enterprise-hms/worker",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@enterprise-hms/config": "*",
+    "@enterprise-hms/database": "*",
+    "@enterprise-hms/modules": "*",
+    "bullmq": "^5.65.1",
+    "dotenv": "^16.4.5",
+    "ioredis": "^5.6.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.0.0"
+  }
+}
