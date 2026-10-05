@@ -20,6 +20,7 @@ model Tenant {
   roles          Role[]
   auditLogs      AuditLog[]
   systemSettings SystemSetting[]
+  entitlements   TenantEntitlement[]
 
   @@map("tenants")
 }
@@ -77,6 +78,7 @@ model Branch {
   operatingTheatres OperatingTheatre[]
   purchaseRequests  PurchaseRequest[]
   housekeepingTasks HousekeepingTask[]
+  schedules         DoctorSchedule[]
 
   @@map("branches")
 }
@@ -102,6 +104,7 @@ model Department {
   wards            Ward[]
   purchaseRequests PurchaseRequest[]
   Employee         Employee[]
+  referrals        EncounterReferral[]
 
   @@map("departments")
 }
@@ -171,6 +174,7 @@ model User {
   createdJournals           Journal[]                      @relation("JournalCreatedBy")
   assignedMaintenance       MaintenanceTask[]              @relation("MaintenanceAssignedTo")
   securityEvents            SecurityEvent[]
+  uploadedPatientDocs       PatientDocument[]              @relation("PatientDocUploadedBy")
 
   @@map("users")
 }
@@ -289,6 +293,9 @@ model Doctor {
   surgeryRequests     SurgeryRequest[]
   otProcedureNotes    OTProcedureNote[]
   dietOrders          DietOrder[]
+  schedules           DoctorSchedule[]
+  issuedCertificates  MedicalCertificate[]  @relation("IssuedCertificates")
+  incomingReferrals   EncounterReferral[]   @relation("ReferredToDoctor")
 
   @@map("doctors")
 }
@@ -339,8 +346,26 @@ model AuditLog {
   @@map("audit_logs")
 }
 
+model TenantEntitlement {
+  id        String    @id @default(uuid())
+  tenantId  String
+  moduleId  String
+  enabled   Boolean   @default(true)
+  limits    Json?
+  validFrom DateTime  @default(now())
+  validTo   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, moduleId])
+  @@index([tenantId])
+  @@map("tenant_entitlements")
+}
+
 // ==========================================
-// PHASE 2: CLINICAL & PATIENT MANAGEMENT
+// CLINICAL & PATIENT MANAGEMENT
 // ==========================================
 
 model Patient {
@@ -369,6 +394,11 @@ model Patient {
   registrationDate   DateTime @default(now())
   registrationSource String?
   status             String   @default("ACTIVE")
+  photoUrl           String?
+  abhaNumber         String?
+  abhaAddress        String?
+  mergedIntoPatientId String?
+  mergedAt           DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -383,6 +413,9 @@ model Patient {
   investigationOrders InvestigationOrder[]
   queues              Queue[]
   FollowUp            FollowUp[]
+  consents            PatientConsent[]
+  documents           PatientDocument[]
+  certificates        MedicalCertificate[]
   admissions          Admission[]
   bedReservations     BedReservation[]
   labSamples          LabSample[]
@@ -563,6 +596,8 @@ model Encounter {
   dietOrders              DietOrder[]
   ambulanceTrips          AmbulanceTrip[]
   feedbacks               PatientFeedback[]
+  referrals               EncounterReferral[]
+  certificates            MedicalCertificate[]
 
   @@index([patientId])
   @@index([doctorId])
@@ -771,8 +806,107 @@ model FollowUp {
   @@map("follow_ups")
 }
 
+model DoctorSchedule {
+  id             String   @id @default(uuid())
+  tenantId       String
+  branchId       String
+  doctorId       String
+  dayOfWeek      Int      // 0 = Sunday, 1 = Monday, ... 6 = Saturday
+  startTime      String   // "09:00"
+  endTime        String   // "17:00"
+  slotDuration   Int      @default(15) // minutes
+  maxOverbooking Int      @default(2)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  doctor Doctor @relation(fields: [doctorId], references: [id])
+  branch Branch @relation(fields: [branchId], references: [id])
+
+  @@index([tenantId, branchId, doctorId])
+  @@map("doctor_schedules")
+}
+
+model PatientConsent {
+  id          String    @id @default(uuid())
+  tenantId    String
+  patientId   String
+  consentType String    // GENERAL_TREATMENT, DATA_SHARING_ABHA, SURGERY, ANESTHESIA
+  status      String    @default("GRANTED") // GRANTED, REVOKED, EXPIRED
+  grantedAt   DateTime  @default(now())
+  expiresAt   DateTime?
+  notes       String?
+  witnessName String?
+  createdAt   DateTime  @default(now())
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@index([tenantId, patientId])
+  @@map("patient_consents")
+}
+
+model PatientDocument {
+  id           String   @id @default(uuid())
+  tenantId     String
+  patientId    String
+  title        String
+  documentType String   // ID_PROOF, INSURANCE_CARD, MEDICAL_RECORD, LAB_REPORT, CONSENT_FORM
+  fileUrl      String
+  fileSize     Int?
+  mimeType     String?
+  uploadedById String
+  uploadedAt   DateTime @default(now())
+
+  patient    Patient @relation(fields: [patientId], references: [id])
+  uploadedBy User    @relation("PatientDocUploadedBy", fields: [uploadedById], references: [id])
+
+  @@index([tenantId, patientId])
+  @@map("patient_documents")
+}
+
+model EncounterReferral {
+  id                 String   @id @default(uuid())
+  encounterId        String
+  referralType       String   // INTERNAL, EXTERNAL
+  toDepartmentId     String?
+  toDoctorId         String?
+  toExternalFacility String?
+  reason             String   @db.Text
+  notes              String?  @db.Text
+  status             String   @default("PENDING") // PENDING, ACCEPTED, COMPLETED, CANCELLED
+  createdAt          DateTime @default(now())
+
+  encounter    Encounter   @relation(fields: [encounterId], references: [id])
+  toDepartment Department? @relation(fields: [toDepartmentId], references: [id])
+  toDoctor     Doctor?     @relation("ReferredToDoctor", fields: [toDoctorId], references: [id])
+
+  @@map("encounter_referrals")
+}
+
+model MedicalCertificate {
+  id                  String    @id @default(uuid())
+  tenantId            String
+  encounterId         String
+  patientId           String
+  doctorId            String
+  certificateType     String    // SICKNESS, FITNESS, ATTENDANCE, CUSTOM
+  diagnosisSummary    String    @db.Text
+  restDaysRecommended Int?
+  startDate           DateTime?
+  endDate             DateTime?
+  remarks             String?   @db.Text
+  issuedAt            DateTime  @default(now())
+
+  encounter Encounter @relation(fields: [encounterId], references: [id])
+  patient   Patient   @relation(fields: [patientId], references: [id])
+  doctor    Doctor    @relation("IssuedCertificates", fields: [doctorId], references: [id])
+
+  @@index([tenantId, patientId])
+  @@map("medical_certificates")
+}
+
 // ============================================================================
-// PHASE 3: INPATIENT / IPD MANAGEMENT
+// INPATIENT / IPD MANAGEMENT
 // ============================================================================
 
 model Admission {

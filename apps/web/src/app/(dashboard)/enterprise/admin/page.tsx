@@ -1,4 +1,5 @@
 import { prisma } from '@enterprise-hms/database';
+import Link from 'next/link';
 
 export const revalidate = 0;
 
@@ -15,9 +16,17 @@ export default async function EnterpriseAdmin() {
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Enterprise Administration</h1>
           <p className="text-slate-500 mt-1">Manage tenants, hospitals, subscriptions, and global entitlements.</p>
         </div>
-        <button className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 shadow-sm">
-          + Add Enterprise Tenant
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/enterprise/modules"
+            className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-cyan-800 shadow-sm"
+          >
+            Module Manager & Licensing
+          </Link>
+          <button className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 shadow-sm">
+            + Add Enterprise Tenant
+          </button>
+        </div>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">

@@ -17,22 +17,32 @@ export class EntitlementService {
     }
 
     try {
-      // Look for custom module configuration stored in system_configurations
-      const config = await prisma.systemConfiguration.findFirst({
-        where: {
-          tenantId,
-          configKey: 'enabled_modules',
-        },
-      });
-
       let requestedModules: string[] = [];
 
-      if (config && Array.isArray(config.configValue)) {
-        requestedModules = config.configValue as string[];
+      // Check tenant_entitlements table first (Section 4.4)
+      const entitlements = await prisma.tenantEntitlement.findMany({
+        where: { tenantId, enabled: true },
+        select: { moduleId: true },
+      });
+
+      if (entitlements.length > 0) {
+        requestedModules = entitlements.map((e: any) => e.moduleId);
       } else {
-        // Default to hospital-standard preset if not explicitly configured
-        const standard = resolvePresetModules('hospital-standard');
-        requestedModules = standard.enabled;
+        // Look for custom module configuration stored in system_configurations
+        const config = await prisma.systemConfiguration.findFirst({
+          where: {
+            tenantId,
+            configKey: 'enabled_modules',
+          },
+        });
+
+        if (config && Array.isArray(config.configValue)) {
+          requestedModules = config.configValue as string[];
+        } else {
+          // Default to hospital-standard preset if not explicitly configured
+          const standard = resolvePresetModules('hospital-standard');
+          requestedModules = standard.enabled;
+        }
       }
 
       const { enabled } = defaultResolver.resolveDependencies(requestedModules);

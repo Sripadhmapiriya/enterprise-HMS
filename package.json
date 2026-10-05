@@ -11,7 +11,10 @@
     "dev": "npm run dev --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "vitest run"
+    "test": "vitest run",
+    "provision": "tsx scripts/provision.ts",
+    "build:edition": "tsx scripts/build-edition.ts",
+    "issue:license": "tsx scripts/issue-license.ts"
   },
   "devDependencies": {
     "@types/supertest": "^7.2.1",

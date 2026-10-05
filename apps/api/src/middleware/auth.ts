@@ -51,7 +51,14 @@ export function requirePermission(permissionCode: string) {
     const hasPermission =
       permissions.includes('*') ||
       permissions.includes('superadmin') ||
-      permissions.includes(permissionCode);
+      permissions.includes(permissionCode) ||
+      permissions.some((p) => {
+        if (p.endsWith('.*')) {
+          const prefix = p.slice(0, -2);
+          return permissionCode.startsWith(prefix + '.');
+        }
+        return false;
+      });
 
     if (!hasPermission) {
       return next(
@@ -100,4 +107,8 @@ export function requireModule(moduleId: string) {
       next(err);
     }
   };
+}
+
+export function clearEntitlementsCache(tenantId?: string) {
+  entitlementService.invalidateCache(tenantId);
 }

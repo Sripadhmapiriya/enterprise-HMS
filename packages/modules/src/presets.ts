@@ -80,6 +80,8 @@ export const BUILTIN_PRESETS: Record<string, PresetDef> = {
   },
 };
 
+export const EDITION_PRESETS = BUILTIN_PRESETS;
+
 export function getPreset(presetId: string): PresetDef | undefined {
   return BUILTIN_PRESETS[presetId];
 }

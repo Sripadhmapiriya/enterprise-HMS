@@ -167,6 +167,7 @@ const NAV_SECTIONS: NavSectionDef[] = [
       { id: 'hr', label: 'Employee Master', route: '/hr/employees', icon: 'UserCheck' },
       { id: 'finance', label: 'General Ledger', route: '/finance/ledger', icon: 'BookOpen' },
       { id: 'enterprise', label: 'Enterprise Admin', route: '/enterprise/admin', icon: 'Building' },
+      { id: 'module-manager', label: 'Module Manager', route: '/enterprise/modules', icon: 'ShieldCheck' },
       { id: 'hospitals', label: 'Hospital Master', route: '/hospitals', icon: 'Building' },
       { id: 'users', label: 'Users & Roles', route: '/users', icon: 'Users' },
     ],

@@ -19,9 +19,10 @@ import doctorRoutes from './routes/doctors';
 import settingRoutes from './routes/settings';
 import auditRoutes from './routes/audit';
 import patientRoutes from './routes/patients';
-import appointmentRoutes from './routes/appointments';
-import queueRoutes from './routes/queues';
-import encounterRoutes from './routes/encounters';
+import schedulingRoutes from './routes/scheduling';
+import opdRoutes from './routes/opd';
+import enterpriseRoutes from './routes/enterprise';
+import licensingRoutes from './routes/licensing';
 
 dotenv.config();
 
@@ -92,9 +93,13 @@ app.use('/api/v1/audit', auditRoutes);
 
 // Clinical & Module Routes
 app.use('/api/v1/patients', patientRoutes);
-app.use('/api/v1/appointments', appointmentRoutes);
-app.use('/api/v1/queues', queueRoutes);
-app.use('/api/v1/encounters', encounterRoutes);
+app.use('/api/v1/scheduling', schedulingRoutes);
+app.use('/api/v1/appointments', schedulingRoutes);
+app.use('/api/v1/queues', schedulingRoutes);
+app.use('/api/v1/opd', opdRoutes);
+app.use('/api/v1/encounters', opdRoutes);
+app.use('/api/v1/enterprise', enterpriseRoutes);
+app.use('/api/v1/licensing', licensingRoutes);
 
 // Fallback 404 handler
 app.use((req, res) => {
