@@ -1,0 +1,33 @@
+{
+  "id": "full-enterprise",
+  "name": "Full Enterprise Edition",
+  "description": "All clinical, operational, diagnostic, and financial enterprise modules",
+  "modules": [
+    "patients",
+    "scheduling",
+    "opd",
+    "emergency",
+    "ipd",
+    "icu",
+    "ot",
+    "laboratory",
+    "radiology",
+    "pharmacy",
+    "inventory",
+    "procurement",
+    "billing",
+    "insurance",
+    "bloodbank",
+    "cssd",
+    "dietary",
+    "housekeeping",
+    "ambulance",
+    "hr",
+    "finance",
+    "assets",
+    "crm",
+    "analytics",
+    "integrations",
+    "enterprise"
+  ]
+}

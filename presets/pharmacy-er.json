@@ -1,0 +1,9 @@
+{
+  "id": "pharmacy-er",
+  "name": "Pharmacy and Emergency Care",
+  "description": "ER triage, emergency tracking board, medication dispensing and inventory",
+  "modules": [
+    "emergency",
+    "pharmacy"
+  ]
+}

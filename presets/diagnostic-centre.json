@@ -1,0 +1,10 @@
+{
+  "id": "diagnostic-centre",
+  "name": "Diagnostic Centre Edition",
+  "description": "Laboratory sample collection/results, radiology studies, and billing",
+  "modules": [
+    "laboratory",
+    "radiology",
+    "billing"
+  ]
+}

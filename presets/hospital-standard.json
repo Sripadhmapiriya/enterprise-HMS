@@ -1,0 +1,19 @@
+{
+  "id": "hospital-standard",
+  "name": "Hospital Standard Edition",
+  "description": "Standard hospital operations including OPD, IPD, Emergency, Pharmacy, Lab, Radiology, and Billing",
+  "modules": [
+    "patients",
+    "scheduling",
+    "opd",
+    "emergency",
+    "ipd",
+    "pharmacy",
+    "inventory",
+    "laboratory",
+    "radiology",
+    "billing",
+    "insurance",
+    "housekeeping"
+  ]
+}

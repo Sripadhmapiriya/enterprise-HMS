@@ -3,6 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { prisma } from '@enterprise-hms/database';
+import { getEnv } from '@enterprise-hms/config';
+import { requestIdMiddleware } from './middleware/requestId';
+import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
 import tenantRoutes from './routes/tenants';
 import hospitalRoutes from './routes/hospitals';
@@ -22,25 +25,58 @@ import encounterRoutes from './routes/encounters';
 
 dotenv.config();
 
-const app = express();
+const env = getEnv();
+export const app = express();
 
 app.use(helmet());
-app.use(cors());
-app.use(express.json());
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN === '*' ? true : env.CORS_ORIGIN.split(','),
+    credentials: true,
+  })
+);
+app.use(express.json({ limit: '10mb' }));
+app.use(requestIdMiddleware);
 
-app.get('/health', async (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+// Liveness check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'enterprise-hms-api',
+    timestamp: new Date().toISOString(),
+    requestId: req.id,
+  });
+});
+
+// Readiness check
+app.get('/ready', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({
+      status: 'ok',
+      database: 'connected',
+      timestamp: new Date().toISOString(),
+      requestId: req.id,
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'error',
+      database: 'disconnected',
+      requestId: req.id,
+    });
+  }
 });
 
 app.get('/health/database', async (req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    res.json({ status: 'ok', database: 'connected' });
+    res.json({ status: 'ok', database: 'connected', requestId: req.id });
   } catch (error) {
-    res.status(500).json({ status: 'error', database: 'disconnected' });
+    res.status(500).json({ status: 'error', database: 'disconnected', requestId: req.id });
   }
 });
 
+// Foundation & Auth Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tenants', tenantRoutes);
 app.use('/api/v1/hospitals', hospitalRoutes);
@@ -54,18 +90,30 @@ app.use('/api/v1/doctors', doctorRoutes);
 app.use('/api/v1/settings', settingRoutes);
 app.use('/api/v1/audit', auditRoutes);
 
+// Clinical & Module Routes
 app.use('/api/v1/patients', patientRoutes);
 app.use('/api/v1/appointments', appointmentRoutes);
 app.use('/api/v1/queues', queueRoutes);
 app.use('/api/v1/encounters', encounterRoutes);
 
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ success: false, error: { message: 'Internal Server Error' } });
+// Fallback 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    error: {
+      code: 'ROUTE_NOT_FOUND',
+      message: `Cannot \${req.method} \${req.path}`,
+      requestId: req.id,
+    },
+  });
 });
 
-const PORT = process.env.PORT || 4000;
+// Standard Error Envelope Middleware
+app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Enterprise HMS API running on port ${PORT}`);
-});
+const PORT = env.PORT || 4000;
+
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Enterprise HMS API running on port \${PORT}`);
+  });
+}

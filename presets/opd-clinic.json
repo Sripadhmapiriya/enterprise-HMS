@@ -1,0 +1,10 @@
+{
+  "id": "opd-clinic",
+  "name": "Outpatient Clinic Edition",
+  "description": "OPD consultations, appointments, queue tokens, and billing",
+  "modules": [
+    "opd",
+    "scheduling",
+    "billing"
+  ]
+}

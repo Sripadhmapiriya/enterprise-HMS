@@ -1,0 +1,8 @@
+{
+  "id": "patients-only",
+  "name": "Patients Master Index Only",
+  "description": "Patient registration, master patient index, Patient 360 and alerts",
+  "modules": [
+    "patients"
+  ]
+}
