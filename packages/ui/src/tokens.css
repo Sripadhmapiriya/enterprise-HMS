@@ -1,0 +1,197 @@
+/**
+ * Enterprise HMS Design Tokens
+ * Generated via ui-ux-pro-max (MASTER.md)
+ * Architecture: Primitive -> Semantic -> Component
+ * Clinical Dial: DESIGN_VARIANCE 2, MOTION_INTENSITY 2, VISUAL_DENSITY 8
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* -------------------------------------------------------------
+   * 1. PRIMITIVE TOKENS
+   * ----------------------------------------------------------- */
+  /* Cyan / Brand Primitives */
+  --primitive-cyan-50: #ECFEFF;
+  --primitive-cyan-100: #CFFAFE;
+  --primitive-cyan-200: #A5F3FC;
+  --primitive-cyan-300: #67E8F9;
+  --primitive-cyan-400: #22D3EE;
+  --primitive-cyan-500: #06B6D4;
+  --primitive-cyan-600: #0891B2;
+  --primitive-cyan-700: #0E7490;
+  --primitive-cyan-800: #155E75;
+  --primitive-cyan-900: #164E63;
+
+  /* Emerald / Health Primitives */
+  --primitive-emerald-50: #ECFDF5;
+  --primitive-emerald-100: #D1FAE5;
+  --primitive-emerald-200: #A7F3D0;
+  --primitive-emerald-500: #10B981;
+  --primitive-emerald-600: #059669;
+  --primitive-emerald-700: #047857;
+  --primitive-emerald-800: #065F46;
+
+  /* Red / Critical Primitives */
+  --primitive-red-50: #FEF2F2;
+  --primitive-red-100: #FEE2E2;
+  --primitive-red-200: #FECACA;
+  --primitive-red-500: #EF4444;
+  --primitive-red-600: #DC2626;
+  --primitive-red-700: #B91C1C;
+  --primitive-red-800: #991B1B;
+
+  /* Amber / Warning Primitives */
+  --primitive-amber-50: #FFFBEB;
+  --primitive-amber-100: #FEF3C7;
+  --primitive-amber-200: #FDE68A;
+  --primitive-amber-500: #F59E0B;
+  --primitive-amber-600: #D97706;
+  --primitive-amber-700: #B45309;
+  --primitive-amber-800: #92400E;
+
+  /* Neutral / Slate Primitives */
+  --primitive-slate-50: #F8FAFC;
+  --primitive-slate-100: #F1F5F9;
+  --primitive-slate-200: #E2E8F0;
+  --primitive-slate-300: #CBD5E1;
+  --primitive-slate-400: #94A3B8;
+  --primitive-slate-500: #64748B;
+  --primitive-slate-600: #475569;
+  --primitive-slate-700: #334155;
+  --primitive-slate-800: #1E293B;
+  --primitive-slate-900: #0F172A;
+  --primitive-slate-950: #020617;
+
+  /* Typography Scales */
+  --font-family-sans: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* High Density (Visual Density 8) Spacing */
+  --space-2xs: 2px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-base: 16px;
+  --space-lg: 20px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+
+  /* Radius */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Shadows (Calm, neutral-tinted) */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+
+  /* -------------------------------------------------------------
+   * 2. SEMANTIC TOKENS (LIGHT THEME DEFAULT)
+   * ----------------------------------------------------------- */
+  --color-bg-canvas: #F8FAFC;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-subtle: #F1F5F9;
+  --color-bg-muted: #E2E8F0;
+
+  --color-fg-primary: #0F172A;
+  --color-fg-secondary: #334155;
+  --color-fg-muted: #64748B;
+  --color-fg-subtle: #94A3B8;
+
+  --color-border-subtle: #F1F5F9;
+  --color-border-default: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+
+  --color-primary: #0891B2;
+  --color-primary-hover: #0E7490;
+  --color-primary-fg: #FFFFFF;
+
+  --color-accent: #059669;
+  --color-accent-hover: #047857;
+  --color-accent-fg: #FFFFFF;
+
+  --color-focus-ring: #0891B2;
+
+  /* -------------------------------------------------------------
+   * 3. CLINICAL SEMANTIC STATUS TOKENS
+   * (Status is never conveyed by color alone: Pair with icon + text)
+   * ----------------------------------------------------------- */
+  /* Critical / Emergency */
+  --clinical-critical-bg: #FEF2F2;
+  --clinical-critical-border: #FECACA;
+  --clinical-critical-fg: #991B1B;
+  --clinical-critical-solid: #DC2626;
+
+  /* Warning / Caution */
+  --clinical-warning-bg: #FFFBEB;
+  --clinical-warning-border: #FDE68A;
+  --clinical-warning-fg: #92400E;
+  --clinical-warning-solid: #D97706;
+
+  /* Stable / Normal */
+  --clinical-stable-bg: #ECFDF5;
+  --clinical-stable-border: #A7F3D0;
+  --clinical-stable-fg: #065F46;
+  --clinical-stable-solid: #059669;
+
+  /* Info / Diagnostics */
+  --clinical-info-bg: #ECFEFF;
+  --clinical-info-border: #A5F3FC;
+  --clinical-info-fg: #155E75;
+  --clinical-info-solid: #0891B2;
+
+  /* Neutral / Pending */
+  --clinical-neutral-bg: #F8FAFC;
+  --clinical-neutral-border: #E2E8F0;
+  --clinical-neutral-fg: #334155;
+  --clinical-neutral-solid: #64748B;
+}
+
+/* Dark Theme Support */
+[data-theme='dark'] {
+  --color-bg-canvas: #090D16;
+  --color-bg-surface: #0F172A;
+  --color-bg-subtle: #1E293B;
+  --color-bg-muted: #334155;
+
+  --color-fg-primary: #F8FAFC;
+  --color-fg-secondary: #CBD5E1;
+  --color-fg-muted: #94A3B8;
+  --color-fg-subtle: #64748B;
+
+  --color-border-subtle: #1E293B;
+  --color-border-default: #334155;
+  --color-border-strong: #475569;
+
+  --clinical-critical-bg: #450A0A;
+  --clinical-critical-border: #7F1D1D;
+  --clinical-critical-fg: #FCA5A5;
+
+  --clinical-warning-bg: #451A03;
+  --clinical-warning-border: #78350F;
+  --clinical-warning-fg: #FCD34D;
+
+  --clinical-stable-bg: #022C22;
+  --clinical-stable-border: #064E3B;
+  --clinical-stable-fg: #6EE7B7;
+
+  --clinical-info-bg: #083344;
+  --clinical-info-border: #164E63;
+  --clinical-info-fg: #67E8F9;
+
+  --clinical-neutral-bg: #1E293B;
+  --clinical-neutral-border: #334155;
+  --clinical-neutral-fg: #CBD5E1;
+}
+
+/* Number display standard: Always tabular numerals in clinical and financial contexts */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}

@@ -1,5 +1,6 @@
 import { prisma } from '@enterprise-hms/database';
 import Link from 'next/link';
+import { AlertOctagon } from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -30,8 +31,11 @@ export default async function EmergencyDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-4 rounded-xl border border-rose-200 shadow-sm bg-rose-50/30">
-          <p className="text-sm font-medium text-rose-700 flex items-center"><span className="mr-2">🚨</span> Critical (Red)</p>
-          <p className="text-3xl font-bold text-rose-700">0</p>
+          <p className="text-sm font-medium text-rose-700 flex items-center">
+            <AlertOctagon className="w-4 h-4 mr-1.5 text-rose-600 inline" aria-hidden="true" />
+            Critical (Red)
+          </p>
+          <p className="text-3xl font-bold text-rose-700 tabular-nums">0</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Waiting Triage</p>

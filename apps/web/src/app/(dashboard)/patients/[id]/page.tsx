@@ -1,5 +1,6 @@
 import { prisma } from '@enterprise-hms/database';
 import Link from 'next/link';
+import { AlertTriangle, Pill } from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -59,7 +60,10 @@ export default async function PatientProfile({ params }: { params: { id: string 
           </div>
           
           <div className="bg-rose-50 p-6 rounded-xl border border-rose-100 shadow-sm">
-            <h3 className="font-semibold text-rose-800 mb-2 flex items-center"><span className="mr-2">⚠️</span> Clinical Alerts</h3>
+            <h3 className="font-semibold text-rose-800 mb-2 flex items-center">
+              <AlertTriangle className="w-4 h-4 mr-2 text-rose-600 shrink-0" aria-hidden="true" />
+              Clinical Alerts
+            </h3>
             <p className="text-sm text-rose-600">No active alerts or allergies recorded.</p>
           </div>
         </div>
@@ -67,7 +71,7 @@ export default async function PatientProfile({ params }: { params: { id: string 
         <div className="col-span-2 space-y-6">
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
             <div className="p-4 border-b border-slate-100 bg-slate-50">
-              <h3 className="font-semibold text-slate-800">Diagnostics & Investigations (Phase 4)</h3>
+              <h3 className="font-semibold text-slate-800">Diagnostics & Investigations</h3>
             </div>
             <div className="p-6">
               {patient.investigationOrders.length === 0 ? (
@@ -108,7 +112,7 @@ export default async function PatientProfile({ params }: { params: { id: string 
 
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
             <div className="p-4 border-b border-slate-100 bg-slate-50">
-              <h3 className="font-semibold text-slate-800">Pharmacy & Medication History (Phase 5)</h3>
+              <h3 className="font-semibold text-slate-800">Pharmacy & Medication History</h3>
             </div>
             <div className="p-6">
               {patient.dispensings.length === 0 ? (
@@ -163,8 +167,9 @@ export default async function PatientProfile({ params }: { params: { id: string 
                           </div>
                         )}
                         {enc.prescriptions.length > 0 && (
-                          <div className="mt-2 text-sm text-emerald-600 flex items-center">
-                            <span>💊 Rx Generated</span>
+                          <div className="mt-2 text-sm text-emerald-600 flex items-center gap-1.5">
+                            <Pill className="w-3.5 h-3.5 text-emerald-600 inline shrink-0" aria-hidden="true" />
+                            <span>Rx Generated</span>
                           </div>
                         )}
                       </div>

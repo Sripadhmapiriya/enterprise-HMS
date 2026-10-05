@@ -1,5 +1,6 @@
 import { prisma } from '@enterprise-hms/database';
 import Link from 'next/link';
+import { AlertTriangle } from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -47,8 +48,11 @@ export default async function InventoryDashboard() {
           <p className="text-3xl font-bold text-rose-600">{outOfStock}</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-amber-200 shadow-sm bg-amber-50/50">
-          <p className="text-sm font-medium text-amber-700 flex items-center"><span className="mr-2">⚠️</span> Low Stock / Expired</p>
-          <p className="text-3xl font-bold text-amber-700">{lowStock} / {expired}</p>
+          <p className="text-sm font-medium text-amber-700 flex items-center">
+            <AlertTriangle className="w-4 h-4 mr-1.5 text-amber-600 inline" aria-hidden="true" />
+            Low Stock / Expired
+          </p>
+          <p className="text-3xl font-bold text-amber-700 tabular-nums">{lowStock} / {expired}</p>
         </div>
       </div>
 

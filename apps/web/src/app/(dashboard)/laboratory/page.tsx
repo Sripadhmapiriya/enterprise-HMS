@@ -1,5 +1,6 @@
 import { prisma } from '@enterprise-hms/database';
 import Link from 'next/link';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -47,8 +48,11 @@ export default async function LaboratoryDashboard() {
           <p className="text-3xl font-bold text-amber-600">{verificationPending}</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-rose-200 shadow-sm bg-rose-50/50">
-          <p className="text-sm font-medium text-rose-600 flex items-center"><span className="mr-2">⚠️</span> Critical Results</p>
-          <p className="text-3xl font-bold text-rose-700">{criticalResults}</p>
+          <p className="text-sm font-medium text-rose-600 flex items-center">
+            <AlertTriangle className="w-4 h-4 mr-1.5 text-rose-600 inline" aria-hidden="true" />
+            Critical Results
+          </p>
+          <p className="text-3xl font-bold text-rose-700 tabular-nums">{criticalResults}</p>
         </div>
       </div>
 
@@ -89,14 +93,18 @@ export default async function LaboratoryDashboard() {
           <div className="p-6 flex flex-col items-center justify-center text-center h-48">
             {criticalResults > 0 ? (
               <>
-                <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center text-2xl mb-3">⚠️</div>
+                <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mb-3">
+                  <AlertTriangle className="w-6 h-6 text-rose-600" aria-hidden="true" />
+                </div>
                 <h4 className="font-medium text-slate-900 mb-1">{criticalResults} Critical Results Pending</h4>
                 <p className="text-sm text-slate-500 mb-4">Immediate acknowledgment required.</p>
                 <button className="bg-rose-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-rose-700">Review Now</button>
               </>
             ) : (
               <>
-                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl mb-3">✓</div>
+                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-3">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-600" aria-hidden="true" />
+                </div>
                 <h4 className="font-medium text-slate-900">All Clear</h4>
                 <p className="text-sm text-slate-500">No pending critical results.</p>
               </>

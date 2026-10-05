@@ -1,5 +1,6 @@
 import { prisma } from '@enterprise-hms/database';
 import Link from 'next/link';
+import { AlertTriangle } from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -80,7 +81,10 @@ export default async function IpdChart({ params }: { params: { id: string } }) {
           </div>
           
           <div className="bg-rose-50 p-5 rounded-xl border border-rose-100 shadow-sm">
-            <h3 className="font-semibold text-rose-800 mb-2 flex items-center text-sm uppercase tracking-wider"><span className="mr-2">⚠️</span> Alerts</h3>
+            <h3 className="font-semibold text-rose-800 mb-2 flex items-center text-sm uppercase tracking-wider">
+              <AlertTriangle className="w-4 h-4 mr-2 text-rose-600 shrink-0" aria-hidden="true" />
+              Alerts
+            </h3>
             <p className="text-sm text-rose-600">No active alerts recorded.</p>
           </div>
         </div>

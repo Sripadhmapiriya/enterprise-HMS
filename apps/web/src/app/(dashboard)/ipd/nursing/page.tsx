@@ -1,5 +1,6 @@
 import { prisma } from '@enterprise-hms/database';
 import Link from 'next/link';
+import { Users, Pill, HeartPulse } from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -28,25 +29,31 @@ export default async function NursingDashboard() {
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">My Assigned Patients</p>
-            <p className="text-3xl font-bold text-slate-900">{activeAdmissions.length}</p>
+            <p className="text-3xl font-bold text-slate-900 tabular-nums">{activeAdmissions.length}</p>
           </div>
-          <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl">👥</div>
+          <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+            <Users className="w-5 h-5 text-blue-600" aria-hidden="true" />
+          </div>
         </div>
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Pending Medications</p>
-            <p className="text-3xl font-bold text-amber-600">
+            <p className="text-3xl font-bold text-amber-600 tabular-nums">
               {activeAdmissions.reduce((acc, adm) => acc + adm.medicationOrders.reduce((acc2, mo) => acc2 + mo.administrations.length, 0), 0)}
             </p>
           </div>
-          <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-xl">💊</div>
+          <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center">
+            <Pill className="w-5 h-5 text-amber-600" aria-hidden="true" />
+          </div>
         </div>
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Vitals Due</p>
-            <p className="text-3xl font-bold text-rose-600">3</p>
+            <p className="text-3xl font-bold text-rose-600 tabular-nums">3</p>
           </div>
-          <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center text-xl">❤️</div>
+          <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center">
+            <HeartPulse className="w-5 h-5 text-rose-600" aria-hidden="true" />
+          </div>
         </div>
       </div>
 

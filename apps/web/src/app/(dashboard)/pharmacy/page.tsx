@@ -1,5 +1,6 @@
 import { prisma } from '@enterprise-hms/database';
 import Link from 'next/link';
+import { AlertTriangle, AlertOctagon } from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -45,12 +46,18 @@ export default async function PharmacyDashboard() {
           <p className="text-3xl font-bold text-emerald-600">${revenueToday.toFixed(2)}</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-amber-200 shadow-sm bg-amber-50/50">
-          <p className="text-sm font-medium text-amber-700 flex items-center"><span className="mr-2">⚠️</span> Low Stock Items</p>
-          <p className="text-3xl font-bold text-amber-700">{lowStock}</p>
+          <p className="text-sm font-medium text-amber-700 flex items-center">
+            <AlertTriangle className="w-4 h-4 mr-1.5 text-amber-600 inline" aria-hidden="true" />
+            Low Stock Items
+          </p>
+          <p className="text-3xl font-bold text-amber-700 tabular-nums">{lowStock}</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-rose-200 shadow-sm bg-rose-50/50">
-          <p className="text-sm font-medium text-rose-600 flex items-center"><span className="mr-2">🛑</span> Expired Batches</p>
-          <p className="text-3xl font-bold text-rose-700">{expired}</p>
+          <p className="text-sm font-medium text-rose-600 flex items-center">
+            <AlertOctagon className="w-4 h-4 mr-1.5 text-rose-600 inline" aria-hidden="true" />
+            Expired Batches
+          </p>
+          <p className="text-3xl font-bold text-rose-700 tabular-nums">{expired}</p>
         </div>
       </div>
 
