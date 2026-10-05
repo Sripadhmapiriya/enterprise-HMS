@@ -30,6 +30,14 @@ import billingRoutes from './routes/billing';
 import insuranceRoutes from './routes/insurance';
 import laboratoryRoutes from './routes/laboratory';
 import radiologyRoutes from './routes/radiology';
+import ipdRoutes from './routes/ipd';
+import icuRoutes from './routes/icu';
+import otRoutes from './routes/ot';
+import bloodbankRoutes from './routes/bloodbank';
+import cssdRoutes from './routes/cssd';
+import dietaryRoutes from './routes/dietary';
+import housekeepingRoutes from './routes/housekeeping';
+import ambulanceRoutes from './routes/ambulance';
 
 dotenv.config();
 
@@ -114,6 +122,14 @@ app.use('/api/v1/billing', billingRoutes);
 app.use('/api/v1/insurance', insuranceRoutes);
 app.use('/api/v1/laboratory', laboratoryRoutes);
 app.use('/api/v1/radiology', radiologyRoutes);
+app.use('/api/v1/ipd', ipdRoutes);
+app.use('/api/v1/icu', icuRoutes);
+app.use('/api/v1/ot', otRoutes);
+app.use('/api/v1/bloodbank', bloodbankRoutes);
+app.use('/api/v1/cssd', cssdRoutes);
+app.use('/api/v1/dietary', dietaryRoutes);
+app.use('/api/v1/housekeeping', housekeepingRoutes);
+app.use('/api/v1/ambulance', ambulanceRoutes);
 
 // Fallback 404 handler
 app.use((req, res) => {

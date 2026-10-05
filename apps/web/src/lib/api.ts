@@ -27,7 +27,7 @@ function getStoredTenantId(): string | null {
 async function request<T = any>(
   endpoint: string,
   options: RequestInit = {}
-): Promise<{ success: boolean; data: T; meta?: any }> {
+): Promise<{ success: boolean; data: T; meta?: any; message?: string }> {
   const token = getStoredToken();
   const tenantId = getStoredTenantId();
 
@@ -86,6 +86,10 @@ export const patientsApi = {
 
     const qs = searchParams.toString();
     return request('/patients' + (qs ? '?' + qs : ''));
+  },
+
+  getAll: async (params?: any) => {
+    return patientsApi.list(params);
   },
 
   get: async (id: string) => {
@@ -153,6 +157,19 @@ export const patientsApi = {
 
   getTimeline: async (patientId: string) => {
     return request('/patients/' + patientId + '/timeline');
+  },
+};
+
+// ==========================================
+// ENCOUNTERS API
+// ==========================================
+
+export const encountersApi = {
+  create: async (data: any) => request('/encounters', { method: 'POST', body: JSON.stringify(data) }),
+  get: async (id: string) => request('/encounters/' + id),
+  list: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/encounters' + (qs ? '?' + qs : ''));
   },
 };
 
@@ -706,5 +723,233 @@ export const radiologyApi = {
   getPacsUrl: async (studyId: string) => {
     return request('/radiology/studies/' + studyId + '/pacs-url');
   },
+};
+
+// ==========================================
+// IPD (INPATIENT) API
+// ==========================================
+
+export const ipdApi = {
+  getWards: async () => request('/ipd/wards'),
+  createWard: async (data: any) => request('/ipd/wards', { method: 'POST', body: JSON.stringify(data) }),
+  getBeds: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/ipd/beds' + (qs ? '?' + qs : ''));
+  },
+  createBed: async (data: any) => request('/ipd/beds', { method: 'POST', body: JSON.stringify(data) }),
+  getBedBoard: async () => request('/ipd/bed-board'),
+  updateBedStatus: async (bedId: string, status: string) =>
+    request('/ipd/beds/' + bedId + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
+  getAdmissions: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/ipd/admissions' + (qs ? '?' + qs : ''));
+  },
+  getAdmission: async (id: string) => request('/ipd/admissions/' + id),
+  createAdmission: async (data: any) =>
+    request('/ipd/admissions', { method: 'POST', body: JSON.stringify(data) }),
+  allocateBed: async (admissionId: string, data: any) =>
+    request('/ipd/admissions/' + admissionId + '/allocate-bed', { method: 'POST', body: JSON.stringify(data) }),
+  getNursingAssessments: async (admissionId: string) =>
+    request('/ipd/admissions/' + admissionId + '/nursing-assessments'),
+  createNursingAssessment: async (admissionId: string, data: any) =>
+    request('/ipd/admissions/' + admissionId + '/nursing-assessments', { method: 'POST', body: JSON.stringify(data) }),
+  getIntakeOutput: async (admissionId: string) =>
+    request('/ipd/admissions/' + admissionId + '/intake-output'),
+  createIntakeOutput: async (admissionId: string, data: any) =>
+    request('/ipd/admissions/' + admissionId + '/intake-output', { method: 'POST', body: JSON.stringify(data) }),
+  getRounds: async (admissionId: string) =>
+    request('/ipd/admissions/' + admissionId + '/rounds'),
+  createRound: async (admissionId: string, data: any) =>
+    request('/ipd/admissions/' + admissionId + '/rounds', { method: 'POST', body: JSON.stringify(data) }),
+  getMedicationOrders: async (admissionId: string) =>
+    request('/ipd/admissions/' + admissionId + '/medication-orders'),
+  createMedicationOrder: async (admissionId: string, data: any) =>
+    request('/ipd/admissions/' + admissionId + '/medication-orders', { method: 'POST', body: JSON.stringify(data) }),
+  getMar: async (admissionId: string) =>
+    request('/ipd/admissions/' + admissionId + '/mar'),
+  administerMar: async (orderId: string, data: any) =>
+    request('/ipd/mar/' + orderId + '/administer', { method: 'POST', body: JSON.stringify(data) }),
+  transfer: async (admissionId: string, data: any) =>
+    request('/ipd/admissions/' + admissionId + '/transfer', { method: 'POST', body: JSON.stringify(data) }),
+  getDischargeSummary: async (admissionId: string) =>
+    request('/ipd/admissions/' + admissionId + '/discharge-summary'),
+  saveDischargeSummary: async (admissionId: string, data: any) =>
+    request('/ipd/admissions/' + admissionId + '/discharge-summary', { method: 'POST', body: JSON.stringify(data) }),
+  getBillingClearance: async (admissionId: string) =>
+    request('/ipd/admissions/' + admissionId + '/billing-clearance'),
+  dischargePatient: async (admissionId: string) =>
+    request('/ipd/admissions/' + admissionId + '/discharge', { method: 'POST' }),
+};
+
+// ==========================================
+// ICU API
+// ==========================================
+
+export const icuApi = {
+  getFlowsheets: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/icu/flowsheets' + (qs ? '?' + qs : ''));
+  },
+  getFlowsheet: async (id: string) => request('/icu/flowsheets/' + id),
+  createFlowsheet: async (data: any) =>
+    request('/icu/flowsheets', { method: 'POST', body: JSON.stringify(data) }),
+  getActivePatients: async () => request('/icu/active-patients'),
+};
+
+// ==========================================
+// OT (OPERATING THEATRE) API
+// ==========================================
+
+export const otApi = {
+  getTheatres: async () => request('/ot/theatres'),
+  createTheatre: async (data: any) =>
+    request('/ot/theatres', { method: 'POST', body: JSON.stringify(data) }),
+  updateTheatreStatus: async (id: string, status: string) =>
+    request('/ot/theatres/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
+  getRequests: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/ot/requests' + (qs ? '?' + qs : ''));
+  },
+  createRequest: async (data: any) =>
+    request('/ot/requests', { method: 'POST', body: JSON.stringify(data) }),
+  getSchedules: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/ot/schedules' + (qs ? '?' + qs : ''));
+  },
+  createSchedule: async (data: any) =>
+    request('/ot/schedules', { method: 'POST', body: JSON.stringify(data) }),
+  updateScheduleStatus: async (id: string, status: string) =>
+    request('/ot/schedules/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
+  addTeamMember: async (scheduleId: string, data: any) =>
+    request('/ot/schedules/' + scheduleId + '/team', { method: 'POST', body: JSON.stringify(data) }),
+  removeTeamMember: async (scheduleId: string, memberId: string) =>
+    request('/ot/schedules/' + scheduleId + '/team/' + memberId, { method: 'DELETE' }),
+  submitWhoChecklist: async (scheduleId: string, data: any) =>
+    request('/ot/schedules/' + scheduleId + '/who-checklist', { method: 'POST', body: JSON.stringify(data) }),
+  addProcedureNote: async (scheduleId: string, data: any) =>
+    request('/ot/schedules/' + scheduleId + '/notes', { method: 'POST', body: JSON.stringify(data) }),
+  addImplant: async (scheduleId: string, data: any) =>
+    request('/ot/schedules/' + scheduleId + '/implants', { method: 'POST', body: JSON.stringify(data) }),
+};
+
+// ==========================================
+// BLOOD BANK API
+// ==========================================
+
+export const bloodBankApi = {
+  getDonors: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/bloodbank/donors' + (qs ? '?' + qs : ''));
+  },
+  createDonor: async (data: any) =>
+    request('/bloodbank/donors', { method: 'POST', body: JSON.stringify(data) }),
+  getDonations: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/bloodbank/donations' + (qs ? '?' + qs : ''));
+  },
+  recordDonation: async (data: any) =>
+    request('/bloodbank/donations', { method: 'POST', body: JSON.stringify(data) }),
+  processDonation: async (id: string, data: any) =>
+    request('/bloodbank/donations/' + id + '/process', { method: 'POST', body: JSON.stringify(data) }),
+  getComponents: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/bloodbank/components' + (qs ? '?' + qs : ''));
+  },
+  getInventorySummary: async () => request('/bloodbank/inventory-summary'),
+  crossmatchCheck: async (data: any) =>
+    request('/bloodbank/crossmatch-check', { method: 'POST', body: JSON.stringify(data) }),
+  issueBlood: async (data: any) =>
+    request('/bloodbank/issues', { method: 'POST', body: JSON.stringify(data) }),
+  updateTransfusion: async (issueId: string, transfusionStatus: string) =>
+    request('/bloodbank/issues/' + issueId + '/transfusion', {
+      method: 'PATCH',
+      body: JSON.stringify({ transfusionStatus }),
+    }),
+  getIssues: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/bloodbank/issues' + (qs ? '?' + qs : ''));
+  },
+};
+
+// ==========================================
+// CSSD API
+// ==========================================
+
+export const cssdApi = {
+  getCycles: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/cssd/cycles' + (qs ? '?' + qs : ''));
+  },
+  getCycle: async (id: string) => request('/cssd/cycles/' + id),
+  createCycle: async (data: any) =>
+    request('/cssd/cycles', { method: 'POST', body: JSON.stringify(data) }),
+  completeCycle: async (id: string, data: any) =>
+    request('/cssd/cycles/' + id + '/complete', { method: 'POST', body: JSON.stringify(data) }),
+  getStats: async () => request('/cssd/stats'),
+};
+
+// ==========================================
+// DIETARY API
+// ==========================================
+
+export const dietaryApi = {
+  getDietTypes: async () => request('/dietary/diet-types'),
+  createDietType: async (data: any) =>
+    request('/dietary/diet-types', { method: 'POST', body: JSON.stringify(data) }),
+  getOrders: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/dietary/orders' + (qs ? '?' + qs : ''));
+  },
+  createOrder: async (data: any) =>
+    request('/dietary/orders', { method: 'POST', body: JSON.stringify(data) }),
+  updateOrderStatus: async (id: string, status: string) =>
+    request('/dietary/orders/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
+  getKitchenWorklist: async () => request('/dietary/kitchen-worklist'),
+};
+
+// ==========================================
+// HOUSEKEEPING API
+// ==========================================
+
+export const housekeepingApi = {
+  getTasks: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/housekeeping/tasks' + (qs ? '?' + qs : ''));
+  },
+  createTask: async (data: any) =>
+    request('/housekeeping/tasks', { method: 'POST', body: JSON.stringify(data) }),
+  assignTask: async (id: string, assignedToId: string) =>
+    request('/housekeeping/tasks/' + id + '/assign', { method: 'PATCH', body: JSON.stringify({ assignedToId }) }),
+  startTask: async (id: string) =>
+    request('/housekeeping/tasks/' + id + '/start', { method: 'PATCH' }),
+  completeTask: async (id: string) =>
+    request('/housekeeping/tasks/' + id + '/complete', { method: 'PATCH' }),
+  verifyTask: async (id: string) =>
+    request('/housekeeping/tasks/' + id + '/verify', { method: 'PATCH' }),
+  getStats: async () => request('/housekeeping/stats'),
+};
+
+// ==========================================
+// AMBULANCE API
+// ==========================================
+
+export const ambulanceApi = {
+  getAmbulances: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/ambulance/ambulances' + (qs ? '?' + qs : ''));
+  },
+  createAmbulance: async (data: any) =>
+    request('/ambulance/ambulances', { method: 'POST', body: JSON.stringify(data) }),
+  updateAmbulanceStatus: async (id: string, status: string) =>
+    request('/ambulance/ambulances/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
+  getTrips: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/ambulance/trips' + (qs ? '?' + qs : ''));
+  },
+  dispatchTrip: async (data: any) =>
+    request('/ambulance/trips', { method: 'POST', body: JSON.stringify(data) }),
+  updateTripStatus: async (id: string, status: string) =>
+    request('/ambulance/trips/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
+  getStats: async () => request('/ambulance/stats'),
 };
 
