@@ -26,6 +26,10 @@ import licensingRoutes from './routes/licensing';
 import inventoryRoutes from './routes/inventory';
 import pharmacyRoutes from './routes/pharmacy';
 import emergencyRoutes from './routes/emergency';
+import billingRoutes from './routes/billing';
+import insuranceRoutes from './routes/insurance';
+import laboratoryRoutes from './routes/laboratory';
+import radiologyRoutes from './routes/radiology';
 
 dotenv.config();
 
@@ -106,6 +110,10 @@ app.use('/api/v1/licensing', licensingRoutes);
 app.use('/api/v1/inventory', inventoryRoutes);
 app.use('/api/v1/pharmacy', pharmacyRoutes);
 app.use('/api/v1/emergency', emergencyRoutes);
+app.use('/api/v1/billing', billingRoutes);
+app.use('/api/v1/insurance', insuranceRoutes);
+app.use('/api/v1/laboratory', laboratoryRoutes);
+app.use('/api/v1/radiology', radiologyRoutes);
 
 // Fallback 404 handler
 app.use((req, res) => {

@@ -21,7 +21,7 @@ const DispenseItemSchema = z.object({
 
 const DispenseSchema = z.object({
   prescriptionId: z.string().optional(),
-  patientId: z.string().min(1, 'Patient ID is required'),
+  patientId: z.string().optional(),
   locationId: z.string().min(1, 'Pharmacy location ID is required'),
   items: z.array(DispenseItemSchema).min(1, 'At least one item must be dispensed'),
   isNarcotic: z.boolean().default(false),
@@ -181,9 +181,20 @@ router.post('/dispense', requirePermission('pharmacy.dispense'), async (req, res
     const body = DispenseSchema.parse(req.body);
     const now = new Date();
 
+    let patientId = body.patientId;
+    if (!patientId && body.prescriptionId) {
+      const rx = await req.prismaTenant.prescription.findFirst({
+        where: { id: body.prescriptionId },
+      });
+      patientId = rx?.patientId;
+    }
+    if (!patientId) {
+      throw AppError.badRequest('Patient ID is required or must be linked via prescriptionId');
+    }
+
     // Verify patient
     const patient = await req.prismaTenant.patient.findFirst({
-      where: { tenantId, id: body.patientId },
+      where: { tenantId, id: patientId },
     });
     if (!patient) throw AppError.notFound('Patient not found');
 
@@ -284,7 +295,7 @@ router.post('/dispense', requirePermission('pharmacy.dispense'), async (req, res
         tenantId,
         locationId: body.locationId,
         prescriptionId: body.prescriptionId || null,
-        patientId: body.patientId,
+        patientId,
         dispensedById: userId,
         status: 'COMPLETED',
         totalAmount,
@@ -314,7 +325,7 @@ router.post('/dispense', requirePermission('pharmacy.dispense'), async (req, res
       tenantId,
       hospitalId,
       branchId,
-      patientId: body.patientId,
+      patientId,
       chargeCode: 'PHARM-MED-DISPENSE',
       description: `Pharmacy Dispensing #${dispensing.id.slice(0, 8).toUpperCase()}`,
       quantity: 1,
@@ -329,7 +340,7 @@ router.post('/dispense', requirePermission('pharmacy.dispense'), async (req, res
       message: 'Medications dispensed successfully',
       data: {
         dispensingId: dispensing.id,
-        patientId: body.patientId,
+        patientId,
         totalAmount,
         status: dispensing.status,
         items: dispensedItemDetails,

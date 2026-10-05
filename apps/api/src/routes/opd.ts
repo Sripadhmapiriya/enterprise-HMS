@@ -14,7 +14,10 @@ const StartEncounterSchema = z.object({
   departmentId: z.string().min(1),
   hospitalId: z.string().optional(),
   appointmentId: z.string().optional(),
-  type: z.enum(['OPD', 'FOLLOW_UP', 'EMERGENCY']).default('OPD'),
+  type: z
+    .enum(['OPD', 'FOLLOW_UP', 'EMERGENCY', 'CONSULTATION', 'IPD'])
+    .default('OPD')
+    .transform((val) => (val === 'CONSULTATION' ? 'OPD' : val)),
 });
 
 const RecordVitalsSchema = z.object({
@@ -28,15 +31,29 @@ const RecordVitalsSchema = z.object({
   weight: z.number().optional(), // kg
 });
 
-const RecordSoapSchema = z.object({
-  chiefComplaint: z.string().optional(),
-  historyOfPresent: z.string().optional(),
-  pastMedical: z.string().optional(),
-  pastSurgical: z.string().optional(),
-  examinationFindings: z.string().optional(),
-  examinationSystem: z.string().default('GENERAL'),
-  assessmentPlan: z.string().optional(),
-});
+const RecordSoapSchema = z
+  .object({
+    chiefComplaint: z.string().optional(),
+    historyOfPresent: z.string().optional(),
+    pastMedical: z.string().optional(),
+    pastSurgical: z.string().optional(),
+    examinationFindings: z.string().optional(),
+    examinationSystem: z.string().default('GENERAL'),
+    assessmentPlan: z.string().optional(),
+    subjective: z.string().optional(),
+    objective: z.string().optional(),
+    assessment: z.string().optional(),
+    plan: z.string().optional(),
+  })
+  .transform((val) => ({
+    ...val,
+    chiefComplaint: val.chiefComplaint || val.subjective,
+    historyOfPresent: val.historyOfPresent || val.subjective,
+    examinationFindings: val.examinationFindings || val.objective,
+    assessmentPlan:
+      val.assessmentPlan ||
+      (val.assessment && val.plan ? `${val.assessment} | ${val.plan}` : val.assessment || val.plan),
+  }));
 
 const AddDiagnosisSchema = z.object({
   diagnosisCode: z.string().optional(), // ICD-10 code (e.g. J06.9, I10)
@@ -45,17 +62,28 @@ const AddDiagnosisSchema = z.object({
   notes: z.string().optional(),
 });
 
-const PrescriptionItemSchema = z.object({
-  medicationName: z.string().min(1),
-  strength: z.string().optional(),
-  dosage: z.string().default('1 tablet'),
-  route: z.string().default('ORAL'),
-  frequency: z.string().default('1-0-1 (Twice Daily)'),
-  duration: z.string().default('5 days'),
-  quantity: z.number().int().default(10),
-  instructions: z.string().optional(),
-  timing: z.enum(['BEFORE_FOOD', 'AFTER_FOOD', 'WITH_FOOD']).default('AFTER_FOOD'),
-});
+const PrescriptionItemSchema = z
+  .object({
+    productId: z.string().optional(),
+    medicationId: z.string().optional(),
+    medicationName: z.string().optional(),
+    medicineName: z.string().optional(),
+    name: z.string().optional(),
+    strength: z.string().optional(),
+    dosage: z.string().default('1 tablet'),
+    route: z.string().default('ORAL'),
+    frequency: z.string().default('1-0-1 (Twice Daily)'),
+    duration: z.string().optional(),
+    durationDays: z.number().int().optional(),
+    quantity: z.number().int().default(10),
+    instructions: z.string().optional(),
+    timing: z.enum(['BEFORE_FOOD', 'AFTER_FOOD', 'WITH_FOOD']).default('AFTER_FOOD'),
+  })
+  .transform((val) => ({
+    ...val,
+    medicationName: val.medicationName || val.medicineName || val.name || 'Prescribed Medication',
+    duration: val.duration || (val.durationDays ? `${val.durationDays} days` : '5 days'),
+  }));
 
 const CreatePrescriptionSchema = z.object({
   notes: z.string().optional(),

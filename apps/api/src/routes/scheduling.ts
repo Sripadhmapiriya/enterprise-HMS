@@ -31,12 +31,34 @@ const BookAppointmentSchema = z.object({
   doctorId: z.string().min(1),
   branchId: z.string().min(1),
   departmentId: z.string().min(1),
-  appointmentDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}/)),
-  startTime: z.string().datetime(),
-  endTime: z.string().datetime(),
-  type: z.enum(['NEW', 'FOLLOW_UP', 'PROCEDURE', 'WALK_IN']).default('NEW'),
+  appointmentDate: z.string().optional(),
+  scheduledDate: z.string().optional(),
+  startTime: z.string(),
+  endTime: z.string(),
+  type: z.string().optional().default('NEW'),
   reason: z.string().optional(),
   notes: z.string().optional(),
+}).transform((val) => {
+  const dateStr = val.appointmentDate || val.scheduledDate || new Date().toISOString().slice(0, 10);
+  let start = val.startTime;
+  let end = val.endTime;
+  if (!start.includes('T') && !start.includes('Z')) {
+    start = `${dateStr.slice(0, 10)}T${start.length === 5 ? start + ':00.000Z' : '09:00:00.000Z'}`;
+  }
+  if (!end.includes('T') && !end.includes('Z')) {
+    end = `${dateStr.slice(0, 10)}T${end.length === 5 ? end + ':00.000Z' : '09:30:00.000Z'}`;
+  }
+  let apptType: any = val.type;
+  if (!['NEW', 'FOLLOW_UP', 'PROCEDURE', 'WALK_IN'].includes(apptType)) {
+    apptType = 'NEW';
+  }
+  return {
+    ...val,
+    appointmentDate: dateStr,
+    startTime: start,
+    endTime: end,
+    type: apptType as 'NEW' | 'FOLLOW_UP' | 'PROCEDURE' | 'WALK_IN',
+  };
 });
 
 const RescheduleSchema = z.object({
@@ -498,6 +520,76 @@ router.post('/appointments/:id/check-in', requirePermission('scheduling.queue.ma
 // ==========================================
 // OPD QUEUE & DISPLAY BOARD
 // ==========================================
+
+// POST /api/v1/scheduling/queue (Check-in / token issuance)
+router.post('/queue', requirePermission('scheduling.queue.manage'), async (req, res, next) => {
+  try {
+    const { patientId, branchId, departmentId, doctorId, appointmentId, priority } = req.body;
+
+    if (!patientId || !branchId || !departmentId || !doctorId) {
+      throw AppError.badRequest('patientId, branchId, departmentId, and doctorId are required');
+    }
+
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    const existingQueue = await req.prismaTenant.queue.findMany({
+      where: {
+        branchId,
+        doctorId,
+        queueDate: today,
+      },
+      select: { queueNumber: true },
+    });
+
+    const existingTokens = new Set(existingQueue.map((q: any) => q.queueNumber));
+    let nextNum = 1;
+    let tokenNumber = `T-${String(nextNum).padStart(3, '0')}`;
+    while (existingTokens.has(tokenNumber)) {
+      nextNum++;
+      tokenNumber = `T-${String(nextNum).padStart(3, '0')}`;
+    }
+
+    const queueEntry = await req.prismaTenant.queue.create({
+      data: {
+        tenantId: req.tenantId!,
+        branchId,
+        departmentId,
+        doctorId,
+        patientId,
+        appointmentId: appointmentId || undefined,
+        queueNumber: tokenNumber,
+        queueDate: today,
+        priority: priority || 'REGULAR',
+        status: 'WAITING',
+        checkInTime: new Date(),
+      },
+      include: {
+        patient: true,
+        doctor: { include: { user: true } },
+        department: true,
+      },
+    });
+
+    if (appointmentId) {
+      await req.prismaTenant.appointment.update({
+        where: { id: appointmentId },
+        data: { status: 'ARRIVED' },
+      }).catch(() => {});
+    }
+
+    res.status(201).json({
+      success: true,
+      message: `Patient checked in with token ${tokenNumber}`,
+      data: {
+        ...queueEntry,
+        tokenNumber,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 // GET /api/v1/scheduling/queue
 router.get('/queue', requirePermission('scheduling.queue.read'), async (req, res, next) => {

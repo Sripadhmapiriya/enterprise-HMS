@@ -110,19 +110,25 @@ export class ChargeCaptureService {
 
     // Find or create ChargeMaster item
     let chargeMaster = await prisma.chargeMaster.findFirst({
-      where: { tenantId: input.tenantId, code: input.chargeCode },
+      where: { code: input.chargeCode },
     });
 
     if (!chargeMaster) {
-      chargeMaster = await prisma.chargeMaster.create({
-        data: {
-          tenantId: input.tenantId,
-          code: input.chargeCode,
-          name: input.description,
-          category: input.sourceModule,
-          isBillable: true,
-        },
-      });
+      try {
+        chargeMaster = await prisma.chargeMaster.create({
+          data: {
+            tenantId: input.tenantId,
+            code: input.chargeCode,
+            name: input.description,
+            category: input.sourceModule,
+            isBillable: true,
+          },
+        });
+      } catch {
+        chargeMaster = (await prisma.chargeMaster.findFirst({
+          where: { code: input.chargeCode },
+        }))!;
+      }
     }
 
     // Create BillItem

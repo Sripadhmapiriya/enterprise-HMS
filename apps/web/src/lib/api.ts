@@ -493,3 +493,218 @@ export const emergencyApi = {
   },
 };
 
+// ==========================================
+// BILLING API
+// ==========================================
+
+export const billingApi = {
+  getTariffs: async () => {
+    return request('/billing/tariffs');
+  },
+  getCharges: async () => {
+    return request('/billing/charges');
+  },
+  getBills: async (params?: { patientId?: string; status?: string; billType?: string; page?: number; limit?: number }) => {
+    const searchParams = new URLSearchParams(params as any);
+    const qs = searchParams.toString();
+    return request('/billing/bills' + (qs ? '?' + qs : ''));
+  },
+  getBill: async (id: string) => {
+    return request('/billing/bills/' + id);
+  },
+  createBill: async (data: any) => {
+    return request('/billing/bills', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  addItem: async (billId: string, item: any) => {
+    return request('/billing/bills/' + billId + '/items', {
+      method: 'POST',
+      body: JSON.stringify(item),
+    });
+  },
+  finalizeBill: async (billId: string) => {
+    return request('/billing/bills/' + billId + '/finalize', {
+      method: 'POST',
+    });
+  },
+  processPayment: async (billId: string, payment: any) => {
+    return request('/billing/bills/' + billId + '/payments', {
+      method: 'POST',
+      body: JSON.stringify(payment),
+    });
+  },
+  getPayments: async () => {
+    return request('/billing/payments');
+  },
+  getInvoicePdfUrl: (billId: string) => {
+    const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    return `${base}/billing/bills/${billId}/pdf`;
+  },
+  getReceiptPdfUrl: (paymentId: string) => {
+    const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    return `${base}/billing/payments/${paymentId}/receipt-pdf`;
+  },
+  startShift: async (data: any) => {
+    return request('/billing/shifts/start', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  closeShift: async (data: any) => {
+    return request('/billing/shifts/close', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+};
+
+// ==========================================
+// INSURANCE API
+// ==========================================
+
+export const insuranceApi = {
+  getProviders: async () => {
+    return request('/insurance/providers');
+  },
+  createProvider: async (data: any) => {
+    return request('/insurance/providers', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  getTpas: async () => {
+    return request('/insurance/tpas');
+  },
+  createTpa: async (data: any) => {
+    return request('/insurance/tpas', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  getPatientPolicies: async (patientId: string) => {
+    return request('/insurance/patients/' + patientId + '/policies');
+  },
+  addPatientPolicy: async (patientId: string, data: any) => {
+    return request('/insurance/patients/' + patientId + '/policies', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  submitPreAuth: async (data: any) => {
+    return request('/insurance/pre-auth', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  getClaims: async (params?: { status?: string; providerId?: string }) => {
+    const searchParams = new URLSearchParams(params as any);
+    const qs = searchParams.toString();
+    return request('/insurance/claims' + (qs ? '?' + qs : ''));
+  },
+  getClaim: async (id: string) => {
+    return request('/insurance/claims/' + id);
+  },
+  createClaim: async (data: any) => {
+    return request('/insurance/claims', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  settleClaim: async (claimId: string, data: any) => {
+    return request('/insurance/claims/' + claimId + '/settle', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+};
+
+// ==========================================
+// LABORATORY API
+// ==========================================
+
+export const laboratoryApi = {
+  getWorklist: async (status?: string) => {
+    const qs = status ? '?status=' + status : '';
+    return request('/laboratory/worklist' + qs);
+  },
+  createOrder: async (data: any) => {
+    return request('/laboratory/orders', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  collectSample: async (data: any) => {
+    return request('/laboratory/samples/collect', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  getSamples: async (status?: string) => {
+    const qs = status ? '?status=' + status : '';
+    return request('/laboratory/samples' + qs);
+  },
+  enterResults: async (sampleId: string, results: any[]) => {
+    return request('/laboratory/samples/' + sampleId + '/results', {
+      method: 'POST',
+      body: JSON.stringify({ results }),
+    });
+  },
+  validateSample: async (sampleId: string) => {
+    return request('/laboratory/samples/' + sampleId + '/validate', {
+      method: 'POST',
+    });
+  },
+  getCriticalResults: async () => {
+    return request('/laboratory/critical-results');
+  },
+  acknowledgeCritical: async (criticalId: string, data: any) => {
+    return request('/laboratory/critical-results/' + criticalId + '/acknowledge', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  getReportPdfUrl: (sampleId: string) => {
+    const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    return `${base}/laboratory/samples/${sampleId}/report-pdf`;
+  },
+};
+
+// ==========================================
+// RADIOLOGY API
+// ==========================================
+
+export const radiologyApi = {
+  getWorklist: async (params?: { modality?: string; status?: string }) => {
+    const searchParams = new URLSearchParams(params as any);
+    const qs = searchParams.toString();
+    return request('/radiology/worklist' + (qs ? '?' + qs : ''));
+  },
+  createOrder: async (data: any) => {
+    return request('/radiology/orders', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  performStudy: async (studyId: string) => {
+    return request('/radiology/studies/' + studyId + '/perform', {
+      method: 'POST',
+    });
+  },
+  reportStudy: async (studyId: string, data: any) => {
+    return request('/radiology/studies/' + studyId + '/report', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  verifyStudy: async (studyId: string) => {
+    return request('/radiology/studies/' + studyId + '/verify', {
+      method: 'POST',
+    });
+  },
+  getPacsUrl: async (studyId: string) => {
+    return request('/radiology/studies/' + studyId + '/pacs-url');
+  },
+};
+

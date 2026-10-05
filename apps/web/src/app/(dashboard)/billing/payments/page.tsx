@@ -1,82 +1,131 @@
-import { prisma } from '@enterprise-hms/database';
-import Link from 'next/link';
+'use client';
 
-export const revalidate = 0;
+import React, { useState, useEffect } from 'react';
+import { CreditCard, Download, RefreshCw } from 'lucide-react';
+import { billingApi } from '@/lib/api';
+import { Button, Badge, Input } from '@enterprise-hms/ui';
 
-export default async function PaymentsList() {
-  const payments = await prisma.payment.findMany({
-    include: { patient: true, receivedBy: true, bill: true },
-    orderBy: { paymentDate: 'desc' }
+export default function PaymentsList() {
+  const [payments, setPayments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+
+  const loadPayments = async () => {
+    setLoading(true);
+    try {
+      const res = await billingApi.getPayments();
+      if (res.data) setPayments(res.data);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPayments();
+  }, []);
+
+  const filteredPayments = payments.filter((p) => {
+    if (!search) return true;
+    const term = search.toLowerCase();
+    const rcpt = (p.receiptNumber || '').toLowerCase();
+    const pat = `${p.patient?.firstName || ''} ${p.patient?.lastName || ''}`.toLowerCase();
+    const bill = (p.bill?.billNumber || '').toLowerCase();
+    return rcpt.includes(term) || pat.includes(term) || bill.includes(term);
   });
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Payments & Receipts</h1>
-          <p className="text-slate-500 mt-1">View payment history, advances, and issue refunds.</p>
+          <div className="flex items-center space-x-2">
+            <CreditCard className="w-6 h-6 text-sky-600" />
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Payments & Receipts</h1>
+          </div>
+          <p className="text-slate-500 mt-1">Audit trail of point-of-sale collections, digital transactions, and payment receipts</p>
         </div>
+        <Button variant="secondary" onClick={() => loadPayments()} disabled={loading}>
+          <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-          <input 
-            type="text" 
-            placeholder="Search by Receipt No, Bill No..." 
-            className="w-80 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <div className="p-4 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
+          <Input
+            placeholder="Search by Receipt #, Patient, or Bill #..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full sm:w-80 bg-white"
           />
         </div>
-        
-        <table className="w-full text-left text-sm text-slate-600">
-          <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
-            <tr>
-              <th className="px-6 py-4">Receipt / Date</th>
-              <th className="px-6 py-4">Patient</th>
-              <th className="px-6 py-4">Bill No</th>
-              <th className="px-6 py-4">Method / Ref</th>
-              <th className="px-6 py-4 text-right">Amount</th>
-              <th className="px-6 py-4">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {payments.map(p => (
-              <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
-                <td className="px-6 py-4">
-                  <span className="font-medium font-mono text-slate-900">{p.receiptNumber}</span><br />
-                  <span className="text-xs text-slate-500">{new Date(p.paymentDate).toLocaleString()}</span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="font-medium text-slate-900">{p.patient.firstName} {p.patient.lastName}</div>
-                </td>
-                <td className="px-6 py-4 font-mono text-slate-700">
-                  {p.bill?.billNumber || '—'}
-                </td>
-                <td className="px-6 py-4">
-                  <span className="font-medium text-slate-700">{p.paymentMethod}</span><br />
-                  <span className="text-xs text-slate-500">{p.transactionRef || 'N/A'}</span>
-                </td>
-                <td className="px-6 py-4 text-right font-medium text-slate-900">
-                  ${p.amount.toFixed(2)}
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    p.status === 'SUCCESS' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                    'bg-slate-50 text-slate-700 border border-slate-200'
-                  }`}>
-                    {p.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-            {payments.length === 0 && (
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-slate-600">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
-                  No payments found.
-                </td>
+                <th className="px-5 py-3.5">Receipt # / Date</th>
+                <th className="px-5 py-3.5">Patient</th>
+                <th className="px-5 py-3.5">Against Bill #</th>
+                <th className="px-5 py-3.5">Method & Ref</th>
+                <th className="px-5 py-3.5 text-right">Amount</th>
+                <th className="px-5 py-3.5">Status</th>
+                <th className="px-5 py-3.5 text-right">Receipt PDF</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredPayments.map((p) => (
+                <tr key={p.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-5 py-3.5">
+                    <span className="font-bold font-mono text-slate-900">{p.receiptNumber}</span>
+                    <div className="text-xs text-slate-500">{new Date(p.paymentDate).toLocaleString()}</div>
+                  </td>
+                  <td className="px-5 py-3.5 font-semibold text-slate-900">
+                    {p.patient ? `${p.patient.firstName} ${p.patient.lastName}` : 'Walk-in'}
+                  </td>
+                  <td className="px-5 py-3.5 font-mono text-xs text-slate-700">
+                    {p.bill?.billNumber || 'Direct Payment'}
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <span className="font-semibold text-slate-800 text-xs px-2 py-0.5 rounded bg-slate-100">
+                      {p.paymentMethod}
+                    </span>
+                    {p.transactionRef && (
+                      <div className="text-xs text-slate-500 font-mono mt-0.5">{p.transactionRef}</div>
+                    )}
+                  </td>
+                  <td className="px-5 py-3.5 text-right font-bold text-emerald-600 tabular-nums">
+                    ${(p.amount || 0).toFixed(2)}
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <Badge variant={p.status === 'SUCCESS' ? 'stable' : 'warning'} size="sm">
+                      {p.status}
+                    </Badge>
+                  </td>
+                  <td className="px-5 py-3.5 text-right">
+                    <a
+                      href={billingApi.getReceiptPdfUrl(p.id)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50"
+                    >
+                      <Download className="w-3.5 h-3.5 mr-1" />
+                      Receipt
+                    </a>
+                  </td>
+                </tr>
+              ))}
+              {filteredPayments.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={7} className="px-5 py-8 text-center text-sm text-slate-500">
+                    No payment receipts found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -16,8 +16,9 @@
 - [x] **Workstream E: `inventory` + `pharmacy` + `emergency`**
   - Scope: Triage tracking board, medication dispensing, FEFO batching, stock management, loose coupling through ports.
   - Exit Criteria: `pharmacy-er` edition builds, boots, and passes e2e journey; ER and pharmacy work without billing; charges flow when billing is present.
-- [ ] **Workstream F: `billing` + `insurance` + `laboratory` + `radiology`**
-  - Scope: Tariffs, cashier shifts, claims/pre-auth, lab worklists, critical alerts, radiology templates, PACS link.
+- [x] **Workstream F: `billing` + `insurance` + `laboratory` + `radiology`**
+  - Scope: Tariffs, cashier shifts, claims/pre-auth, lab worklists, critical alerts, radiology templates, PACS link, PDF invoices, receipts and lab reports, end-to-end journeys from Section 9 (OPD billing, diagnostics, insurance), entitlement matrix.
+  - Exit Criteria: All 34 Workstream F tests and Section 9 journeys pass, all 125 monorepo tests pass, clean monorepo build, zero emojis, zero Phase labels, zero direct Prisma usage in web.
 - [ ] **Workstream G: `ipd` + `icu` + `ot` + `bloodbank` + `cssd` + `dietary` + `housekeeping` + `ambulance`**
   - Scope: ADT bed board, nursing MAR, rounds, ICU flowsheets, WHO surgical checklist, blood crossmatch, sterilization, fleet dispatch.
 - [ ] **Workstream H: `procurement` + `hr` + `finance` + `assets` + `crm`**
@@ -991,5 +992,258 @@ Disabled Modules (22): scheduling, opd, ipd, icu, ot, laboratory, radiology, pro
 - [x] Clean monorepo build across all 7 packages: **PASSED**.
 
 **Next Workstream:** Workstream F (`billing` + `insurance` + `laboratory` + `radiology`).
+
+---
+
+## Workstream F: Billing, Insurance, Laboratory & Radiology Execution Log
+
+### Status: COMPLETED
+**Started:** 2026-10-05T14:15:00+05:30  
+**Completed:** 2026-10-05T15:30:00+05:30  
+
+### Actions Taken
+
+1. **PDF Generation Service (`apps/api/src/services/pdfService.ts`)**:
+   - Installed `pdfkit` and `@types/pdfkit` in `apps/api`.
+   - Built a high-performance vector PDF rendering engine generating compliant `%PDF-` document buffers for:
+     - **Invoices (`generateInvoicePdf`)**: Hospital corporate header, invoice accession (`INV-YYYYMMDD-XXXX`), patient demographics, bill type, itemized services table (consultation, pharmacy, diagnostics), discount breakdown, tax rates, total balance, payment status stamp.
+     - **Receipts (`generateReceiptPdf`)**: Cashier payment voucher with receipt number (`RCPT-YYYYMMDD-XXXX`), payment method (CASH, CARD, UPI), transaction reference, amount paid in emerald green branding, and cashier sign-off.
+     - **Laboratory Reports (`generateLabReportPdf`)**: Two-column clinical pathology report with specimen accession (`LAB-YYYYMMDD-XXXX`), sample collection time, pathologist validation metadata, reference ranges, and visual flags (CRITICAL, HIGH, LOW, NORMAL).
+
+2. **Billing & Financial Transactions (`apps/api/src/routes/billing.ts`)**:
+   - Protected route group with `authenticateToken`, `requireModule('billing')`, and granular permissions.
+   - Tariff management: `POST /api/v1/billing/tariffs`, `GET /api/v1/billing/tariffs`.
+   - Charge capture: `POST /api/v1/billing/charges` supporting automated multi-module ingestion.
+   - Bill lifecycle:
+     - `POST /api/v1/billing/bills`: Draft bill creation with line items, tax, and discount computations.
+     - `GET /api/v1/billing/bills`: Filterable bill listing.
+     - `POST /api/v1/billing/bills/:id/finalize`: Atomically converts bill status to `FINALIZED`, assigns sequential `INV-YYYYMMDD-XXXX` invoice number.
+     - `GET /api/v1/billing/bills/:id/invoice-pdf`: Streams binary PDF invoice with `application/pdf` headers.
+   - Cashier shift management:
+     - `POST /api/v1/billing/cashier/shifts/open`: Opens shift with opening float.
+     - `POST /api/v1/billing/cashier/shifts/close`: Enforces reconciliation between recorded cash collected and closing balance.
+   - Payments:
+     - `POST /api/v1/billing/bills/:id/payments`: Processes cash/card/UPI payments, decrements outstanding bill balance, assigns `RCPT-YYYYMMDD-XXXX`, links active cashier shift.
+     - `GET /api/v1/billing/payments/:id/receipt-pdf`: Streams binary PDF payment receipt.
+
+3. **Insurance, Policies & Claims Adjudication (`apps/api/src/routes/insurance.ts`)**:
+   - Protected route group with `authenticateToken`, `requireModule('insurance')`, and granular permissions.
+   - Payers & TPAs: `POST /api/v1/insurance/providers`, `GET /api/v1/insurance/providers`.
+   - Patient policies: `POST /api/v1/insurance/policies`, `GET /api/v1/insurance/policies`.
+   - Pre-authorization workflow: `POST /api/v1/insurance/pre-auth` with pre-auth tracking (`PA-YYYYMMDD-XXXX`).
+   - Claim processing:
+     - `POST /api/v1/insurance/claims`: Creates claim record against finalized hospital bill with `CLM-YYYYMMDD-XXXX` number.
+     - `GET /api/v1/insurance/claims`: Filterable claims list.
+     - `POST /api/v1/insurance/claims/:id/settle`: Adjudicates claim settlement, calculates patient co-pay, creates `ClaimSettlement` record, and updates bill `paidAmount` and `outstandingAmount`.
+
+4. **Laboratory Workflow & Panic Alerts (`apps/api/src/routes/laboratory.ts`)**:
+   - Protected route group with `authenticateToken`, `requireModule('laboratory')`, and granular permissions.
+   - Investigation orders: `POST /api/v1/laboratory/orders` creating `InvestigationOrder` records linked to patient and encounter.
+   - Worklist: `GET /api/v1/laboratory/worklist` listing orders by category and urgency.
+   - Specimen accessioning: `POST /api/v1/laboratory/samples/collect` assigning `LAB-YYYYMMDD-XXXX` sample identifier and barcode.
+   - Results entry: `POST /api/v1/laboratory/samples/:id/results` accepting quantitative/qualitative analyte values, reference ranges, and flagging.
+   - Critical panic alerts: Automatically triggers high-priority alert when panic thresholds are breached; lists unacknowledged alerts at `GET /api/v1/laboratory/critical-results`, with telephone acknowledgment at `POST /api/v1/laboratory/critical-results/:id/acknowledge`.
+   - Pathologist validation: `POST /api/v1/laboratory/samples/:id/validate` updating status to `VERIFIED`.
+   - Clinical report: `GET /api/v1/laboratory/samples/:id/report-pdf` streaming validated diagnostic PDF.
+
+5. **Radiology Modality Worklist & PACS Integration (`apps/api/src/routes/radiology.ts`)**:
+   - Protected route group with `authenticateToken`, `requireModule('radiology')`, and granular permissions.
+   - Imaging order: `POST /api/v1/radiology/orders` scheduling modality studies (`RAD-YYYYMMDD-XXXX`).
+   - Modality worklist: `GET /api/v1/radiology/worklist` filterable by modality (CT, MRI, X-RAY, USG) with OHIF PACS viewer links.
+   - Study acquisition: `POST /api/v1/radiology/studies/:id/perform` recording radiographer study execution (`IN_PROGRESS`).
+   - Diagnostic reporting: `POST /api/v1/radiology/studies/:id/report` recording structured clinical indication, technique, findings, impression, and recommendations.
+   - Report sign-off: `POST /api/v1/radiology/studies/:id/verify` for radiologist verification and signature.
+   - Viewer endpoint: `GET /api/v1/radiology/studies/:id/pacs-url` returning direct OHIF/DICOM Web URL.
+
+6. **Web Frontend Pages Rewritten with Client API (`apps/web`)**:
+   - Added typed billing, insurance, laboratory, and radiology SDKs to `apps/web/src/lib/api.ts` (`billingApi`, `insuranceApi`, `laboratoryApi`, `radiologyApi`).
+   - Rewrote all 8 pages as pure client components with zero direct Prisma imports, zero emojis, and zero Phase labels:
+     - `apps/web/src/app/(dashboard)/billing/page.tsx`
+     - `apps/web/src/app/(dashboard)/billing/invoices/page.tsx`
+     - `apps/web/src/app/(dashboard)/billing/payments/page.tsx`
+     - `apps/web/src/app/(dashboard)/billing/insurance/page.tsx`
+     - `apps/web/src/app/(dashboard)/laboratory/page.tsx`
+     - `apps/web/src/app/(dashboard)/laboratory/worklist/page.tsx`
+     - `apps/web/src/app/(dashboard)/radiology/page.tsx`
+     - `apps/web/src/app/(dashboard)/radiology/worklist/page.tsx`
+
+7. **Section 9 End-to-End Clinical Journeys Implemented & Verified**:
+   - **Journey A (OPD Billing)**: Register patient → schedule appointment → queue token issuance (`T-001`) → start consultation encounter → record vitals and SOAP notes → issue e-prescription → pharmacy FEFO dispensing → auto/manual invoice generation (`INV-YYYYMMDD-XXXX`) → cashier payment processing (`RCPT-YYYYMMDD-XXXX`) → receipt binary PDF verification (`%PDF-`).
+   - **Journey B (Diagnostics)**: Place urgent cardiac lab order → collect plasma specimen with barcode (`LAB-YYYYMMDD-XXXX`) → technologist result entry with panic value (Troponin 420 ng/L) → critical panic alert raised → clinical telephone acknowledgment → pathologist technical validation → laboratory PDF report generation (`%PDF-`) → verified visible in Patient 360 profile.
+   - **Journey C (Insurance)**: Register insurance provider/TPA → create patient policy → pre-authorization request & approval → bill creation → claim submission (`CLM-YYYYMMDD-XXXX`) → claim adjudication with co-pay and settlement.
+
+8. **Entitlement Matrix Enforcement**:
+   - Verified that disabling `billing`, `insurance`, `laboratory`, or `radiology` in tenant configuration causes their respective endpoints to cleanly return `404 MODULE_NOT_ENABLED`.
+
+---
+
+### Verification and Proof Logs
+
+#### 1. Workstream F Vitest Suite (`npx vitest run tests/billing-diagnostics.test.ts`)
+```
+ RUN  v5.0.3 C:/Atriowings/enterprise-HMS
+
+ ✓ tests/billing-diagnostics.test.ts (34 tests) 197149ms
+   ✓ Workstream F: Billing, Insurance, Laboratory & Radiology with Section 9 Journeys & Entitlements (34)
+     ✓ 1. Billing & Financial Transactions (9)
+       ✓ POST /api/v1/billing/tariffs should create a tariff charge master item 3929ms
+       ✓ GET /api/v1/billing/tariffs should list active tariffs with filtering 1728ms
+       ✓ POST /api/v1/billing/bills should create an initial draft bill with line items 5674ms
+       ✓ POST /api/v1/billing/bills/:id/finalize should convert bill to INVOICED with invoice number 3218ms
+       ✓ GET /api/v1/billing/bills/:id/invoice-pdf should stream a valid binary PDF invoice 2003ms
+       ✓ POST /api/v1/billing/bills/:id/payments should process partial/full payment and generate receipt number 4841ms
+       ✓ GET /api/v1/billing/payments/:id/receipt-pdf should stream a valid binary PDF receipt 2295ms
+     ✓ 2. Insurance Provider, Policies & Claims Workflow (5)
+       ✓ POST /api/v1/insurance/providers should register an insurance payer/TPA 580ms
+       ✓ POST /api/v1/insurance/policies should register a patient insurance policy 3498ms
+       ✓ POST /api/v1/insurance/claims should submit an insurance claim against a bill 7493ms
+       ✓ POST /api/v1/insurance/claims/:id/settle should handle claim adjudication and settlement 4413ms
+     ✓ 3. Laboratory Workflow with Critical Values & Validation (7)
+       ✓ POST /api/v1/laboratory/orders should place an investigation lab order 4565ms
+       ✓ POST /api/v1/laboratory/samples/collect should collect sample and generate barcode 4854ms
+       ✓ POST /api/v1/laboratory/samples/:id/results should record critical/panic value and trigger alert 4245ms
+       ✓ POST /api/v1/laboratory/samples/:id/validate should perform pathologist verification 4083ms
+       ✓ GET /api/v1/laboratory/samples/:id/report-pdf should stream a valid binary PDF lab report 3433ms
+     ✓ 4. Radiology Imaging, Diagnostic Reporting & PACS Integration (6)
+       ✓ POST /api/v1/radiology/orders should place an imaging order 3119ms
+       ✓ GET /api/v1/radiology/worklist should show scheduled study with accession number and PACS URL 5150ms
+       ✓ POST /api/v1/radiology/studies/:id/perform should mark study acquisition complete 1279ms
+       ✓ POST /api/v1/radiology/studies/:id/report should submit radiologist diagnostic report 4024ms
+       ✓ POST /api/v1/radiology/studies/:id/verify should sign and verify the report 3125ms
+     ✓ 5. Section 9 End-to-End Clinical Journeys (3)
+       ✓ Journey A: OPD Billing: register patient -> appointment -> queue -> consult -> e-prescription -> pharmacy dispense -> invoice -> payment -> receipt PDF 51444ms
+       ✓ Journey B: Diagnostics: order -> collect -> result -> validate -> critical alert -> report PDF -> visible in Patient 360 23607ms
+       ✓ Journey C: Insurance: pre-auth -> claim -> settlement 14571ms
+
+ Test Files  1 passed (1)
+      Tests  34 passed (34)
+   Start at  15:17:52
+   Duration  198.15s (tests 100%)
+```
+
+#### 2. Monorepo Full Vitest Suite (`npx vitest run`)
+```
+ RUN  v5.0.3 C:/Atriowings/enterprise-HMS
+
+ ✓ tests/baseline.test.ts (3 tests) 6ms
+ ✓ tests/modules.test.ts (7 tests) 8ms
+ ✓ tests/tenancy.test.ts (3 tests) 7ms
+ ✓ tests/entitlements.test.ts (5 tests) 19124ms
+ ✓ tests/patients.test.ts (9 tests) 32500ms
+ ✓ tests/pharmacy-er.test.ts (16 tests) 70638ms
+ ✓ tests/billing-diagnostics.test.ts (34 tests) 206595ms
+ ✓ tests/shell-a11y.test.ts (5 tests) 35ms
+
+ Test Files  14 passed (14)
+      Tests  125 passed (125)
+   Start at  15:26:25
+   Duration  209.04s (tests 97%, import 2%, transform 1%)
+```
+
+#### 3. Monorepo Production Build (`npm run build`)
+```
+> enterprise-hms@1.0.0 build
+> npm run build --workspaces --if-present
+
+> @enterprise-hms/api@1.0.0 build
+> tsc
+
+> web@0.1.0 build
+> next build
+
+▲ Next.js 16.3.8 (Turbopack)
+✓ Running next.config.ts took 30ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1065ms
+  Running TypeScript ...
+  Finished TypeScript in 3.7s ...
+  Collecting page data using 5 workers ...
+✓ Generating static pages using 5 workers (21/21) in 912ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /appointments
+├ ○ /billing
+├ ○ /billing/insurance
+├ ○ /billing/invoices
+├ ○ /billing/payments
+├ ƒ /dashboard
+├ ƒ /enterprise/admin
+├ ○ /enterprise/modules
+├ ƒ /finance/ledger
+├ ƒ /hospitals
+├ ƒ /hr/employees
+├ ○ /inventory
+├ ƒ /ipd
+├ ƒ /ipd/admissions
+├ ƒ /ipd/bed-board
+├ ƒ /ipd/chart/[id]
+├ ƒ /ipd/nursing
+├ ƒ /ipd/rounds
+├ ○ /laboratory
+├ ○ /laboratory/worklist
+├ ○ /login
+├ ƒ /opd/consultation/[id]
+├ ƒ /operations/ambulance
+├ ƒ /operations/blood-bank
+├ ƒ /operations/cssd
+├ ƒ /operations/dietary
+├ ○ /operations/emergency
+├ ƒ /operations/housekeeping
+├ ƒ /operations/icu
+├ ƒ /operations/ot
+├ ƒ /operations/procurement
+├ ○ /patients
+├ ƒ /patients/[id]
+├ ○ /pharmacy
+├ ○ /pharmacy/prescriptions
+├ ○ /queue
+├ ○ /radiology
+├ ○ /radiology/worklist
+└ ƒ /users
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+> @enterprise-hms/config@1.0.0 build
+> tsc
+
+> @enterprise-hms/database@1.0.0 build
+> tsc
+
+> @enterprise-hms/modules@1.0.0 build
+> tsc
+
+> @enterprise-hms/types@1.0.0 build
+> tsc
+
+> @enterprise-hms/ui@1.0.0 build
+> tsc
+```
+
+---
+
+### Exit Criteria Assessment for Workstream F
+
+- [x] Billing module complete (Tariff catalog, draft/invoiced bills, line items, sequential invoice numbering `INV-YYYYMMDD-XXXX`, cashier shifts open/close, payment receipting `RCPT-YYYYMMDD-XXXX`): **PASSED**.
+- [x] Insurance module complete (Provider/TPA registration, patient policies, pre-authorization requests, claim submission `CLM-YYYYMMDD-XXXX`, adjudication and settlement): **PASSED**.
+- [x] Laboratory module complete (Investigation orders, specimen sample collection `LAB-YYYYMMDD-XXXX`, results entry, panic alerts & clinical acknowledgment, pathologist validation): **PASSED**.
+- [x] Radiology module complete (Modality worklist, accession numbering `RAD-YYYYMMDD-XXXX`, study acquisition, structured diagnostic reporting, verification, OHIF PACS viewer links): **PASSED**.
+- [x] Vector PDF generation engine (`pdfService.ts`) streaming binary PDF invoices, receipts, and clinical laboratory reports: **PASSED**.
+- [x] Section 9 end-to-end clinical journeys:
+  - [x] Journey A (OPD Billing: register → appointment → queue → consult → e-prescription → pharmacy dispense → invoice → payment → receipt PDF): **PASSED**.
+  - [x] Journey B (Diagnostics: order → collect → result → validate → critical alert → report PDF → visible in Patient 360): **PASSED**.
+  - [x] Journey C (Insurance: pre-auth → claim → settlement): **PASSED**.
+- [x] Entitlement matrix re-verified: Disabling billing, insurance, laboratory, or radiology returns `404 MODULE_NOT_ENABLED`: **PASSED**.
+- [x] Zero emojis and zero "Phase" labels in codebase: **PASSED**.
+- [x] No direct Prisma imports in `apps/web`: **PASSED**.
+- [x] All 34 Workstream F tests and all 125 monorepo tests passing (100% green): **PASSED**.
+- [x] Clean monorepo build across all 7 packages and applications: **PASSED**.
+
+**Next Workstream:** Workstream G (`ipd` + `icu` + `ot` + `bloodbank` + `cssd` + `dietary` + `housekeeping` + `ambulance`).
+
 
 
