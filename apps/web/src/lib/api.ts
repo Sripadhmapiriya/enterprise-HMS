@@ -375,6 +375,11 @@ export const inventoryApi = {
     return request('/inventory/items' + qs);
   },
 
+  getProducts: async (params?: any) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request('/inventory/items' + qs);
+  },
+
   getItem: async (id: string) => {
     return request('/inventory/items/' + id);
   },
@@ -951,5 +956,150 @@ export const ambulanceApi = {
   updateTripStatus: async (id: string, status: string) =>
     request('/ambulance/trips/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
   getStats: async () => request('/ambulance/stats'),
+};
+
+// ==========================================
+// PROCUREMENT API
+// ==========================================
+
+export const procurementApi = {
+  getSuppliers: async () => request('/procurement/suppliers'),
+  createSupplier: async (data: any) =>
+    request('/procurement/suppliers', { method: 'POST', body: JSON.stringify(data) }),
+  getRequests: async () => request('/procurement/requests'),
+  createRequest: async (data: any) =>
+    request('/procurement/requests', { method: 'POST', body: JSON.stringify(data) }),
+  approveRequest: async (id: string, data: any) =>
+    request('/procurement/requests/' + id + '/approve', { method: 'PATCH', body: JSON.stringify(data) }),
+  getOrders: async () => request('/procurement/orders'),
+  createOrder: async (data: any) =>
+    request('/procurement/orders', { method: 'POST', body: JSON.stringify(data) }),
+  getGoodsReceipts: async () => request('/procurement/goods-receipts'),
+  createGoodsReceipt: async (data: any) =>
+    request('/procurement/goods-receipts', { method: 'POST', body: JSON.stringify(data) }),
+  getMatchSummary: async (poId: string) => request('/procurement/match-summary/' + poId),
+};
+
+// ==========================================
+// HR & WORKFORCE API
+// ==========================================
+
+export const hrApi = {
+  getEmployees: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/hr/employees' + (qs ? '?' + qs : ''));
+  },
+  createEmployee: async (data: any) =>
+    request('/hr/employees', { method: 'POST', body: JSON.stringify(data) }),
+  getEmployee: async (id: string) => request('/hr/employees/' + id),
+  addCredential: async (employeeId: string, data: any) =>
+    request('/hr/employees/' + employeeId + '/credentials', { method: 'POST', body: JSON.stringify(data) }),
+  getExpiringCredentials: async () => request('/hr/compliance/expiring-credentials'),
+  getCredentials: async (params?: any) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request('/hr/compliance/expiring-credentials' + qs);
+  },
+  recordAttendance: async (data: any) =>
+    request('/hr/attendance', { method: 'POST', body: JSON.stringify(data) }),
+  getAttendance: async (params?: any) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request('/hr/attendance' + qs);
+  },
+  logAttendance: async (data: any) =>
+    request('/hr/attendance', { method: 'POST', body: JSON.stringify(data) }),
+  submitLeave: async (data: any) =>
+    request('/hr/leaves', { method: 'POST', body: JSON.stringify(data) }),
+  getLeaveRequests: async (params?: any) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request('/hr/leaves' + qs);
+  },
+  approveLeave: async (id: string, approved: boolean) =>
+    request('/hr/leaves/' + id + '/approve', { method: 'PATCH', body: JSON.stringify({ approved }) }),
+  reviewLeave: async (id: string, data: any) =>
+    request('/hr/leaves/' + id, { method: 'PATCH', body: JSON.stringify(data) }),
+  runPayroll: async (data: any) =>
+    request('/hr/payroll/run', { method: 'POST', body: JSON.stringify(data) }),
+  getPayrollPeriods: async () => request('/hr/payroll/periods'),
+  getPayslips: async (params?: any) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request('/hr/payroll/payslips' + qs);
+  },
+};
+
+// ==========================================
+// FINANCE & GENERAL LEDGER API
+// ==========================================
+
+export const financeApi = {
+  getAccounts: async () => request('/finance/accounts'),
+  createAccount: async (data: any) =>
+    request('/finance/accounts', { method: 'POST', body: JSON.stringify(data) }),
+  getJournals: async () => request('/finance/journals'),
+  createJournal: async (data: any) =>
+    request('/finance/journals', { method: 'POST', body: JSON.stringify(data) }),
+  postJournal: async (data: any) =>
+    request('/finance/journals', { method: 'POST', body: JSON.stringify(data) }),
+  getTrialBalance: async () => request('/finance/trial-balance'),
+  getApArSummary: async () => request('/finance/ap-ar-summary'),
+  getAgingSummary: async () => request('/finance/ap-ar-summary'),
+};
+
+// ==========================================
+// ASSET MANAGEMENT & CMMS API
+// ==========================================
+
+export const assetsApi = {
+  getAssets: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/assets/assets' + (qs ? '?' + qs : ''));
+  },
+  createAsset: async (data: any) =>
+    request('/assets/assets', { method: 'POST', body: JSON.stringify(data) }),
+  getAsset: async (id: string) => request('/assets/assets/' + id),
+  getTasks: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/assets/tasks' + (qs ? '?' + qs : ''));
+  },
+  getMaintenanceTasks: async (params?: any) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request('/assets/tasks' + qs);
+  },
+  createTask: async (data: any) =>
+    request('/assets/tasks', { method: 'POST', body: JSON.stringify(data) }),
+  createMaintenanceTask: async (data: any) =>
+    request('/assets/tasks', { method: 'POST', body: JSON.stringify(data) }),
+  reportBreakdown: async (data: any) =>
+    request('/assets/breakdown', { method: 'POST', body: JSON.stringify(data) }),
+  assignTask: async (id: string, assignedToId: string) =>
+    request('/assets/tasks/' + id + '/assign', { method: 'PATCH', body: JSON.stringify({ assignedToId }) }),
+  completeTask: async (id: string, data: any) =>
+    request('/assets/tasks/' + id + '/complete', { method: 'PATCH', body: JSON.stringify(data) }),
+  completeMaintenanceTask: async (id: string, data: any) =>
+    request('/assets/tasks/' + id + '/complete', { method: 'PATCH', body: JSON.stringify(data) }),
+};
+
+// ==========================================
+// CRM & PATIENT FEEDBACK API
+// ==========================================
+
+export const crmApi = {
+  getFeedbacks: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/crm/feedback' + (qs ? '?' + qs : ''));
+  },
+  getFeedback: async (params?: any) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request('/crm/feedback' + qs);
+  },
+  createFeedback: async (data: any) =>
+    request('/crm/feedback', { method: 'POST', body: JSON.stringify(data) }),
+  submitFeedback: async (data: any) =>
+    request('/crm/feedback', { method: 'POST', body: JSON.stringify(data) }),
+  updateStatus: async (id: string, data: any) =>
+    request('/crm/feedback/' + id + '/status', { method: 'PATCH', body: JSON.stringify(data) }),
+  updateFeedbackStatus: async (id: string, data: any) =>
+    request('/crm/feedback/' + id + '/status', { method: 'PATCH', body: JSON.stringify(data) }),
+  getEscalations: async () => request('/crm/escalations'),
+  getAnalytics: async () => request('/crm/analytics'),
 };
 

@@ -37,6 +37,8 @@ import {
   Network,
   ShieldCheck,
   Settings,
+  Wrench,
+  MessageSquare,
   ChevronDown,
   Search,
   Bell,
@@ -83,6 +85,8 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Network,
   ShieldCheck,
   Settings,
+  Wrench,
+  MessageSquare,
 };
 
 interface NavItemDef {
@@ -157,6 +161,7 @@ const NAV_SECTIONS: NavSectionDef[] = [
     items: [
       { id: 'bloodbank', label: 'Blood Bank', route: '/operations/blood-bank', icon: 'Droplets' },
       { id: 'procurement', label: 'Procurement (PO/GRN)', route: '/operations/procurement', icon: 'ShoppingCart' },
+      { id: 'assets', label: 'Biomedical Assets', route: '/finance/assets', icon: 'Wrench' },
       { id: 'housekeeping', label: 'Housekeeping', route: '/operations/housekeeping', icon: 'Brush' },
       { id: 'ambulance', label: 'Ambulance Dispatch', route: '/operations/ambulance', icon: 'Truck' },
     ],
@@ -166,6 +171,7 @@ const NAV_SECTIONS: NavSectionDef[] = [
     items: [
       { id: 'hr', label: 'Employee Master', route: '/hr/employees', icon: 'UserCheck' },
       { id: 'finance', label: 'General Ledger', route: '/finance/ledger', icon: 'BookOpen' },
+      { id: 'crm', label: 'Patient CRM & Feedback', route: '/crm/feedback', icon: 'MessageSquare' },
       { id: 'enterprise', label: 'Enterprise Admin', route: '/enterprise/admin', icon: 'Building' },
       { id: 'module-manager', label: 'Module Manager', route: '/enterprise/modules', icon: 'ShieldCheck' },
       { id: 'hospitals', label: 'Hospital Master', route: '/hospitals', icon: 'Building' },

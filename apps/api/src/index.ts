@@ -38,6 +38,11 @@ import cssdRoutes from './routes/cssd';
 import dietaryRoutes from './routes/dietary';
 import housekeepingRoutes from './routes/housekeeping';
 import ambulanceRoutes from './routes/ambulance';
+import procurementRoutes from './routes/procurement';
+import hrRoutes from './routes/hr';
+import financeRoutes from './routes/finance';
+import assetRoutes from './routes/assets';
+import crmRoutes from './routes/crm';
 
 dotenv.config();
 
@@ -130,6 +135,11 @@ app.use('/api/v1/cssd', cssdRoutes);
 app.use('/api/v1/dietary', dietaryRoutes);
 app.use('/api/v1/housekeeping', housekeepingRoutes);
 app.use('/api/v1/ambulance', ambulanceRoutes);
+app.use('/api/v1/procurement', procurementRoutes);
+app.use('/api/v1/hr', hrRoutes);
+app.use('/api/v1/finance', financeRoutes);
+app.use('/api/v1/assets', assetRoutes);
+app.use('/api/v1/crm', crmRoutes);
 
 // Fallback 404 handler
 app.use((req, res) => {
