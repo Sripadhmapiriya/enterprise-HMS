@@ -1,119 +1,615 @@
-import { prisma } from '@enterprise-hms/database';
-import Link from 'next/link';
-import { AlertOctagon } from 'lucide-react';
+'use client';
 
-export const revalidate = 0;
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Button,
+  Badge,
+  Dialog,
+  Input,
+  Select,
+  Textarea,
+  EmptyState,
+  ErrorState,
+  Skeleton,
+} from '@enterprise-hms/ui';
+import {
+  Activity,
+  AlertOctagon,
+  Clock,
+  UserPlus,
+  ShieldAlert,
+  Flame,
+  User,
+  HeartPulse,
+  RefreshCw,
+} from 'lucide-react';
+import { emergencyApi } from '@/lib/api';
 
-export default async function EmergencyDashboard() {
-  const triageCount = await prisma.triageAssessment.count();
-  
-  // Since we use the existing Encounter model, we filter for EMERGENCY type
-  const encounters = await prisma.encounter.findMany({
-    where: { type: 'EMERGENCY' },
-    include: { patient: true, doctor: { include: { user: true } }, triageAssessment: true },
-    orderBy: { startTime: 'desc' },
-    take: 10
+interface ErBoardPatient {
+  encounterId: string;
+  patient: {
+    id: string;
+    mrn: string;
+    firstName: string;
+    lastName: string;
+    gender: string;
+    allergies?: Array<{ allergen: string }>;
+    alerts?: Array<{ description: string; severity: string }>;
+  };
+  priority: 'RED' | 'ORANGE' | 'YELLOW' | 'GREEN' | 'BLUE';
+  priorityRank: number;
+  chiefComplaint: string;
+  consciousness: string;
+  painScore: number | null;
+  arrivalMode: string;
+  arrivalTime: string;
+  elapsedMinutes: number;
+  attendingDoctor: string | null;
+  latestVitals?: {
+    bloodPressure?: string;
+    pulseRate?: number;
+    temperature?: number;
+    oxygenSaturation?: number;
+  } | null;
+  status: string;
+}
+
+export default function EmergencyDashboard() {
+  const [boardData, setBoardData] = useState<{
+    patients: ErBoardPatient[];
+    counts: { total: number; red: number; orange: number; yellow: number; green: number; blue: number };
+  }>({
+    patients: [],
+    counts: { total: 0, red: 0, orange: 0, yellow: 0, green: 0, blue: 0 },
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fast-register Modal
+  const [isFastRegOpen, setIsFastRegOpen] = useState(false);
+  const [isSubmittingFastReg, setIsSubmittingFastReg] = useState(false);
+  const [fastRegForm, setFastRegForm] = useState({
+    firstName: 'Unknown',
+    lastName: '(Trauma)',
+    gender: 'UNKNOWN',
+    estimatedAge: '',
+    arrivalMode: 'AMBULANCE',
+    chiefComplaint: '',
+    isMlc: false,
+    policeStation: '',
+  });
+
+  // Triage Modal
+  const [isTriageOpen, setIsTriageOpen] = useState(false);
+  const [selectedEncounterId, setSelectedEncounterId] = useState<string | null>(null);
+  const [isSubmittingTriage, setIsSubmittingTriage] = useState(false);
+  const [triageForm, setTriageForm] = useState({
+    priority: 'YELLOW' as 'RED' | 'ORANGE' | 'YELLOW' | 'GREEN' | 'BLUE',
+    chiefComplaint: '',
+    consciousness: 'ALERT' as 'ALERT' | 'VERBAL' | 'PAIN' | 'UNRESPONSIVE',
+    painScore: '0',
+    systolic: '',
+    diastolic: '',
+    heartRate: '',
+    oxygenSaturation: '',
+    temperature: '',
+    isMlc: false,
+    policeStation: '',
+  });
+
+  const fetchBoard = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await emergencyApi.getBoard();
+      setBoardData(res.data);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to load emergency tracking board');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBoard();
+    const interval = setInterval(fetchBoard, 15000); // Polling every 15s for live board
+    return () => clearInterval(interval);
+  }, [fetchBoard]);
+
+  const handleFastRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fastRegForm.chiefComplaint) return;
+    try {
+      setIsSubmittingFastReg(true);
+      await emergencyApi.fastRegister({
+        ...fastRegForm,
+        estimatedAge: fastRegForm.estimatedAge ? parseInt(fastRegForm.estimatedAge, 10) : undefined,
+      });
+      setIsFastRegOpen(false);
+      setFastRegForm({
+        firstName: 'Unknown',
+        lastName: '(Trauma)',
+        gender: 'UNKNOWN',
+        estimatedAge: '',
+        arrivalMode: 'AMBULANCE',
+        chiefComplaint: '',
+        isMlc: false,
+        policeStation: '',
+      });
+      await fetchBoard();
+    } catch (err: any) {
+      alert(err?.message || 'Fast registration failed');
+    } finally {
+      setIsSubmittingFastReg(false);
+    }
+  };
+
+  const handleTriageSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEncounterId) return;
+    try {
+      setIsSubmittingTriage(true);
+      await emergencyApi.triage({
+        encounterId: selectedEncounterId,
+        priority: triageForm.priority,
+        chiefComplaint: triageForm.chiefComplaint,
+        consciousness: triageForm.consciousness,
+        painScore: parseInt(triageForm.painScore, 10) || 0,
+        vitals: {
+          systolic: triageForm.systolic ? parseFloat(triageForm.systolic) : undefined,
+          diastolic: triageForm.diastolic ? parseFloat(triageForm.diastolic) : undefined,
+          heartRate: triageForm.heartRate ? parseFloat(triageForm.heartRate) : undefined,
+          oxygenSaturation: triageForm.oxygenSaturation ? parseFloat(triageForm.oxygenSaturation) : undefined,
+          temperature: triageForm.temperature ? parseFloat(triageForm.temperature) : undefined,
+        },
+        isMlc: triageForm.isMlc,
+        policeStation: triageForm.policeStation || undefined,
+      });
+      setIsTriageOpen(false);
+      await fetchBoard();
+    } catch (err: any) {
+      alert(err?.message || 'Triage submission failed');
+    } finally {
+      setIsSubmittingTriage(false);
+    }
+  };
+
+  const getPriorityBadgeVariant = (priority: string): 'critical' | 'warning' | 'stable' | 'info' | 'neutral' => {
+    switch (priority) {
+      case 'RED':
+        return 'critical';
+      case 'ORANGE':
+        return 'warning';
+      case 'YELLOW':
+        return 'warning';
+      case 'GREEN':
+        return 'stable';
+      case 'BLUE':
+        return 'info';
+      default:
+        return 'neutral';
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-end">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Emergency Department (ER)</h1>
-          <p className="text-slate-500 mt-1">Manage triage, critical patients, and emergency encounters.</p>
+          <div className="flex items-center space-x-2">
+            <Activity className="w-6 h-6 text-rose-600" />
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Emergency Department (ER)</h1>
+          </div>
+          <p className="text-slate-500 mt-1">Live ESI Triage tracking board, trauma intake, and resuscitation management.</p>
         </div>
-        <div className="flex space-x-3">
-          <button className="bg-rose-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-rose-700 shadow-sm shadow-rose-600/20">
-            + New Triage
-          </button>
+        <div className="flex items-center space-x-3">
+          <Button variant="secondary" onClick={() => fetchBoard()} disabled={loading}>
+            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button variant="destructive" onClick={() => setIsFastRegOpen(true)}>
+            <UserPlus className="w-4 h-4 mr-1.5" />
+            Fast-Track Trauma Intake
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-4 rounded-xl border border-rose-200 shadow-sm bg-rose-50/30">
-          <p className="text-sm font-medium text-rose-700 flex items-center">
-            <AlertOctagon className="w-4 h-4 mr-1.5 text-rose-600 inline" aria-hidden="true" />
-            Critical (Red)
+      {/* Triage Acuity Stat Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+        <div className="bg-rose-50 border border-rose-200 p-4 rounded-xl">
+          <div className="flex items-center space-x-1.5 text-rose-700 text-xs font-semibold uppercase">
+            <Flame className="w-4 h-4" />
+            <span>Level 1: Red</span>
+          </div>
+          <div className="text-2xl font-bold text-rose-900 mt-1 tabular-nums">
+            {boardData.counts.red}
+          </div>
+          <span className="text-xs text-rose-600">Immediate / Resus</span>
+        </div>
+
+        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl">
+          <div className="flex items-center space-x-1.5 text-amber-700 text-xs font-semibold uppercase">
+            <AlertOctagon className="w-4 h-4" />
+            <span>Level 2: Orange</span>
+          </div>
+          <div className="text-2xl font-bold text-amber-900 mt-1 tabular-nums">
+            {boardData.counts.orange}
+          </div>
+          <span className="text-xs text-amber-600">Emergent (&lt;15m)</span>
+        </div>
+
+        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl">
+          <div className="flex items-center space-x-1.5 text-yellow-700 text-xs font-semibold uppercase">
+            <Clock className="w-4 h-4" />
+            <span>Level 3: Yellow</span>
+          </div>
+          <div className="text-2xl font-bold text-yellow-900 mt-1 tabular-nums">
+            {boardData.counts.yellow}
+          </div>
+          <span className="text-xs text-yellow-600">Urgent (&lt;60m)</span>
+        </div>
+
+        <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl">
+          <div className="flex items-center space-x-1.5 text-emerald-700 text-xs font-semibold uppercase">
+            <HeartPulse className="w-4 h-4" />
+            <span>Level 4: Green</span>
+          </div>
+          <div className="text-2xl font-bold text-emerald-900 mt-1 tabular-nums">
+            {boardData.counts.green}
+          </div>
+          <span className="text-xs text-emerald-600">Less Urgent</span>
+        </div>
+
+        <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl">
+          <div className="flex items-center space-x-1.5 text-blue-700 text-xs font-semibold uppercase">
+            <User className="w-4 h-4" />
+            <span>Level 5: Blue</span>
+          </div>
+          <div className="text-2xl font-bold text-blue-900 mt-1 tabular-nums">
+            {boardData.counts.blue}
+          </div>
+          <span className="text-xs text-blue-600">Non-Urgent</span>
+        </div>
+
+        <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+          <div className="text-slate-500 text-xs font-semibold uppercase">Total Active</div>
+          <div className="text-2xl font-bold text-slate-800 mt-1 tabular-nums">
+            {boardData.counts.total}
+          </div>
+          <span className="text-xs text-slate-500">In ER</span>
+        </div>
+      </div>
+
+      {/* Main Board Content */}
+      {loading && boardData.patients.length === 0 ? (
+        <div className="space-y-3 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      ) : error ? (
+        <ErrorState title="Failed to load emergency board" message={error} onRetry={fetchBoard} />
+      ) : boardData.patients.length === 0 ? (
+        <EmptyState
+          title="No Active Emergency Patients"
+          description="The Emergency Department tracking board currently has no waiting or admitted patients."
+          actionLabel="Intake Trauma Walk-in"
+          onAction={() => setIsFastRegOpen(true)}
+        />
+      ) : (
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-100 bg-slate-50/70 flex justify-between items-center">
+            <h3 className="font-semibold text-slate-800 flex items-center">
+              <Activity className="w-4 h-4 mr-2 text-rose-600" />
+              Active Emergency Triage Tracking Board
+            </h3>
+            <span className="text-xs text-slate-500">Sorted by Acuity (ESI) and Wait Time</span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-slate-600">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+                <tr>
+                  <th className="px-5 py-3">Acuity</th>
+                  <th className="px-5 py-3">Patient</th>
+                  <th className="px-5 py-3">Chief Complaint</th>
+                  <th className="px-5 py-3">Vitals / AVPU</th>
+                  <th className="px-5 py-3">Elapsed Time</th>
+                  <th className="px-5 py-3">Attending</th>
+                  <th className="px-5 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {boardData.patients.map((p) => (
+                  <tr key={p.encounterId} className="hover:bg-slate-50/60 transition-colors">
+                    {/* Acuity Badge */}
+                    <td className="px-5 py-3">
+                      <Badge variant={getPriorityBadgeVariant(p.priority)} size="md">
+                        {p.priority} (ESI {p.priorityRank})
+                      </Badge>
+                    </td>
+
+                    {/* Patient MRN and Name */}
+                    <td className="px-5 py-3">
+                      <div className="font-semibold text-slate-900">
+                        {p.patient.firstName} {p.patient.lastName}
+                      </div>
+                      <div className="text-xs text-slate-500 font-mono">
+                        {p.patient.mrn} &bull; {p.patient.gender}
+                      </div>
+                      {p.patient.alerts && p.patient.alerts.length > 0 && (
+                        <div className="mt-1 flex items-center space-x-1 text-xs text-rose-600 font-medium">
+                          <ShieldAlert className="w-3.5 h-3.5 inline" />
+                          <span>MLC / Alert</span>
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Chief Complaint */}
+                    <td className="px-5 py-3 max-w-[220px]">
+                      <div className="font-medium text-slate-800 line-clamp-2">
+                        {p.chiefComplaint}
+                      </div>
+                      <span className="text-xs text-slate-400 capitalize">
+                        Via {p.arrivalMode.replace('_', ' ').toLowerCase()}
+                      </span>
+                    </td>
+
+                    {/* Vitals */}
+                    <td className="px-5 py-3">
+                      <div className="text-xs font-mono">
+                        {p.latestVitals?.bloodPressure && <span>BP: {p.latestVitals.bloodPressure} </span>}
+                        {p.latestVitals?.pulseRate && <span>HR: {p.latestVitals.pulseRate} </span>}
+                        {p.latestVitals?.oxygenSaturation && <span>SpO2: {p.latestVitals.oxygenSaturation}%</span>}
+                      </div>
+                      <div className="text-xs text-slate-500 mt-0.5">
+                        AVPU: <span className="font-medium text-slate-700">{p.consciousness}</span>
+                        {p.painScore !== null && <span> &bull; Pain: {p.painScore}/10</span>}
+                      </div>
+                    </td>
+
+                    {/* Elapsed Time */}
+                    <td className="px-5 py-3">
+                      <div className="flex items-center text-slate-700 font-mono text-sm">
+                        <Clock className="w-3.5 h-3.5 mr-1 text-slate-400" />
+                        <span className="font-bold">{p.elapsedMinutes}</span>m
+                      </div>
+                      <span className="text-xs text-slate-400">
+                        {new Date(p.arrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </td>
+
+                    {/* Attending Doctor */}
+                    <td className="px-5 py-3 text-slate-700">
+                      {p.attendingDoctor || <span className="text-slate-400 italic">Unassigned</span>}
+                    </td>
+
+                    {/* Action buttons */}
+                    <td className="px-5 py-3 text-right space-x-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedEncounterId(p.encounterId);
+                          setTriageForm((prev) => ({
+                            ...prev,
+                            priority: p.priority,
+                            chiefComplaint: p.chiefComplaint,
+                            consciousness: p.consciousness as any,
+                            painScore: p.painScore ? String(p.painScore) : '0',
+                          }));
+                          setIsTriageOpen(true);
+                        }}
+                      >
+                        Update Triage
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Fast-Track Trauma Intake Modal */}
+      <Dialog
+        isOpen={isFastRegOpen}
+        onClose={() => setIsFastRegOpen(false)}
+        title="Fast-Track Emergency Intake"
+      >
+        <form onSubmit={handleFastRegister} className="space-y-4">
+          <p className="text-xs text-slate-500">
+            Rapid intake for trauma, ambulance, and unidentified walk-in patients. An emergency MRN will be auto-generated.
           </p>
-          <p className="text-3xl font-bold text-rose-700 tabular-nums">0</p>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Waiting Triage</p>
-          <p className="text-3xl font-bold text-slate-900">0</p>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">In Treatment</p>
-          <p className="text-3xl font-bold text-blue-600">{encounters.filter(e => e.status === 'IN_PROGRESS').length}</p>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Total ER Visits</p>
-          <p className="text-3xl font-bold text-slate-900">{encounters.length}</p>
-        </div>
-      </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-100 bg-slate-50">
-          <h3 className="font-semibold text-slate-800">Recent Emergency Encounters</h3>
-        </div>
-        <table className="w-full text-left text-sm text-slate-600">
-          <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
-            <tr>
-              <th className="px-6 py-4">Arrival Time</th>
-              <th className="px-6 py-4">Patient</th>
-              <th className="px-6 py-4">Triage Priority</th>
-              <th className="px-6 py-4">Chief Complaint</th>
-              <th className="px-6 py-4">Attending</th>
-              <th className="px-6 py-4">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {encounters.map(e => (
-              <tr key={e.id} className="hover:bg-slate-50/50 transition-colors">
-                <td className="px-6 py-4">
-                  <span className="font-medium text-slate-900">{new Date(e.startTime).toLocaleString()}</span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="font-medium text-slate-900">{e.patient.firstName} {e.patient.lastName}</div>
-                  <div className="text-xs text-slate-500">MRN: {e.patient.mrn}</div>
-                </td>
-                <td className="px-6 py-4">
-                  {e.triageAssessment ? (
-                    <span className={`px-2 py-1 rounded-full text-xs font-bold \${
-                      e.triageAssessment.priority === 'RED' ? 'bg-rose-100 text-rose-700' :
-                      e.triageAssessment.priority === 'YELLOW' ? 'bg-amber-100 text-amber-700' :
-                      'bg-emerald-100 text-emerald-700'
-                    }`}>
-                      {e.triageAssessment.priority}
-                    </span>
-                  ) : (
-                    <span className="text-xs text-slate-400 italic">Pending</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 text-slate-700 truncate max-w-[200px]">
-                  {e.triageAssessment?.chiefComplaint || '—'}
-                </td>
-                <td className="px-6 py-4 text-slate-700">
-                  {e.doctor.user ? e.doctor.user.lastName : e.doctorId}
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium \${
-                    e.status === 'COMPLETED' ? 'bg-slate-100 text-slate-600' : 'bg-blue-50 text-blue-700'
-                  }`}>
-                    {e.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-            {encounters.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
-                  No emergency encounters currently active.
-                </td>
-              </tr>
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="First Name"
+              value={fastRegForm.firstName}
+              onChange={(e) => setFastRegForm({ ...fastRegForm, firstName: e.target.value })}
+              required
+            />
+            <Input
+              label="Last Name"
+              value={fastRegForm.lastName}
+              onChange={(e) => setFastRegForm({ ...fastRegForm, lastName: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <Select
+              label="Gender"
+              value={fastRegForm.gender}
+              onChange={(e) => setFastRegForm({ ...fastRegForm, gender: e.target.value })}
+              options={[
+                { value: 'UNKNOWN', label: 'Unknown' },
+                { value: 'MALE', label: 'Male' },
+                { value: 'FEMALE', label: 'Female' },
+                { value: 'OTHER', label: 'Other' },
+              ]}
+            />
+            <Input
+              label="Estimated Age"
+              type="number"
+              placeholder="e.g. 35"
+              value={fastRegForm.estimatedAge}
+              onChange={(e) => setFastRegForm({ ...fastRegForm, estimatedAge: e.target.value })}
+            />
+            <Select
+              label="Arrival Mode"
+              value={fastRegForm.arrivalMode}
+              onChange={(e) => setFastRegForm({ ...fastRegForm, arrivalMode: e.target.value })}
+              options={[
+                { value: 'AMBULANCE', label: 'Ambulance' },
+                { value: 'WALK_IN', label: 'Walk-in' },
+                { value: 'WHEELCHAIR', label: 'Wheelchair' },
+              ]}
+            />
+          </div>
+
+          <Textarea
+            label="Chief Complaint / Trauma Assessment"
+            placeholder="e.g., Road traffic accident with severe head injury and active bleeding..."
+            value={fastRegForm.chiefComplaint}
+            onChange={(e) => setFastRegForm({ ...fastRegForm, chiefComplaint: e.target.value })}
+            required
+            rows={3}
+          />
+
+          <div className="border border-slate-200 p-3 rounded-lg bg-slate-50 space-y-3">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isMlc"
+                checked={fastRegForm.isMlc}
+                onChange={(e) => setFastRegForm({ ...fastRegForm, isMlc: e.target.checked })}
+                className="rounded border-slate-300 text-rose-600 focus:ring-rose-500"
+              />
+              <label htmlFor="isMlc" className="text-sm font-medium text-slate-800">
+                Medico-Legal Case (MLC)
+              </label>
+            </div>
+
+            {fastRegForm.isMlc && (
+              <Input
+                label="Police Station Jurisdiction"
+                placeholder="e.g., Central Police Station"
+                value={fastRegForm.policeStation}
+                onChange={(e) => setFastRegForm({ ...fastRegForm, policeStation: e.target.value })}
+              />
             )}
-          </tbody>
-        </table>
-      </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+            <Button variant="secondary" type="button" onClick={() => setIsFastRegOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" type="submit" disabled={isSubmittingFastReg}>
+              {isSubmittingFastReg ? 'Registering...' : 'Complete Intake'}
+            </Button>
+          </div>
+        </form>
+      </Dialog>
+
+      {/* Triage Modal */}
+      <Dialog
+        isOpen={isTriageOpen}
+        onClose={() => setIsTriageOpen(false)}
+        title="Emergency Triage Assessment"
+      >
+        <form onSubmit={handleTriageSubmit} className="space-y-4">
+          <Select
+            label="ESI Acuity Priority"
+            value={triageForm.priority}
+            onChange={(e) => setTriageForm({ ...triageForm, priority: e.target.value as any })}
+            options={[
+              { value: 'RED', label: 'Level 1: RED (Immediate Resuscitation)' },
+              { value: 'ORANGE', label: 'Level 2: ORANGE (Emergent - <15 mins)' },
+              { value: 'YELLOW', label: 'Level 3: YELLOW (Urgent - <60 mins)' },
+              { value: 'GREEN', label: 'Level 4: GREEN (Less Urgent)' },
+              { value: 'BLUE', label: 'Level 5: BLUE (Non-Urgent)' },
+            ]}
+          />
+
+          <Textarea
+            label="Clinical Complaint"
+            value={triageForm.chiefComplaint}
+            onChange={(e) => setTriageForm({ ...triageForm, chiefComplaint: e.target.value })}
+            required
+            rows={2}
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <Select
+              label="Consciousness (AVPU)"
+              value={triageForm.consciousness}
+              onChange={(e) => setTriageForm({ ...triageForm, consciousness: e.target.value as any })}
+              options={[
+                { value: 'ALERT', label: 'Alert' },
+                { value: 'VERBAL', label: 'Responds to Voice' },
+                { value: 'PAIN', label: 'Responds to Pain' },
+                { value: 'UNRESPONSIVE', label: 'Unresponsive' },
+              ]}
+            />
+            <Input
+              label="Pain Score (0-10)"
+              type="number"
+              min="0"
+              max="10"
+              value={triageForm.painScore}
+              onChange={(e) => setTriageForm({ ...triageForm, painScore: e.target.value })}
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <Input
+              label="Systolic BP"
+              placeholder="120"
+              value={triageForm.systolic}
+              onChange={(e) => setTriageForm({ ...triageForm, systolic: e.target.value })}
+            />
+            <Input
+              label="Diastolic BP"
+              placeholder="80"
+              value={triageForm.diastolic}
+              onChange={(e) => setTriageForm({ ...triageForm, diastolic: e.target.value })}
+            />
+            <Input
+              label="Heart Rate"
+              placeholder="72 bpm"
+              value={triageForm.heartRate}
+              onChange={(e) => setTriageForm({ ...triageForm, heartRate: e.target.value })}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="SpO2 (%)"
+              placeholder="98%"
+              value={triageForm.oxygenSaturation}
+              onChange={(e) => setTriageForm({ ...triageForm, oxygenSaturation: e.target.value })}
+            />
+            <Input
+              label="Temp (°C)"
+              placeholder="37.0"
+              value={triageForm.temperature}
+              onChange={(e) => setTriageForm({ ...triageForm, temperature: e.target.value })}
+            />
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+            <Button variant="secondary" type="button" onClick={() => setIsTriageOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" disabled={isSubmittingTriage}>
+              {isSubmittingTriage ? 'Saving Triage...' : 'Save Triage & Emit Charges'}
+            </Button>
+          </div>
+        </form>
+      </Dialog>
     </div>
   );
 }

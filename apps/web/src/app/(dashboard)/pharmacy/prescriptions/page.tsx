@@ -1,105 +1,292 @@
-import { prisma } from '@enterprise-hms/database';
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import {
+  Button,
+  Badge,
+  Dialog,
+  Input,
+  Select,
+  EmptyState,
+  ErrorState,
+  Skeleton,
+} from '@enterprise-hms/ui';
+import {
+  FileText,
+  Pill,
+  Search,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowLeft,
+  RefreshCw,
+} from 'lucide-react';
+import { pharmacyApi, inventoryApi } from '@/lib/api';
 
-export const revalidate = 0;
+export default function PrescriptionQueuePage() {
+  const [queue, setQueue] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-export default async function PrescriptionQueue() {
-  const prescriptions = await prisma.prescription.findMany({
-    include: {
-      patient: true,
-      doctor: { include: { user: true } },
-      items: true,
-      dispensings: true
-    },
-    orderBy: { createdAt: 'desc' }
+  // Dispensing Modal State
+  const [isDispenseOpen, setIsDispenseOpen] = useState(false);
+  const [selectedRx, setSelectedRx] = useState<any | null>(null);
+  const [locations, setLocations] = useState<any[]>([]);
+  const [selectedLocationId, setSelectedLocationId] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchQueue = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [queueRes, locsRes] = await Promise.all([
+        pharmacyApi.getQueue(),
+        inventoryApi.listLocations().catch(() => ({ data: [] })),
+      ]);
+      setQueue(queueRes.data || []);
+      const locList = locsRes.data || [];
+      setLocations(locList);
+      if (locList.length > 0 && !selectedLocationId) {
+        setSelectedLocationId(locList[0].id);
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Failed to load prescription queue');
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedLocationId]);
+
+  useEffect(() => {
+    fetchQueue();
+  }, [fetchQueue]);
+
+  const handleOpenDispense = async (rx: any) => {
+    try {
+      const detail = await pharmacyApi.getPrescription(rx.id);
+      setSelectedRx(detail.data);
+      setIsDispenseOpen(true);
+    } catch (err: any) {
+      alert(err?.message || 'Failed to load prescription details');
+    }
+  };
+
+  const handleConfirmDispense = async () => {
+    if (!selectedRx || !selectedLocationId) return;
+
+    try {
+      setIsSubmitting(true);
+      const itemsToDispense = selectedRx.items.map((item: any) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        instructions: item.instructions,
+      }));
+
+      await pharmacyApi.dispense({
+        prescriptionId: selectedRx.id,
+        patientId: selectedRx.patientId,
+        locationId: selectedLocationId,
+        items: itemsToDispense,
+      });
+
+      setIsDispenseOpen(false);
+      await fetchQueue();
+    } catch (err: any) {
+      alert(err?.message || 'Dispensing failed');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const filteredQueue = queue.filter((rx) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    const patientName = `${rx.patient?.firstName} ${rx.patient?.lastName}`.toLowerCase();
+    const mrn = (rx.patient?.mrn || '').toLowerCase();
+    const rxNum = (rx.prescriptionNumber || '').toLowerCase();
+    return patientName.includes(q) || mrn.includes(q) || rxNum.includes(q);
   });
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-end">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Prescription Queue</h1>
-          <p className="text-slate-500 mt-1">Review and dispense patient prescriptions.</p>
+          <div className="flex items-center space-x-2">
+            <Link href="/pharmacy" className="text-slate-400 hover:text-slate-600 transition-colors">
+              <ArrowLeft className="w-5 h-5 mr-1" />
+            </Link>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Prescription Queue</h1>
+          </div>
+          <p className="text-slate-500 mt-1">
+            Review outpatient and emergency prescriptions for FEFO batch fulfillment.
+          </p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <Button variant="secondary" onClick={() => fetchQueue()} disabled={loading}>
+            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-          <input 
-            type="text" 
-            placeholder="Search by Rx ID, Patient, or Doctor..." 
-            className="w-80 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      {/* Filter Bar */}
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search by Patient, MRN, or Rx #..."
+            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <div className="flex space-x-2">
-            <select className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white">
-              <option>All Statuses</option>
-              <option>Pending</option>
-              <option>Partially Dispensed</option>
-              <option>Completed</option>
-            </select>
-          </div>
         </div>
-        
-        <table className="w-full text-left text-sm text-slate-600">
-          <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
-            <tr>
-              <th className="px-6 py-4">Rx ID / Time</th>
-              <th className="px-6 py-4">Patient</th>
-              <th className="px-6 py-4">Doctor</th>
-              <th className="px-6 py-4">Items</th>
-              <th className="px-6 py-4">Status</th>
-              <th className="px-6 py-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {prescriptions.map(rx => {
-              const isDispensed = rx.dispensings.length > 0;
-              
-              return (
-                <tr key={rx.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <span className="font-medium text-slate-900">{rx.id.substring(0,8).toUpperCase()}</span><br />
-                    <span className="text-xs text-slate-500">{new Date(rx.createdAt).toLocaleString()}</span>
+        <span className="text-xs text-slate-500 font-medium">
+          {filteredQueue.length} prescription(s) pending
+        </span>
+      </div>
+
+      {/* Queue Table */}
+      {loading ? (
+        <div className="space-y-3 bg-white p-6 rounded-xl border border-slate-200">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      ) : error ? (
+        <ErrorState title="Failed to load prescription queue" message={error} onRetry={fetchQueue} />
+      ) : filteredQueue.length === 0 ? (
+        <EmptyState
+          title="No Prescriptions Waiting"
+          description="There are currently no active prescriptions awaiting fulfillment in the queue."
+        />
+      ) : (
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+          <table className="w-full text-left text-sm text-slate-600">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+              <tr>
+                <th className="px-5 py-3">Prescription #</th>
+                <th className="px-5 py-3">Patient</th>
+                <th className="px-5 py-3">Prescriber</th>
+                <th className="px-5 py-3">Medications</th>
+                <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredQueue.map((rx) => (
+                <tr key={rx.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="px-5 py-3 font-mono text-sm font-semibold text-slate-900">
+                    {rx.prescriptionNumber}
+                    <div className="text-xs font-normal text-slate-400">
+                      {new Date(rx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-slate-900">{rx.patient.firstName} {rx.patient.lastName}</div>
-                    <div className="text-xs text-slate-500">MRN: {rx.patient.mrn}</div>
+
+                  <td className="px-5 py-3">
+                    <div className="font-semibold text-slate-900">
+                      {rx.patient?.firstName} {rx.patient?.lastName}
+                    </div>
+                    <div className="text-xs text-slate-500 font-mono">
+                      MRN: {rx.patient?.mrn}
+                    </div>
                   </td>
-                  <td className="px-6 py-4 font-medium text-slate-700">
-                    Dr. {rx.doctor.user.lastName}
+
+                  <td className="px-5 py-3 text-slate-700">
+                    {rx.prescriber}
                   </td>
-                  <td className="px-6 py-4">
-                    <span className="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-medium">{rx.items.length} items</span>
+
+                  <td className="px-5 py-3">
+                    <Badge variant="neutral" size="sm">
+                      {rx.itemCount} item(s)
+                    </Badge>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      isDispensed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                      rx.status === 'ACTIVE' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                      'bg-slate-50 text-slate-700 border border-slate-200'
-                    }`}>
-                      {isDispensed ? 'DISPENSED' : 'PENDING'}
-                    </span>
+
+                  <td className="px-5 py-3">
+                    <Badge variant="warning">{rx.status}</Badge>
                   </td>
-                  <td className="px-6 py-4 text-right space-x-3">
-                    {!isDispensed ? (
-                      <button className="text-blue-600 font-medium hover:underline text-sm">Review & Dispense</button>
-                    ) : (
-                      <button className="text-emerald-600 font-medium hover:underline text-sm">View Record</button>
-                    )}
+
+                  <td className="px-5 py-3 text-right">
+                    <Button variant="primary" size="sm" onClick={() => handleOpenDispense(rx)}>
+                      <Pill className="w-3.5 h-3.5 mr-1" />
+                      Dispense
+                    </Button>
                   </td>
                 </tr>
-              )
-            })}
-            {prescriptions.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
-                  No prescriptions found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* FEFO Dispense Confirmation Modal */}
+      <Dialog
+        isOpen={isDispenseOpen}
+        onClose={() => setIsDispenseOpen(false)}
+        title="Fulfill Prescription (FEFO Batch Picking)"
+      >
+        {selectedRx && (
+          <div className="space-y-4">
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <div className="font-semibold text-slate-900">
+                Patient: {selectedRx.patient?.firstName} {selectedRx.patient?.lastName} (MRN: {selectedRx.patient?.mrn})
+              </div>
+              <div className="text-xs text-slate-500 mt-1">
+                Prescription #{selectedRx.prescriptionNumber || selectedRx.id.slice(0, 8)}
+              </div>
+            </div>
+
+            <Select
+              label="Dispensing Pharmacy Location"
+              value={selectedLocationId}
+              onChange={(e) => setSelectedLocationId(e.target.value)}
+              options={locations.map((loc) => ({ value: loc.id, label: loc.name }))}
+            />
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase mb-2">
+                Medication List (Auto-Allocating via FEFO)
+              </label>
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {selectedRx.items?.map((item: any, idx: number) => (
+                  <div key={idx} className="p-3 bg-white border border-slate-200 rounded-lg text-sm">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="font-bold text-slate-900">{item.drugName}</span>
+                        <div className="text-xs text-slate-500">
+                          {item.dosage} &bull; {item.frequency} &bull; {item.duration}
+                        </div>
+                      </div>
+                      <Badge variant="info">Qty: {item.quantity}</Badge>
+                    </div>
+
+                    {item.recommendedBatch ? (
+                      <div className="mt-2 text-xs bg-emerald-50 text-emerald-800 p-2 rounded border border-emerald-200">
+                        FEFO Batch Allocated: <span className="font-mono font-bold">{item.recommendedBatch.batchNumber}</span> (Exp: {new Date(item.recommendedBatch.expiryDate).toLocaleDateString()}) &bull; Available: {item.recommendedBatch.availableQty}
+                      </div>
+                    ) : (
+                      <div className="mt-2 text-xs bg-amber-50 text-amber-800 p-2 rounded border border-amber-200 flex items-center">
+                        <AlertTriangle className="w-3.5 h-3.5 mr-1" />
+                        Stock check: {item.availableStock} in store
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+              <Button variant="secondary" onClick={() => setIsDispenseOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={handleConfirmDispense} disabled={isSubmitting}>
+                {isSubmitting ? 'Dispensing...' : 'Confirm & Dispense'}
+              </Button>
+            </div>
+          </div>
+        )}
+      </Dialog>
     </div>
   );
 }

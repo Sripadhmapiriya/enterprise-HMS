@@ -23,6 +23,9 @@ import schedulingRoutes from './routes/scheduling';
 import opdRoutes from './routes/opd';
 import enterpriseRoutes from './routes/enterprise';
 import licensingRoutes from './routes/licensing';
+import inventoryRoutes from './routes/inventory';
+import pharmacyRoutes from './routes/pharmacy';
+import emergencyRoutes from './routes/emergency';
 
 dotenv.config();
 
@@ -100,6 +103,9 @@ app.use('/api/v1/opd', opdRoutes);
 app.use('/api/v1/encounters', opdRoutes);
 app.use('/api/v1/enterprise', enterpriseRoutes);
 app.use('/api/v1/licensing', licensingRoutes);
+app.use('/api/v1/inventory', inventoryRoutes);
+app.use('/api/v1/pharmacy', pharmacyRoutes);
+app.use('/api/v1/emergency', emergencyRoutes);
 
 // Fallback 404 handler
 app.use((req, res) => {

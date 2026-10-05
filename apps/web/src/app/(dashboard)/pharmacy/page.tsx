@@ -1,100 +1,318 @@
-import { prisma } from '@enterprise-hms/database';
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, AlertOctagon } from 'lucide-react';
+import {
+  Button,
+  Badge,
+  Dialog,
+  Input,
+  Select,
+  EmptyState,
+  ErrorState,
+  Skeleton,
+} from '@enterprise-hms/ui';
+import {
+  Pill,
+  FileText,
+  AlertTriangle,
+  AlertOctagon,
+  ShoppingCart,
+  CheckCircle2,
+  RefreshCw,
+} from 'lucide-react';
+import { pharmacyApi, inventoryApi } from '@/lib/api';
 
-export const revalidate = 0;
-
-export default async function PharmacyDashboard() {
-  const dispensings = await prisma.pharmacyDispensing.findMany({
-    include: { patient: true, items: true, prescription: { include: { doctor: { include: { user: true } } } } },
-    orderBy: { createdAt: 'desc' }
+export default function PharmacyDashboard() {
+  const [dispensings, setDispensings] = useState<any[]>([]);
+  const [queueCount, setQueueCount] = useState<number>(0);
+  const [inventoryAlerts, setInventoryAlerts] = useState<{ lowStock: any[]; expiringBatches: any[] }>({
+    lowStock: [],
+    expiringBatches: [],
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const batches = await prisma.inventoryBatch.findMany({
-    include: { product: true }
+  // Walk-in POS Sale Modal State
+  const [isPosOpen, setIsPosOpen] = useState(false);
+  const [isSubmittingPos, setIsSubmittingPos] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+  const [locations, setLocations] = useState<any[]>([]);
+  const [posForm, setPosForm] = useState({
+    customerName: 'Walk-in Customer',
+    locationId: '',
+    productId: '',
+    quantity: '1',
+    paymentMethod: 'CASH' as 'CASH' | 'CARD' | 'UPI',
   });
+  const [posSuccess, setPosSuccess] = useState<any | null>(null);
 
-  const lowStock = batches.filter(b => b.availableQty < b.product.reorderLevel).length;
-  const expired = batches.filter(b => new Date(b.expiryDate) < new Date()).length;
-  const dispensedToday = dispensings.filter(d => new Date(d.createdAt).toDateString() === new Date().toDateString()).length;
-  
-  const revenueToday = dispensings
-    .filter(d => new Date(d.createdAt).toDateString() === new Date().toDateString())
-    .reduce((sum, d) => sum + d.totalAmount, 0);
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [dispRes, queueRes, alertsRes, prodsRes, locsRes] = await Promise.all([
+        pharmacyApi.getDispensings().catch(() => ({ data: [] })),
+        pharmacyApi.getQueue().catch(() => ({ data: [] })),
+        inventoryApi.getAlerts().catch(() => ({ data: { lowStock: [], expiringBatches: [] } })),
+        inventoryApi.listItems().catch(() => ({ data: [] })),
+        inventoryApi.listLocations().catch(() => ({ data: [] })),
+      ]);
+
+      setDispensings(dispRes.data || []);
+      setQueueCount(queueRes.data ? queueRes.data.length : 0);
+      setInventoryAlerts(alertsRes.data || { lowStock: [], expiringBatches: [] });
+      setProducts(prodsRes.data || []);
+      const locList = locsRes.data || [];
+      setLocations(locList);
+      if (locList.length > 0 && !posForm.locationId) {
+        setPosForm((prev) => ({ ...prev, locationId: locList[0].id }));
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Failed to load pharmacy data');
+    } finally {
+      setLoading(false);
+    }
+  }, [posForm.locationId]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handlePosSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!posForm.productId || !posForm.locationId) return;
+
+    try {
+      setIsSubmittingPos(true);
+      const res = await pharmacyApi.posSale({
+        customerName: posForm.customerName,
+        locationId: posForm.locationId,
+        paymentMethod: posForm.paymentMethod,
+        items: [
+          {
+            productId: posForm.productId,
+            quantity: parseInt(posForm.quantity, 10) || 1,
+          },
+        ],
+      });
+      setPosSuccess(res.data);
+      await loadData();
+    } catch (err: any) {
+      alert(err?.message || 'POS sale failed');
+    } finally {
+      setIsSubmittingPos(false);
+    }
+  };
+
+  const revenueTotal = dispensings.reduce((sum, d) => sum + (d.totalAmount || 0), 0);
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-end">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Pharmacy Dashboard</h1>
-          <p className="text-slate-500 mt-1">Dispensing, prescriptions, and pharmacy operations</p>
+          <div className="flex items-center space-x-2">
+            <Pill className="w-6 h-6 text-emerald-600" />
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Pharmacy & Dispensing</h1>
+          </div>
+          <p className="text-slate-500 mt-1">
+            Prescription queue fulfillment, FEFO batch picking, walk-in POS, and stock control.
+          </p>
         </div>
-        <div className="flex space-x-3">
-          <Link href="/pharmacy/prescriptions" className="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 shadow-sm">
-            Prescription Queue
+        <div className="flex items-center space-x-3">
+          <Button variant="secondary" onClick={() => loadData()} disabled={loading}>
+            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button variant="secondary" onClick={() => { setPosSuccess(null); setIsPosOpen(true); }}>
+            <ShoppingCart className="w-4 h-4 mr-1.5" />
+            Walk-in POS Sale
+          </Button>
+          <Link href="/pharmacy/prescriptions">
+            <Button variant="primary">
+              <FileText className="w-4 h-4 mr-1.5" />
+              Prescription Queue ({queueCount})
+            </Button>
           </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Dispensed Today</p>
-          <p className="text-3xl font-bold text-slate-900">{dispensedToday}</p>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <span className="text-xs font-semibold text-slate-500 uppercase">Prescriptions Waiting</span>
+          <div className="text-3xl font-bold text-slate-900 mt-1 tabular-nums">{queueCount}</div>
+          <span className="text-xs text-blue-600 font-medium">Pending fulfillment</span>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Today&apos;s Revenue</p>
-          <p className="text-3xl font-bold text-emerald-600">${revenueToday.toFixed(2)}</p>
+
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <span className="text-xs font-semibold text-slate-500 uppercase">Total Dispensed Value</span>
+          <div className="text-3xl font-bold text-emerald-600 mt-1 tabular-nums">
+            ${revenueTotal.toFixed(2)}
+          </div>
+          <span className="text-xs text-slate-500 font-medium">{dispensings.length} completed transactions</span>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-amber-200 shadow-sm bg-amber-50/50">
-          <p className="text-sm font-medium text-amber-700 flex items-center">
-            <AlertTriangle className="w-4 h-4 mr-1.5 text-amber-600 inline" aria-hidden="true" />
-            Low Stock Items
-          </p>
-          <p className="text-3xl font-bold text-amber-700 tabular-nums">{lowStock}</p>
+
+        <div className="bg-white p-5 rounded-xl border border-amber-200 shadow-sm bg-amber-50/30">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-amber-700 uppercase">Low Stock Alerts</span>
+            <AlertTriangle className="w-4 h-4 text-amber-600" />
+          </div>
+          <div className="text-3xl font-bold text-amber-700 mt-1 tabular-nums">
+            {inventoryAlerts.lowStock.length}
+          </div>
+          <span className="text-xs text-amber-600 font-medium">At or below reorder level</span>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-rose-200 shadow-sm bg-rose-50/50">
-          <p className="text-sm font-medium text-rose-600 flex items-center">
-            <AlertOctagon className="w-4 h-4 mr-1.5 text-rose-600 inline" aria-hidden="true" />
-            Expired Batches
-          </p>
-          <p className="text-3xl font-bold text-rose-700 tabular-nums">{expired}</p>
+
+        <div className="bg-white p-5 rounded-xl border border-rose-200 shadow-sm bg-rose-50/30">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-rose-700 uppercase">Near Expiry (&lt;90d)</span>
+            <AlertOctagon className="w-4 h-4 text-rose-600" />
+          </div>
+          <div className="text-3xl font-bold text-rose-700 mt-1 tabular-nums">
+            {inventoryAlerts.expiringBatches.length}
+          </div>
+          <span className="text-xs text-rose-600 font-medium">Batches requiring FEFO priority</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm">
-          <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-xl">
-            <h3 className="font-semibold text-slate-800">Recent Dispensings</h3>
+      {/* Main Dispensings Feed */}
+      {loading && dispensings.length === 0 ? (
+        <div className="space-y-3 bg-white p-6 rounded-xl border border-slate-200">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      ) : error ? (
+        <ErrorState title="Failed to load pharmacy data" message={error} onRetry={loadData} />
+      ) : dispensings.length === 0 ? (
+        <EmptyState
+          title="No Dispensings Recorded"
+          description="Dispense medications from the prescription queue or perform a walk-in OTC POS sale."
+          actionLabel="Open Prescription Queue"
+          onAction={() => window.location.href = '/pharmacy/prescriptions'}
+        />
+      ) : (
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-100 bg-slate-50/70 flex justify-between items-center">
+            <h3 className="font-semibold text-slate-800">Recent Pharmacy Dispensings</h3>
+            <span className="text-xs text-slate-500">{dispensings.length} records</span>
           </div>
-          <div className="p-0">
-            <ul className="divide-y divide-slate-100">
-              {dispensings.slice(0, 10).map(disp => (
-                <li key={disp.id} className="p-4 hover:bg-slate-50 transition-colors flex justify-between items-center">
-                  <div>
-                    <p className="font-medium text-slate-900">
-                      {disp.patient.firstName} {disp.patient.lastName}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      {disp.items.length} items • Prescribed by Dr. {disp.prescription?.doctor.user.lastName || 'Unknown'}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      disp.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700' :
-                      disp.status === 'PARTIAL' ? 'bg-amber-50 text-amber-700' :
-                      'bg-slate-100 text-slate-700'
-                    }`}>
-                      {disp.status}
+
+          <div className="divide-y divide-slate-100">
+            {dispensings.slice(0, 15).map((disp) => (
+              <div key={disp.id} className="p-4 hover:bg-slate-50/60 transition-colors flex justify-between items-center">
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-semibold text-slate-900">
+                      {disp.patient?.firstName} {disp.patient?.lastName}
                     </span>
-                    <p className="text-sm font-semibold text-slate-700 mt-2">${disp.totalAmount.toFixed(2)}</p>
+                    <span className="text-xs font-mono text-slate-500">MRN: {disp.patient?.mrn}</span>
                   </div>
-                </li>
-              ))}
-              {dispensings.length === 0 && <li className="p-6 text-center text-slate-500 text-sm">No dispensings found.</li>}
-            </ul>
+                  <div className="text-xs text-slate-500 mt-1">
+                    {disp.items?.length || 0} item(s) dispensed by{' '}
+                    {disp.dispensedBy ? `${disp.dispensedBy.firstName} ${disp.dispensedBy.lastName}` : 'Pharmacist'}
+                    {' '}&bull; {new Date(disp.createdAt).toLocaleString()}
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <Badge variant={disp.status === 'COMPLETED' ? 'stable' : 'warning'}>
+                    {disp.status}
+                  </Badge>
+                  <div className="text-sm font-bold text-slate-800 mt-1 tabular-nums">
+                    ${(disp.totalAmount || 0).toFixed(2)}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Walk-in POS Sale Modal */}
+      <Dialog
+        isOpen={isPosOpen}
+        onClose={() => setIsPosOpen(false)}
+        title="Walk-in OTC Pharmacy POS Sale"
+      >
+        {posSuccess ? (
+          <div className="space-y-4 text-center py-4">
+            <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
+            <h3 className="text-lg font-bold text-slate-900">Sale Completed Successfully</h3>
+            <p className="text-sm text-slate-600">
+              Receipt <span className="font-mono font-bold">{posSuccess.receiptNumber}</span> generated.
+              Total: <span className="font-bold text-emerald-600">${posSuccess.totalAmount.toFixed(2)}</span>
+            </p>
+            <p className="text-xs text-slate-500">
+              Mode: {posSuccess.receiptMode} &bull; Stock ledger updated with FEFO deduction.
+            </p>
+            <Button variant="primary" onClick={() => setIsPosOpen(false)}>
+              Done
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handlePosSubmit} className="space-y-4">
+            <Input
+              label="Customer Name"
+              value={posForm.customerName}
+              onChange={(e) => setPosForm({ ...posForm, customerName: e.target.value })}
+              required
+            />
+
+            <Select
+              label="Dispensing Location"
+              value={posForm.locationId}
+              onChange={(e) => setPosForm({ ...posForm, locationId: e.target.value })}
+              options={locations.map((loc) => ({ value: loc.id, label: loc.name }))}
+            />
+
+            <Select
+              label="Select Medicine / Product"
+              value={posForm.productId}
+              onChange={(e) => setPosForm({ ...posForm, productId: e.target.value })}
+              options={[
+                { value: '', label: '-- Select Item --' },
+                ...products.map((p) => ({
+                  value: p.id,
+                  label: `${p.name} (${p.code}) - Stock: ${p.totalStock}`,
+                })),
+              ]}
+            />
+
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                label="Quantity"
+                type="number"
+                min="1"
+                value={posForm.quantity}
+                onChange={(e) => setPosForm({ ...posForm, quantity: e.target.value })}
+                required
+              />
+              <Select
+                label="Payment Method"
+                value={posForm.paymentMethod}
+                onChange={(e) => setPosForm({ ...posForm, paymentMethod: e.target.value as any })}
+                options={[
+                  { value: 'CASH', label: 'Cash' },
+                  { value: 'CARD', label: 'Card' },
+                  { value: 'UPI', label: 'UPI' },
+                ]}
+              />
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+              <Button variant="secondary" type="button" onClick={() => setIsPosOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit" disabled={isSubmittingPos || !posForm.productId}>
+                {isSubmittingPos ? 'Processing...' : 'Complete POS Sale'}
+              </Button>
+            </div>
+          </form>
+        )}
+      </Dialog>
     </div>
   );
 }

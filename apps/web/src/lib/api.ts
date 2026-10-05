@@ -347,3 +347,149 @@ export const licensingApi = {
     return request('/licensing/status');
   },
 };
+
+// ==========================================
+// INVENTORY API
+// ==========================================
+
+export const inventoryApi = {
+  listItems: async (params?: { q?: string }) => {
+    const qs = params?.q ? `?q=${encodeURIComponent(params.q)}` : '';
+    return request('/inventory/items' + qs);
+  },
+
+  getItem: async (id: string) => {
+    return request('/inventory/items/' + id);
+  },
+
+  createItem: async (data: any) => {
+    return request('/inventory/items', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  listLocations: async () => {
+    return request('/inventory/locations');
+  },
+
+  createLocation: async (data: any) => {
+    return request('/inventory/locations', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  listBatches: async (params?: { productId?: string; locationId?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.productId) searchParams.set('productId', params.productId);
+    if (params?.locationId) searchParams.set('locationId', params.locationId);
+    const qs = searchParams.toString();
+    return request('/inventory/batches' + (qs ? '?' + qs : ''));
+  },
+
+  receiveBatch: async (data: any) => {
+    return request('/inventory/batches', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  adjustStock: async (data: any) => {
+    return request('/inventory/adjustments', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  getAlerts: async () => {
+    return request('/inventory/alerts');
+  },
+
+  getLedger: async (params?: { productId?: string }) => {
+    const qs = params?.productId ? `?productId=${encodeURIComponent(params.productId)}` : '';
+    return request('/inventory/ledger' + qs);
+  },
+};
+
+// ==========================================
+// PHARMACY API
+// ==========================================
+
+export const pharmacyApi = {
+  getQueue: async () => {
+    return request('/pharmacy/queue');
+  },
+
+  getPrescription: async (id: string) => {
+    return request('/pharmacy/prescriptions/' + id);
+  },
+
+  dispense: async (data: any) => {
+    return request('/pharmacy/dispense', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  posSale: async (data: any) => {
+    return request('/pharmacy/pos', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  getDispensings: async () => {
+    return request('/pharmacy/dispensings');
+  },
+
+  getControlledRegister: async () => {
+    return request('/pharmacy/controlled-register');
+  },
+
+  returnMedications: async (data: any) => {
+    return request('/pharmacy/returns', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+};
+
+// ==========================================
+// EMERGENCY (ER) API
+// ==========================================
+
+export const emergencyApi = {
+  fastRegister: async (data: any) => {
+    return request('/emergency/fast-register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  triage: async (data: any) => {
+    return request('/emergency/triage', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  getBoard: async () => {
+    return request('/emergency/board');
+  },
+
+  logResuscitation: async (encounterId: string, data: any) => {
+    return request('/emergency/encounters/' + encounterId + '/resuscitation', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  disposition: async (encounterId: string, data: any) => {
+    return request('/emergency/encounters/' + encounterId + '/disposition', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+};
+

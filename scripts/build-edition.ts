@@ -23,6 +23,8 @@ function parseArgs() {
       } else {
         options[key] = 'true';
       }
+    } else if (!options['preset']) {
+      options['preset'] = arg;
     }
   }
   return options;
