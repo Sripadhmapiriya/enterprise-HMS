@@ -17,6 +17,7 @@ import { Button } from '@enterprise-hms/ui';
 import { analyticsApi, userApi, enterpriseApi } from '@/lib/api';
 
 export default function DashboardPage() {
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState({
     activePersonnel: 24,
@@ -38,6 +39,7 @@ export default function DashboardPage() {
   ]);
 
   useEffect(() => {
+    setMounted(true);
     async function loadData() {
       try {
         const [kpiRes, usersRes] = await Promise.all([
@@ -206,8 +208,8 @@ export default function DashboardPage() {
                 <div key={log.id} className="py-2.5 first:pt-0 last:pb-0">
                   <div className="flex items-start justify-between">
                     <span className="text-xs font-semibold text-slate-800">{log.action}</span>
-                    <span className="text-[10px] text-slate-400 font-mono tabular-nums">
-                      {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <span suppressHydrationWarning className="text-[10px] text-slate-400 font-mono tabular-nums">
+                      {mounted ? new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-500 mt-0.5">
