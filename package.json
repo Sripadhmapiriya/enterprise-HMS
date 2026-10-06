@@ -20,6 +20,8 @@
     "issue:license": "tsx scripts/issue-license.ts"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
     "@types/supertest": "^7.2.1",
     "supertest": "^7.3.1",
     "tsx": "^4.7.0",

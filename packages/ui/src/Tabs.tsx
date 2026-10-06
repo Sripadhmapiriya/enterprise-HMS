@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { cn } from './utils';
 
 export interface TabItem {
@@ -21,7 +22,7 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
     <div
       role="tablist"
       className={cn(
-        'flex border-b border-slate-200 dark:border-slate-800 space-x-1 overflow-x-auto',
+        'flex border-b border-slate-200 dark:border-slate-800 space-x-1 overflow-x-auto relative',
         className
       )}
     >
@@ -37,10 +38,10 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
             disabled={tab.disabled}
             onClick={() => onChange(tab.id)}
             className={cn(
-              'flex items-center gap-2 px-3 py-2 text-xs font-semibold border-b-2 transition-colors -mb-px whitespace-nowrap cursor-pointer disabled:cursor-not-allowed disabled:opacity-40',
+              'relative flex items-center gap-2 px-3 py-2 text-xs font-semibold transition-colors -mb-px whitespace-nowrap cursor-pointer disabled:cursor-not-allowed disabled:opacity-40',
               isActive
-                ? 'border-[#0891B2] text-[#0891B2] dark:text-[#22D3EE] dark:border-[#22D3EE]'
-                : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-200'
+                ? 'text-[#0891B2] dark:text-[#22D3EE]'
+                : 'text-slate-500 hover:text-slate-800 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-200'
             )}
           >
             {tab.icon && <span className="shrink-0">{tab.icon}</span>}
@@ -56,6 +57,13 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
               >
                 {tab.count}
               </span>
+            )}
+            {isActive && (
+              <motion.span
+                layoutId="activeTabUnderline"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0891B2] dark:bg-[#22D3EE]"
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              />
             )}
           </button>
         );

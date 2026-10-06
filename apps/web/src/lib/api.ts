@@ -131,6 +131,8 @@ export const authApi = {
       body: JSON.stringify({ refreshToken }),
     });
   },
+  getCapabilities: async () => request('/auth/capabilities'),
+  getMe: async () => request('/auth/me'),
 };
 
 // ==========================================
@@ -1255,7 +1257,12 @@ export const platformApi = {
     request('/platform/jobs/enqueue', { method: 'POST', body: JSON.stringify({ jobType, payload }) }),
   getJobStatus: async (id: string) => request('/platform/jobs/' + id),
   listJobs: async () => request('/platform/jobs'),
+
+  // Sidebar Badges (Real Database Metrics)
+  getSidebarBadges: async () => request('/platform/sidebar-badges'),
 };
+
+export const platformServiceApi = platformApi;
 
 // ==========================================
 // CORE USERS & HOSPITALS API

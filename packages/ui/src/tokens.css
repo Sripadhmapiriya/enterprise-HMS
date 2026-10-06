@@ -2,12 +2,19 @@
  * Enterprise HMS Design Tokens
  * Generated via ui-ux-pro-max (MASTER.md)
  * Architecture: Primitive -> Semantic -> Component
- * Clinical Dial: DESIGN_VARIANCE 2, MOTION_INTENSITY 2, VISUAL_DENSITY 8
+ * Clinical Dial: DESIGN_VARIANCE 2, MOTION_INTENSITY 4, VISUAL_DENSITY 8
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
+  /* Motion Tokens (MOTION_INTENSITY: 4, durations 120/200/320ms, two curves) */
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+
   /* -------------------------------------------------------------
    * 1. PRIMITIVE TOKENS
    * ----------------------------------------------------------- */
@@ -194,4 +201,47 @@
 .tabular-nums {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum';
+}
+
+/* Custom Thin Dark Scrollbar on hover */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 200ms ease;
+}
+.custom-scrollbar:hover {
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 9999px;
+  transition: background-color 200ms ease;
+}
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.35);
+}
+.custom-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.6);
+}
+
+/* Top and bottom fade masks for scrollable areas */
+.scroll-fade-mask {
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

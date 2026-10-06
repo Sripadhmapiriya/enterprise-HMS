@@ -2144,3 +2144,128 @@ Running Monorepo Integrity Checks
 - [x] Monorepo production build clean across all 8 workspaces (45 Next.js pages): **PASSED**.
 
 **ALL WORKSTREAMS (A THROUGH J) ARE COMPLETE.**
+
+---
+
+## Sidebar Redesign & Purposeful Motion Execution Log
+
+### Status: COMPLETED
+**Started:** 2026-10-06T11:00:00+05:30  
+**Completed:** 2026-10-06T11:54:00+05:30  
+
+### Parameters & Clinical Motion Standards
+- **Motion Dial**: `MOTION_INTENSITY: 4` (purposeful, controlled, clinical-grade).
+- **Variance Dial**: `DESIGN_VARIANCE: 2` (disciplined, high legibility).
+- **Density Dial**: `VISUAL_DENSITY: 8` (compact clinical density).
+- **Library**: `motion` (`motion/react`) for layout and presence animations; plain CSS for micro hover/focus states. GSAP strictly banned.
+- **Shared Tokens** (`packages/ui/src/motion.ts`):
+  - Durations: `fast: 120ms` (0.12s), `normal: 200ms` (0.2s), `slow: 320ms` (0.32s).
+  - Easings: `standard: [0.2, 0, 0, 1]`, `decelerate: [0, 0, 0.2, 1]`.
+  - Spring: `stiffness: 400, damping: 30, mass: 0.8`.
+- **Clinical Safety Rules**:
+  - No looping or infinite decorative animation on patient records or telemetry data.
+  - Critical alerts pulse at most 3 times (`repeat: 2`), then stop completely.
+  - Zero input/click blocking during transitions.
+  - Strict respect for `prefers-reduced-motion` (instant state change / 0.01s).
+
+### 10 Sidebar Features Implemented
+1. **Collapsible Groups**:
+   - Chevron toggle with smooth height and fade animation via `motion.div` and `AnimatePresence`.
+   - Remembers open/closed state per user in `localStorage` (`hms_sidebar_groups_<userId>`).
+   - Automatically opens group containing the current route.
+   - Defaults to opening ONLY the current group so the entire list fits comfortably on screen.
+2. **Icon-Only Collapsed Mode**:
+   - Toggle smoothly shrinks sidebar to 72px icon rail (`w-[72px]`).
+   - Accessible floating tooltips display on hover and keyboard focus (`role="tooltip"`).
+   - Preference saved per user (`hms_sidebar_collapsed_<userId>`).
+   - Responsive drawer on tablet/mobile (<1024px) with backdrop; automatically closes on route change and Escape.
+3. **Sidebar Search & Command Palette**:
+   - Live query input at top of sidebar filters navigation items in real-time.
+   - Visible "Ctrl K" badge; clicking or pressing `Ctrl+K` / `Cmd+K` opens the full `CommandPalette`.
+   - Escape clears search filter or closes popups.
+4. **Favorites / Pinned Navigation**:
+   - Users can pin up to 6 favorite routes into a dedicated "Pinned" group at the top.
+   - Pinned state saved per user in `localStorage` (`hms_sidebar_pinned_<userId>`).
+5. **Live Badges from Real API Data**:
+   - Real-time endpoint `GET /api/v1/platform/sidebar-badges` aggregates database counts (`queue`, `lab`, `emergency`, `criticalAlerts`).
+   - Waiting queue badge on `/queue`, pending lab orders on `/laboratory`.
+   - Emergency badge and notifications use clinical critical token (`Badge variant="critical"`) and `AlertTriangle` icon (not color alone) with 3-pulse clinical alert animation.
+6. **Header & Branch Switcher**:
+   - Product logo and tenant name from tenant settings (`currentUser.tenantName`).
+   - Hospital / branch switcher dropdown embedded directly under header with active branch selection.
+7. **Footer & User Card**:
+   - User card at sidebar bottom displaying avatar initials, full name, role, and branch.
+   - Interactive dropdown for user profile (`/users`), theme toggle (Light / Dark), switch branch, and sign out.
+   - Next.js dev indicator moved to `bottom-right` via `next.config.ts`, ensuring it never covers the footer.
+8. **Scrollbar & Content Fade Mask**:
+   - Thin dark scrollbar that appears on hover (`custom-scrollbar`).
+   - Top and bottom soft gradient masks (`bg-gradient-to-t` / `bg-gradient-to-b`) indicating more content.
+9. **Active Item State**:
+   - Calm active state with left accent bar (`w-1 bg-[#22D3EE]`), tinted background, and `aria-current="page"`.
+   - Shared layout animation indicator (`motion.div layoutId="activeNavIndicator"`) that slides between items.
+   - Longest-prefix route matching prevents items from erroneously staying active on child subroutes.
+10. **Accessibility & WCAG AA Contrast**:
+    - Full keyboard navigation: `ArrowDown`/`ArrowUp` moves focus between links, `Enter` activates, `Escape` closes drawers/popups.
+    - Visible focus rings (`focus-visible:ring-2 focus-visible:ring-cyan-400`).
+    - Semantic ARIA attributes (`aria-expanded`, `aria-controls`, `aria-current="page"`, `aria-label`).
+    - Color contrast exceeds WCAG 2 AA minimum thresholds (4.5:1) in both light and dark themes.
+
+### Module System Pruning Integrity
+- Sidebar is dynamically filtered based on `enabledModules` and user permissions.
+- Foundation module is always accessible.
+- Groups with zero visible items are completely pruned from DOM.
+- Verified for `patients-only` and `pharmacy-er` edition presets.
+
+### Verification Results
+
+#### 1. Monorepo Typecheck (`npm run typecheck`)
+- Clean pass across all 8 workspaces (`api`, `web`, `worker`, `config`, `database`, `modules`, `types`, `ui`).
+
+#### 2. Monorepo Lint (`npm run lint`)
+- Clean pass across all workspaces (0 errors).
+
+#### 3. Monorepo Production Build (`npm run build`)
+- All 8 workspaces built cleanly; 45 Next.js App Router routes compiled with Turbopack.
+
+#### 4. Vitest Full Regression Suite (`npm test`)
+```
+ Test Files  17 passed (17)
+      Tests  235 passed (235)
+   Duration  241.93s
+```
+
+#### 5. Playwright E2E Suite (`npx playwright test tests/e2e/sidebar-motion.spec.ts`)
+```
+Running 11 tests using 1 worker
+
+  ok  1 [chromium] › 1. collapse/expand toggles icon rail (72px) and remembers choice
+  ok  2 [chromium] › 2. group state is remembered after reload and current group opens automatically
+  ok  3 [chromium] › 3. search filters menu items as user types
+  ok  4 [chromium] › 4. favorites / pinned items persist per user (max 6)
+  ok  5 [chromium] › 5. live badges come from API and critical alert uses token and icon
+  ok  6 [chromium] › 6. full keyboard-only navigation works with arrow keys, Enter, and Escape
+  ok  7 [chromium] › 7. drawer works on tablet width (<1024px) and closes on route change
+  ok  8 [chromium] › 8. module pruning for patients-only and pharmacy-er presets
+  ok  9 [chromium] › 9. axe accessibility scan on shell: zero serious/critical issues
+  ok 10 [chromium] › 10. prefers-reduced-motion replaces animations with instant settle
+  ok 11 [chromium] › 11. captures screenshots across states (expanded, collapsed, tablet drawer, light and dark)
+
+  11 passed (48.0s)
+```
+
+#### 6. axe-core Accessibility Scan
+- Zero serious or critical violations across the sidebar, header, and shell landmarks.
+
+#### 7. Generated Visual Proof Artifacts
+- `docs/redesign/screenshots/sidebar-expanded.png` (Expanded desktop state)
+- `docs/redesign/screenshots/sidebar-collapsed.png` (72px collapsed icon rail mode)
+- `docs/redesign/screenshots/sidebar-tablet-drawer.png` (Responsive tablet drawer with backdrop)
+- `docs/redesign/screenshots/sidebar-light.png` (Light theme)
+- `docs/redesign/screenshots/sidebar-dark.png` (Dark theme)
+
+#### 8. Monorepo Integrity Checks (`npm run check:integrity`)
+- Zero "Phase" references detected across active codebase and docs.
+- Zero direct Prisma imports in `apps/web`.
+- Zero placeholders.
+- Zero committed secrets.
+

@@ -330,4 +330,61 @@ router.get('/jobs', async (req, res, next) => {
   }
 });
 
+// ==========================================
+// 6. SIDEBAR LIVE BADGES (REAL API DATA)
+// ==========================================
+
+router.get('/sidebar-badges', async (req, res, next) => {
+  try {
+    const tenantId = req.tenantId!;
+
+    let queueCount = 0;
+    try {
+      queueCount = await req.prismaTenant.queue.count({
+        where: { status: 'WAITING' },
+      });
+    } catch {}
+
+    let labCount = 0;
+    try {
+      labCount = await req.prismaTenant.investigationOrderItem.count({
+        where: {
+          category: 'LABORATORY',
+          order: { status: 'ORDERED' },
+        },
+      });
+    } catch {}
+
+    let emergencyCount = 0;
+    try {
+      emergencyCount = await req.prismaTenant.emergencyTriage.count({
+        where: { priority: { in: ['RED', 'ORANGE'] } },
+      });
+    } catch {}
+
+    let criticalAlertsCount = 0;
+    try {
+      criticalAlertsCount = await req.prismaTenant.notification.count({
+        where: {
+          tenantId,
+          priority: 'CRITICAL',
+          isRead: false,
+        },
+      });
+    } catch {}
+
+    res.json({
+      success: true,
+      data: {
+        queue: queueCount,
+        lab: labCount,
+        emergency: emergencyCount,
+        criticalAlerts: criticalAlertsCount,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;
