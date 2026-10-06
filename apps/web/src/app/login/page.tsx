@@ -38,6 +38,43 @@ export default function LoginPage() {
     setErrorMessage(null);
   };
 
+  const handleQuickLogin = async (demoEmail: string, demoPass: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPass);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    setIsLoading(true);
+
+    try {
+      // Submits to backend endpoint /api/v1/auth/login via authApi
+      const res = await authApi.login({ email: demoEmail, password: demoPass });
+
+      if (res.data?.mfaRequired) {
+        setIsMfaRequired(true);
+        setIsLoading(false);
+        return;
+      }
+
+      if (res.data?.accessToken) {
+        localStorage.setItem('hms_access_token', res.data.accessToken);
+        if (res.data.refreshToken) localStorage.setItem('hms_refresh_token', res.data.refreshToken);
+        if (res.data.user?.tenantId) localStorage.setItem('hms_tenant_id', res.data.user.tenantId);
+        if (res.data.user) localStorage.setItem('hms_user', JSON.stringify(res.data.user));
+      }
+
+      setSuccessMessage('Authentication verified! Loading clinical workspace...');
+      const params = new URLSearchParams(window.location.search);
+      const target = params.get('redirect') || '/dashboard';
+      setTimeout(() => {
+        window.location.href = target;
+      }, 500);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Unable to connect to authentication service.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
@@ -275,34 +312,95 @@ export default function LoginPage() {
 
           {/* Quick Demo Credentials */}
           <div className="mt-5 pt-4 border-t border-slate-100">
-            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-center mb-2">
-              Quick Demo Access
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => applyCredentials('priya.s@vedichealth.org', 'password123')}
-                className="px-2.5 py-1.5 text-xs text-left bg-cyan-50/60 hover:bg-cyan-50 border border-cyan-200 rounded-lg transition-colors group"
-              >
-                <div className="font-semibold text-[#0891B2]">Priya (Admin)</div>
-                <div className="text-[10px] text-slate-500 font-mono truncate">priya.s@vedichealth.org</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => applyCredentials('doctor@demo.com', 'password123')}
-                className="px-2.5 py-1.5 text-xs text-left bg-slate-50 hover:bg-cyan-50 hover:border-[#0891B2] border border-slate-200 rounded-lg transition-colors group"
-              >
-                <div className="font-medium text-slate-800 group-hover:text-[#0891B2]">Doctor Role</div>
-                <div className="text-[10px] text-slate-400 font-mono truncate">doctor@demo.com</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => applyCredentials('admin@enterprise-hms.com', 'password123')}
-                className="px-2.5 py-1.5 text-xs text-left bg-slate-50 hover:bg-cyan-50 hover:border-[#0891B2] border border-slate-200 rounded-lg transition-colors group"
-              >
-                <div className="font-medium text-slate-800 group-hover:text-[#0891B2]">Super Admin</div>
-                <div className="text-[10px] text-slate-400 font-mono truncate">admin@enterprise-hms.com</div>
-              </button>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                Quick Demo Access
+              </p>
+              <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                Password: password123
+              </span>
+            </div>
+            <div className="grid grid-cols-1 gap-2">
+              <div className="flex items-center justify-between p-2.5 bg-cyan-50/70 border border-cyan-200 rounded-lg transition-colors">
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold text-xs text-[#0891B2] flex items-center gap-1.5">
+                    <span>Priya (Admin)</span>
+                    <span className="text-[10px] font-normal text-slate-500 font-mono">password123</span>
+                  </div>
+                  <div className="text-[11px] text-slate-600 font-mono truncate">priya.s@vedichealth.org</div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                  <button
+                    type="button"
+                    onClick={() => applyCredentials('priya.s@vedichealth.org', 'password123')}
+                    className="px-2 py-1 text-[11px] text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded hover:bg-slate-50 font-medium transition-colors cursor-pointer"
+                  >
+                    Fill
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isLoading}
+                    onClick={() => handleQuickLogin('priya.s@vedichealth.org', 'password123')}
+                    className="px-2.5 py-1 text-[11px] text-white bg-[#0891B2] hover:bg-[#0e7490] rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    1-Click Sign In
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold text-xs text-slate-800 flex items-center gap-1.5">
+                    <span>Doctor Role</span>
+                    <span className="text-[10px] font-normal text-slate-400 font-mono">password123</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-mono truncate">doctor@demo.com</div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                  <button
+                    type="button"
+                    onClick={() => applyCredentials('doctor@demo.com', 'password123')}
+                    className="px-2 py-1 text-[11px] text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded hover:bg-slate-50 font-medium transition-colors cursor-pointer"
+                  >
+                    Fill
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isLoading}
+                    onClick={() => handleQuickLogin('doctor@demo.com', 'password123')}
+                    className="px-2.5 py-1 text-[11px] text-white bg-slate-700 hover:bg-slate-800 rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    1-Click Sign In
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold text-xs text-slate-800 flex items-center gap-1.5">
+                    <span>Super Admin</span>
+                    <span className="text-[10px] font-normal text-slate-400 font-mono">password123</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-mono truncate">admin@enterprise-hms.com</div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                  <button
+                    type="button"
+                    onClick={() => applyCredentials('admin@enterprise-hms.com', 'password123')}
+                    className="px-2 py-1 text-[11px] text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded hover:bg-slate-50 font-medium transition-colors cursor-pointer"
+                  >
+                    Fill
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isLoading}
+                    onClick={() => handleQuickLogin('admin@enterprise-hms.com', 'password123')}
+                    className="px-2.5 py-1 text-[11px] text-white bg-slate-700 hover:bg-slate-800 rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    1-Click Sign In
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 

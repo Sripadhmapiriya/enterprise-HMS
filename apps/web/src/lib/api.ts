@@ -55,9 +55,10 @@ async function request<T = any>(
     const json = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      // Attempt silent session refresh on 401 or 403 (e.g. stale token with outdated permissions)
+      // Attempt silent session refresh on 401 or 403 (except for login or refresh itself)
       const isRetried = (options as any)._retried;
-      if ((res.status === 401 || res.status === 403) && typeof window !== 'undefined' && !isRetried) {
+      const isAuthEndpoint = cleanEndpoint.includes('/auth/login') || cleanEndpoint.includes('/auth/refresh');
+      if ((res.status === 401 || res.status === 403) && typeof window !== 'undefined' && !isRetried && !isAuthEndpoint) {
         const storedRefresh = localStorage.getItem('hms_refresh_token');
         if (storedRefresh) {
           try {
