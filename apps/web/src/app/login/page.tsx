@@ -15,6 +15,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@enterprise-hms/ui';
+import { authApi } from '@/lib/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -31,6 +32,12 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const applyCredentials = (demoEmail: string, demoPass: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPass);
+    setErrorMessage(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
@@ -40,42 +47,42 @@ export default function LoginPage() {
     try {
       if (isMfaRequired) {
         // Submit MFA verification
-        const response = await fetch('/api/v1/auth/mfa/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, token: mfaCode }),
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error?.message || 'Invalid two-factor authentication code.');
+        const res = await authApi.verifyMfa({ email, token: mfaCode });
+        if (res.data?.accessToken) {
+          localStorage.setItem('hms_access_token', res.data.accessToken);
+          if (res.data.refreshToken) localStorage.setItem('hms_refresh_token', res.data.refreshToken);
+          if (res.data.user?.tenantId) localStorage.setItem('hms_tenant_id', res.data.user.tenantId);
+          if (res.data.user) localStorage.setItem('hms_user', JSON.stringify(res.data.user));
         }
         setSuccessMessage('Authentication verified. Redirecting to workspace...');
+        const params = new URLSearchParams(window.location.search);
+        const target = params.get('redirect') || '/dashboard';
         setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 800);
+          window.location.href = target;
+        }, 600);
       } else {
-        // Submit initial credentials
-        const response = await fetch('/api/v1/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        });
-        const data = await response.json();
+        // Submits to backend endpoint /api/v1/auth/login via authApi
+        const res = await authApi.login({ email, password });
 
-        if (!response.ok) {
-          throw new Error(data.error?.message || 'Invalid email or password.');
-        }
-
-        if (data.mfaRequired) {
+        if (res.data?.mfaRequired) {
           setIsMfaRequired(true);
           setIsLoading(false);
           return;
         }
 
+        if (res.data?.accessToken) {
+          localStorage.setItem('hms_access_token', res.data.accessToken);
+          if (res.data.refreshToken) localStorage.setItem('hms_refresh_token', res.data.refreshToken);
+          if (res.data.user?.tenantId) localStorage.setItem('hms_tenant_id', res.data.user.tenantId);
+          if (res.data.user) localStorage.setItem('hms_user', JSON.stringify(res.data.user));
+        }
+
         setSuccessMessage('Login successful. Loading clinical workspace...');
+        const params = new URLSearchParams(window.location.search);
+        const target = params.get('redirect') || '/dashboard';
         setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 800);
+          window.location.href = target;
+        }, 600);
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'Unable to connect to authentication service.');
@@ -265,6 +272,39 @@ export default function LoginPage() {
               {isMfaRequired ? 'Verify & Continue' : 'Sign in to Dashboard'}
             </Button>
           </form>
+
+          {/* Quick Demo Credentials */}
+          <div className="mt-5 pt-4 border-t border-slate-100">
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-center mb-2">
+              Quick Demo Access
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => applyCredentials('priya.s@vedichealth.org', 'password123')}
+                className="px-2.5 py-1.5 text-xs text-left bg-cyan-50/60 hover:bg-cyan-50 border border-cyan-200 rounded-lg transition-colors group"
+              >
+                <div className="font-semibold text-[#0891B2]">Priya (Admin)</div>
+                <div className="text-[10px] text-slate-500 font-mono truncate">priya.s@vedichealth.org</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => applyCredentials('doctor@demo.com', 'password123')}
+                className="px-2.5 py-1.5 text-xs text-left bg-slate-50 hover:bg-cyan-50 hover:border-[#0891B2] border border-slate-200 rounded-lg transition-colors group"
+              >
+                <div className="font-medium text-slate-800 group-hover:text-[#0891B2]">Doctor Role</div>
+                <div className="text-[10px] text-slate-400 font-mono truncate">doctor@demo.com</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => applyCredentials('admin@enterprise-hms.com', 'password123')}
+                className="px-2.5 py-1.5 text-xs text-left bg-slate-50 hover:bg-cyan-50 hover:border-[#0891B2] border border-slate-200 rounded-lg transition-colors group"
+              >
+                <div className="font-medium text-slate-800 group-hover:text-[#0891B2]">Super Admin</div>
+                <div className="text-[10px] text-slate-400 font-mono truncate">admin@enterprise-hms.com</div>
+              </button>
+            </div>
+          </div>
 
           {/* Compliance & Security Audit Footnote */}
           <div className="mt-6 pt-5 border-t border-slate-100 text-center">

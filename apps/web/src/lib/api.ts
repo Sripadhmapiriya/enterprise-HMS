@@ -55,6 +55,43 @@ async function request<T = any>(
     const json = await res.json().catch(() => ({}));
 
     if (!res.ok) {
+      // Attempt silent session refresh on 401 or 403 (e.g. stale token with outdated permissions)
+      const isRetried = (options as any)._retried;
+      if ((res.status === 401 || res.status === 403) && typeof window !== 'undefined' && !isRetried) {
+        const storedRefresh = localStorage.getItem('hms_refresh_token');
+        if (storedRefresh) {
+          try {
+            const refreshRes = await fetch(API_BASE + '/auth/refresh', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ refreshToken: storedRefresh }),
+            });
+            const refreshJson = await refreshRes.json().catch(() => ({}));
+            if (refreshRes.ok && refreshJson.data?.accessToken) {
+              localStorage.setItem('hms_access_token', refreshJson.data.accessToken);
+              if (refreshJson.data.refreshToken) {
+                localStorage.setItem('hms_refresh_token', refreshJson.data.refreshToken);
+              }
+              // Retry request with fresh token
+              return request<T>(endpoint, {
+                ...options,
+                _retried: true,
+              } as any);
+            }
+          } catch {
+            // Proceed to standard fallback if refresh fails
+          }
+        }
+
+        if (res.status === 401) {
+          localStorage.removeItem('hms_access_token');
+          if (window.location.pathname !== '/login') {
+            const redirect = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `/login?redirect=${redirect}`;
+          }
+        }
+      }
+
       const err = json?.error || {};
       throw new ApiClientError(
         err.message || 'Request failed with status ' + res.status,
@@ -70,6 +107,31 @@ async function request<T = any>(
     throw new ApiClientError(error?.message || 'Network request failed', 'NETWORK_ERROR', 0);
   }
 }
+
+// ==========================================
+// AUTH API
+// ==========================================
+
+export const authApi = {
+  login: async (credentials: { email: string; password: string }) => {
+    return request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+  },
+  verifyMfa: async (data: { email: string; token: string }) => {
+    return request('/auth/mfa/verify', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  refresh: async (refreshToken: string) => {
+    return request('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
+  },
+};
 
 // ==========================================
 // PATIENTS API

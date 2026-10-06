@@ -85,6 +85,9 @@ router.post('/login', async (req, res, next) => {
 
     for (const ur of user.roles) {
       roles.push(ur.role.name);
+      if (ur.role.isSystem || ur.role.name === 'System Administrator' || ur.role.name === 'Super Admin') {
+        permissionsSet.add('*');
+      }
       for (const rp of ur.role.permissions) {
         permissionsSet.add(`\${rp.permission.category}.\${rp.permission.action}`);
       }
@@ -155,6 +158,9 @@ router.post('/refresh', async (req, res, next) => {
 
     for (const ur of user.roles) {
       roles.push(ur.role.name);
+      if (ur.role.isSystem || ur.role.name === 'System Administrator' || ur.role.name === 'Super Admin') {
+        permissionsSet.add('*');
+      }
       for (const rp of ur.role.permissions) {
         permissionsSet.add(`\${rp.permission.category}.\${rp.permission.action}`);
       }

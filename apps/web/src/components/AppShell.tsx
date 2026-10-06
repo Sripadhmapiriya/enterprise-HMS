@@ -204,6 +204,47 @@ export function AppShell({ children }: { children: ReactNode }) {
     'St. Jude Trauma Center - East',
   ];
 
+  // User state & Authentication Guard
+  const [currentUser, setCurrentUser] = useState<{
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    roles?: string[];
+  } | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('hms_access_token');
+      if (!token) {
+        window.location.href = '/login?redirect=' + encodeURIComponent(pathname);
+        return;
+      }
+      try {
+        const raw = localStorage.getItem('hms_user');
+        if (raw) setCurrentUser(JSON.parse(raw));
+      } catch {}
+    }
+  }, [pathname]);
+
+  const handleSignOut = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('hms_access_token');
+      localStorage.removeItem('hms_refresh_token');
+      localStorage.removeItem('hms_tenant_id');
+      localStorage.removeItem('hms_user');
+      window.location.href = '/login';
+    }
+  };
+
+  const displayName = currentUser?.firstName
+    ? `${currentUser.firstName} ${currentUser.lastName || ''}`.trim()
+    : 'Dr. Sarah Jenkins';
+  const displayEmail = currentUser?.email || 'sarah.jenkins@hospital.org';
+  const displayRole = currentUser?.roles?.[0] || 'Physician / Admin';
+  const initials = currentUser?.firstName
+    ? `${currentUser.firstName[0]}${currentUser.lastName?.[0] || ''}`.toUpperCase()
+    : 'SJ';
+
   // Global Ctrl+K / Cmd+K listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -358,12 +399,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="p-3 border-t border-slate-800 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-cyan-700 text-white flex items-center justify-center text-xs font-bold shrink-0">
-              SJ
+              {initials}
             </div>
             {isSidebarOpen && (
               <div className="overflow-hidden">
-                <div className="text-xs font-semibold text-slate-200 truncate">Dr. Sarah Jenkins</div>
-                <div className="text-[10px] text-slate-400 truncate">Lead Physician • Main Campus</div>
+                <div className="text-xs font-semibold text-slate-200 truncate">{displayName}</div>
+                <div className="text-[10px] text-slate-400 truncate">{displayRole} • Main Campus</div>
               </div>
             )}
           </div>
@@ -504,7 +545,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 className="flex items-center gap-2 p-1 rounded-md hover:bg-slate-100 transition-colors"
               >
                 <div className="w-7 h-7 rounded-full bg-[#0891B2] text-white flex items-center justify-center text-xs font-bold">
-                  SJ
+                  {initials}
                 </div>
                 <ChevronDown className="w-3 h-3 text-slate-400 hidden sm:block" aria-hidden="true" />
               </button>
@@ -512,10 +553,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-1.5 w-52 rounded-md border border-slate-200 bg-white p-1.5 shadow-lg z-40 space-y-1 text-xs">
                   <div className="px-2 py-1.5 border-b border-slate-100">
-                    <div className="font-semibold text-slate-800">Dr. Sarah Jenkins</div>
-                    <div className="text-[11px] text-slate-500">sarah.jenkins@hospital.org</div>
+                    <div className="font-semibold text-slate-800">{displayName}</div>
+                    <div className="text-[11px] text-slate-500 truncate">{displayEmail}</div>
                     <span className="inline-block mt-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-800">
-                      Physician / Admin
+                      {displayRole}
                     </span>
                   </div>
                   <Link
@@ -525,14 +566,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                   >
                     User Profile & Security
                   </Link>
-                  <Link
-                    href="/login"
-                    className="flex items-center gap-2 px-2 py-1.5 rounded text-red-600 hover:bg-red-50"
-                    onClick={() => setIsUserMenuOpen(false)}
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-red-600 hover:bg-red-50 text-left cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
                     <span>Sign Out</span>
-                  </Link>
+                  </button>
                 </div>
               )}
             </div>

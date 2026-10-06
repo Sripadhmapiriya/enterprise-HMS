@@ -102,7 +102,7 @@ describe('Workstream I: Analytics, Integrations, Enterprise Admin & Platform Ser
       }));
 
     const doctor =
-      (await prisma.doctor.findFirst({ where: { branchId: branch.id } })) ||
+      (await prisma.doctor.findFirst({ where: { userId: user.id } })) ||
       (await prisma.doctor.create({
         data: {
           userId: user.id,

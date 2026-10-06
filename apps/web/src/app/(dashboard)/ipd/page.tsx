@@ -26,14 +26,22 @@ export default function IpdDashboard() {
   const loadData = async () => {
     try {
       setLoading(true);
+      setErrorMsg('');
       const [admRes, boardRes] = await Promise.all([
-        ipdApi.getAdmissions(),
-        ipdApi.getBedBoard(),
+        ipdApi.getAdmissions().catch((e) => {
+          console.warn('Admissions fetch warning:', e.message);
+          return { success: false, data: [] };
+        }),
+        ipdApi.getBedBoard().catch((e) => {
+          console.warn('Bed board fetch warning:', e.message);
+          return { success: false, data: null };
+        }),
       ]);
       setAdmissions(admRes.data || []);
       setBedBoard(boardRes.data || null);
     } catch (err: any) {
       console.error('Failed to load IPD data', err);
+      setErrorMsg(err.message || 'Unable to load inpatient records.');
     } finally {
       setLoading(false);
     }

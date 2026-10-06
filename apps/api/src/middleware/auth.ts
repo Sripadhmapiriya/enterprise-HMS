@@ -48,7 +48,10 @@ export function requirePermission(permissionCode: string) {
     }
 
     const permissions = req.user.permissions || [];
+    const roles = req.user.roles || [];
     const hasPermission =
+      roles.includes('System Administrator') ||
+      roles.includes('Super Admin') ||
       permissions.includes('*') ||
       permissions.includes('superadmin') ||
       permissions.includes(permissionCode) ||
