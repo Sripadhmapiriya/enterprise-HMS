@@ -172,14 +172,14 @@ export default function InventoryDashboard() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <Boxes className="w-6 h-6 text-blue-600" />
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Inventory & Materials Management</h1>
+            <Boxes className="w-6 h-6 text-info" />
+            <h1 className="text-2xl font-bold text-text tracking-tight">Inventory & Materials Management</h1>
           </div>
-          <p className="text-slate-500 mt-1">Multi-store stock tracking, FEFO batch control, and stock ledger adjustments.</p>
+          <p className="text-text-muted mt-1">Multi-store stock tracking, FEFO batch control, and stock ledger adjustments.</p>
         </div>
         <div className="flex items-center space-x-3">
           <Button variant="secondary" onClick={() => loadData()} disabled={loading}>
-            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ?'animate-spin' : ''}`} />
             Refresh
           </Button>
           <Button variant="secondary" onClick={() => setIsAdjustOpen(true)}>
@@ -195,50 +195,49 @@ export default function InventoryDashboard() {
 
       {/* KPI Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <span className="text-xs font-semibold text-slate-500 uppercase">Item Master Catalog</span>
-          <div className="text-3xl font-bold text-slate-900 mt-1 tabular-nums">{items.length}</div>
-          <span className="text-xs text-slate-500">Active SKUs registered</span>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <span className="text-xs font-semibold text-text-muted uppercase">Item Master Catalog</span>
+          <div className="text-3xl font-bold text-text mt-1 tabular-nums">{items.length}</div>
+          <span className="text-xs text-text-muted">Active SKUs registered</span>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <span className="text-xs font-semibold text-slate-500 uppercase">Total Available Units</span>
-          <div className="text-3xl font-bold text-blue-600 mt-1 tabular-nums">{totalStockCount}</div>
-          <span className="text-xs text-slate-500">Across {locations.length} store locations</span>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <span className="text-xs font-semibold text-text-muted uppercase">Total Available Units</span>
+          <div className="text-3xl font-bold text-info mt-1 tabular-nums">{totalStockCount}</div>
+          <span className="text-xs text-text-muted">Across {locations.length} store locations</span>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-amber-200 shadow-sm bg-amber-50/30">
+        <div className="bg-surface p-5 rounded-xl border border-warning-border shadow-sm bg-warning-bg/30">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-700 uppercase">Low Stock Alerts</span>
-            <AlertTriangle className="w-4 h-4 text-amber-600" />
+            <span className="text-xs font-semibold text-warning-text uppercase">Low Stock Alerts</span>
+            <AlertTriangle className="w-4 h-4 text-warning" />
           </div>
-          <div className="text-3xl font-bold text-amber-700 mt-1 tabular-nums">
+          <div className="text-3xl font-bold text-warning-text mt-1 tabular-nums">
             {alerts.lowStock.length}
           </div>
-          <span className="text-xs text-amber-600">Items below reorder point</span>
+          <span className="text-xs text-warning">Items below reorder point</span>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-rose-200 shadow-sm bg-rose-50/30">
+        <div className="bg-surface p-5 rounded-xl border border-critical-border shadow-sm bg-critical-bg/30">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-rose-700 uppercase">Near Expiry Batches</span>
-            <AlertOctagon className="w-4 h-4 text-rose-600" />
+            <span className="text-xs font-semibold text-critical-text uppercase">Near Expiry Batches</span>
+            <AlertOctagon className="w-4 h-4 text-critical" />
           </div>
-          <div className="text-3xl font-bold text-rose-700 mt-1 tabular-nums">
+          <div className="text-3xl font-bold text-critical-text mt-1 tabular-nums">
             {alerts.expiringBatches.length}
           </div>
-          <span className="text-xs text-rose-600">Expiring within 90 days</span>
+          <span className="text-xs text-critical">Expiring within 90 days</span>
         </div>
       </div>
 
       {/* Tabs & Search */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
-        <div className="flex space-x-2 border-b border-slate-200 w-full sm:w-auto">
+        <div className="flex space-x-2 border-b border-border w-full sm:w-auto">
           <button
             onClick={() => setActiveTab('products')}
-            className={`pb-3 px-3 text-sm font-semibold flex items-center border-b-2 transition-colors ${
-              activeTab === 'products'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
+            className={`pb-3 px-3 text-sm font-semibold flex items-center border-b-2 transition-colors ${ activeTab ==='products'
+                ? 'border-brand text-info'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             <Package className="w-4 h-4 mr-1.5" />
@@ -246,10 +245,9 @@ export default function InventoryDashboard() {
           </button>
           <button
             onClick={() => setActiveTab('batches')}
-            className={`pb-3 px-3 text-sm font-semibold flex items-center border-b-2 transition-colors ${
-              activeTab === 'batches'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
+            className={`pb-3 px-3 text-sm font-semibold flex items-center border-b-2 transition-colors ${ activeTab ==='batches'
+                ? 'border-brand text-info'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             <Layers className="w-4 h-4 mr-1.5" />
@@ -258,11 +256,11 @@ export default function InventoryDashboard() {
         </div>
 
         <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-3 top-3 text-text-muted" />
           <input
             type="text"
             placeholder="Search items or SKU..."
-            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-9 pr-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -271,7 +269,7 @@ export default function InventoryDashboard() {
 
       {/* Main View */}
       {loading ? (
-        <div className="space-y-3 bg-white p-6 rounded-xl border border-slate-200">
+        <div className="space-y-3 bg-surface p-6 rounded-xl border border-border">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-10 w-full" />
@@ -287,9 +285,9 @@ export default function InventoryDashboard() {
             onAction={() => setIsReceiveOpen(true)}
           />
         ) : (
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+            <table className="w-full text-left text-sm text-text-muted">
+              <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                 <tr>
                   <th className="px-5 py-3">Item / SKU</th>
                   <th className="px-5 py-3">Category</th>
@@ -299,17 +297,17 @@ export default function InventoryDashboard() {
                   <th className="px-5 py-3">Stock Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {filteredItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/60 transition-colors">
+                  <tr key={item.id} className="hover:bg-surface-subtle/60 transition-colors">
                     <td className="px-5 py-3">
-                      <div className="font-semibold text-slate-900">{item.name}</div>
-                      <div className="text-xs text-slate-400 font-mono">{item.code}</div>
+                      <div className="font-semibold text-text">{item.name}</div>
+                      <div className="text-xs text-text-muted font-mono">{item.code}</div>
                     </td>
-                    <td className="px-5 py-3 text-slate-700">{item.category}</td>
-                    <td className="px-5 py-3 text-slate-700">{item.unit}</td>
+                    <td className="px-5 py-3 text-text">{item.category}</td>
+                    <td className="px-5 py-3 text-text">{item.unit}</td>
                     <td className="px-5 py-3 tabular-nums font-mono">{item.reorderLevel}</td>
-                    <td className="px-5 py-3 font-bold text-slate-900 tabular-nums">
+                    <td className="px-5 py-3 font-bold text-text tabular-nums">
                       {item.totalStock}
                     </td>
                     <td className="px-5 py-3">
@@ -328,9 +326,9 @@ export default function InventoryDashboard() {
           </div>
         )
       ) : (
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+        <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3">Product</th>
                 <th className="px-5 py-3">Batch #</th>
@@ -340,20 +338,20 @@ export default function InventoryDashboard() {
                 <th className="px-5 py-3">Expiry Date (FEFO)</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border">
               {batches.map((b) => {
                 const isExpired = new Date(b.expiryDate) <= new Date();
                 return (
-                  <tr key={b.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="px-5 py-3 font-semibold text-slate-900">
+                  <tr key={b.id} className="hover:bg-surface-subtle/60 transition-colors">
+                    <td className="px-5 py-3 font-semibold text-text">
                       {b.product?.name} ({b.product?.code})
                     </td>
-                    <td className="px-5 py-3 font-mono font-bold text-slate-800">{b.batchNumber}</td>
-                    <td className="px-5 py-3 text-slate-700">{b.location?.name}</td>
-                    <td className="px-5 py-3 font-bold text-slate-900 tabular-nums">{b.availableQty}</td>
+                    <td className="px-5 py-3 font-mono font-bold text-text">{b.batchNumber}</td>
+                    <td className="px-5 py-3 text-text">{b.location?.name}</td>
+                    <td className="px-5 py-3 font-bold text-text tabular-nums">{b.availableQty}</td>
                     <td className="px-5 py-3 font-mono">${(b.sellingRate || 0).toFixed(2)}</td>
                     <td className="px-5 py-3">
-                      <span className={`font-mono text-xs font-semibold ${isExpired ? 'text-rose-600' : 'text-slate-700'}`}>
+                      <span className={`font-mono text-xs font-semibold ${isExpired ?'text-critical' : 'text-text'}`}>
                         {new Date(b.expiryDate).toLocaleDateString()}
                       </span>
                       {isExpired && <Badge variant="critical" size="sm" className="ml-2">Expired</Badge>}
@@ -433,7 +431,7 @@ export default function InventoryDashboard() {
             onChange={(e) => setBatchForm({ ...batchForm, supplierName: e.target.value })}
           />
 
-          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end space-x-3 pt-3 border-t border-border">
             <Button variant="secondary" type="button" onClick={() => setIsReceiveOpen(false)}>
               Cancel
             </Button>
@@ -485,7 +483,7 @@ export default function InventoryDashboard() {
             rows={2}
           />
 
-          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end space-x-3 pt-3 border-t border-border">
             <Button variant="secondary" type="button" onClick={() => setIsAdjustOpen(false)}>
               Cancel
             </Button>

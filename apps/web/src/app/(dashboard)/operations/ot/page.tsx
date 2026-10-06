@@ -197,15 +197,15 @@ export default function OTDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Operating Theatre Suite (OT)</h1>
-          <p className="text-slate-500 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-text tracking-tight">Operating Theatre Suite (OT)</h1>
+          <p className="text-text-muted text-sm mt-0.5">
             Surgical booking, conflict-aware theatre scheduling, WHO safety checklists, and operative records.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={openNewRequestModal}
-            className="inline-flex items-center px-3.5 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 shadow-sm"
+            className="inline-flex items-center px-3.5 py-2 border border-border text-sm font-medium rounded-lg text-text bg-surface hover:bg-surface-subtle shadow-sm"
           >
             + Surgery Request
           </button>
@@ -214,7 +214,7 @@ export default function OTDashboard() {
               setShowScheduleModal(true);
               setNotice(null);
             }}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 shadow-sm"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-brand-foreground bg-brand hover:bg-brand-hover shadow-sm"
           >
             Schedule OT Slot
           </button>
@@ -223,10 +223,9 @@ export default function OTDashboard() {
 
       {notice && (
         <div
-          className={`p-3.5 rounded-lg text-xs font-medium flex justify-between items-center ${
-            notice.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border border-rose-200 text-rose-800'
+          className={`p-3.5 rounded-lg text-xs font-medium flex justify-between items-center ${ notice.type ==='success'
+              ? 'bg-stable-bg border border-stable-border text-stable-text'
+              : 'bg-critical-bg border border-critical-border text-critical-text'
           }`}
         >
           <span>{notice.text}</span>
@@ -236,60 +235,58 @@ export default function OTDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Active Theatres</p>
-          <p className="text-2xl font-bold text-slate-900 mt-2">{theatres.length}</p>
-          <p className="text-xs text-slate-400 mt-1">Major, Minor, Cardiac, Endoscopy</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Active Theatres</p>
+          <p className="text-2xl font-bold text-text mt-2">{theatres.length}</p>
+          <p className="text-xs text-text-muted mt-1">Major, Minor, Cardiac, Endoscopy</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Surgeries Scheduled</p>
-          <p className="text-2xl font-bold text-blue-600 mt-2">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Surgeries Scheduled</p>
+          <p className="text-2xl font-bold text-info mt-2">
             {schedules.filter((s) => s.status === 'SCHEDULED' || s.status === 'PREPARING').length}
           </p>
-          <p className="text-xs text-slate-400 mt-1">Pending operative execution</p>
+          <p className="text-xs text-text-muted mt-1">Pending operative execution</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Surgeries In-Progress</p>
-          <p className="text-2xl font-bold text-amber-600 mt-2">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Surgeries In-Progress</p>
+          <p className="text-2xl font-bold text-warning mt-2">
             {schedules.filter((s) => s.status === 'IN_PROGRESS').length}
           </p>
-          <p className="text-xs text-slate-400 mt-1">Currently on table</p>
+          <p className="text-xs text-text-muted mt-1">Currently on table</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Surgeries Completed</p>
-          <p className="text-2xl font-bold text-emerald-600 mt-2">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Surgeries Completed</p>
+          <p className="text-2xl font-bold text-stable mt-2">
             {schedules.filter((s) => s.status === 'COMPLETED').length}
           </p>
-          <p className="text-xs text-slate-400 mt-1">Post-op recovery and cleaning</p>
+          <p className="text-xs text-text-muted mt-1">Post-op recovery and cleaning</p>
         </div>
       </div>
 
       {/* Operating Theatres Live Status */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-3">
-        <h2 className="text-base font-semibold text-slate-900">Operating Theatre Live Status</h2>
+      <div className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-3">
+        <h2 className="text-base font-semibold text-text">Operating Theatre Live Status</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {theatres.map((th) => (
             <div
               key={th.id}
-              className={`p-4 rounded-lg border ${
-                th.status === 'IN_USE'
-                  ? 'bg-rose-50 border-rose-200 text-rose-950'
+              className={`p-4 rounded-lg border ${ th.status ==='IN_USE'
+                  ? 'bg-critical-bg border-critical-border text-critical-text'
                   : th.status === 'AVAILABLE'
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-950'
-                  : 'bg-slate-50 border-slate-200 text-slate-800'
+                  ? 'bg-stable-bg border-stable-border text-stable-text'
+                  : 'bg-surface-subtle border-border text-text'
               }`}
             >
               <div className="flex justify-between items-center">
                 <span className="font-bold text-sm">{th.name}</span>
-                <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${
-                  th.status === 'IN_USE' ? 'bg-rose-200 text-rose-900' : 'bg-emerald-200 text-emerald-900'
+                <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${ th.status ==='IN_USE' ? 'bg-critical-bg text-critical-text' : 'bg-stable-bg text-stable-text'
                 }`}>
                   {th.status}
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-1">Type: {th.type} ({th.code})</p>
+              <p className="text-xs text-text-muted mt-1">Type: {th.type} ({th.code})</p>
               {th.schedules && th.schedules.length > 0 && (
-                <p className="text-xs font-medium text-slate-700 mt-2 truncate">
+                <p className="text-xs font-medium text-text mt-2 truncate">
                   Next: {th.schedules[0].request?.procedureName}
                 </p>
               )}
@@ -299,15 +296,15 @@ export default function OTDashboard() {
       </div>
 
       {/* Main Surgery Schedule Table */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-          <h2 className="text-base font-semibold text-slate-900">Surgical Schedule & Operative Worklist</h2>
-          <span className="text-xs text-slate-500">{schedules.length} surgical cases</span>
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border flex justify-between items-center">
+          <h2 className="text-base font-semibold text-text">Surgical Schedule & Operative Worklist</h2>
+          <span className="text-xs text-text-muted">{schedules.length} surgical cases</span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3">Scheduled Time</th>
                 <th className="px-5 py-3">Theatre</th>
@@ -318,16 +315,16 @@ export default function OTDashboard() {
                 <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
+            <tbody className="divide-y divide-border text-xs">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={7} className="px-5 py-8 text-center text-text-muted">
                     Loading surgical schedules...
                   </td>
                 </tr>
               ) : schedules.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={7} className="px-5 py-8 text-center text-text-muted">
                     No surgeries scheduled. Click &quot;Schedule OT Slot&quot; to book an operative session.
                   </td>
                 </tr>
@@ -338,47 +335,46 @@ export default function OTDashboard() {
                   const endStr = new Date(s.scheduledEnd).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                   return (
-                    <tr key={s.id} className="hover:bg-slate-50/50">
+                    <tr key={s.id} className="hover:bg-surface-subtle/50">
                       <td className="px-5 py-4 font-mono">
-                        <strong className="text-slate-900">{startStr} - {endStr}</strong>
-                        <span className="text-[11px] text-slate-400 block font-sans">
+                        <strong className="text-text">{startStr} - {endStr}</strong>
+                        <span className="text-[11px] text-text-muted block font-sans">
                           {new Date(s.scheduledStart).toLocaleDateString()}
                         </span>
                       </td>
-                      <td className="px-5 py-4 font-semibold text-slate-800">
+                      <td className="px-5 py-4 font-semibold text-text">
                         {s.ot?.name}
                       </td>
                       <td className="px-5 py-4">
-                        <strong className="text-slate-900">{patient?.firstName} {patient?.lastName}</strong>
-                        <span className="text-slate-400 block text-[11px]">
+                        <strong className="text-text">{patient?.firstName} {patient?.lastName}</strong>
+                        <span className="text-text-muted block text-[11px]">
                           MRN: {patient?.mrn} • Blood: {patient?.bloodGroup || 'Unspecified'}
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <strong className="text-blue-900 block">{s.request?.procedureName}</strong>
-                        <span className="text-slate-500 text-[11px]">{s.request?.diagnosis || 'Elective procedure'}</span>
+                        <strong className="text-info-text block">{s.request?.procedureName}</strong>
+                        <span className="text-text-muted text-[11px]">{s.request?.diagnosis || 'Elective procedure'}</span>
                       </td>
                       <td className="px-5 py-4">
                         {s.team && s.team.length > 0 ? (
                           <div className="space-y-0.5">
                             {s.team.map((t: any) => (
-                              <span key={t.id} className="block text-[11px] text-slate-600">
+                              <span key={t.id} className="block text-[11px] text-text-muted">
                                 <strong>{t.role}:</strong> {t.user?.name || 'Staff'}
                               </span>
                             ))}
                           </div>
                         ) : (
-                          <span className="text-slate-400 italic">Team unassigned</span>
+                          <span className="text-text-muted italic">Team unassigned</span>
                         )}
                       </td>
                       <td className="px-5 py-4">
                         <span
-                          className={`text-xs px-2.5 py-0.5 rounded-full font-bold ${
-                            s.status === 'COMPLETED'
-                              ? 'bg-emerald-100 text-emerald-800'
+                          className={`text-xs px-2.5 py-0.5 rounded-full font-bold ${ s.status ==='COMPLETED'
+                              ? 'bg-stable-bg text-stable-text'
                               : s.status === 'IN_PROGRESS'
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-blue-100 text-blue-800'
+                              ? 'bg-warning-bg text-warning-text'
+                              : 'bg-info-bg text-info-text'
                           }`}
                         >
                           {s.status}
@@ -389,7 +385,7 @@ export default function OTDashboard() {
                           {s.status === 'SCHEDULED' && (
                             <button
                               onClick={() => handleStatusChange(s.id, 'IN_PROGRESS')}
-                              className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-[11px] font-bold"
+                              className="px-2.5 py-1 bg-warning hover:bg-warning text-brand-foreground rounded text-[11px] font-bold"
                             >
                               Start Surgery
                             </button>
@@ -397,14 +393,14 @@ export default function OTDashboard() {
                           {s.status === 'IN_PROGRESS' && (
                             <button
                               onClick={() => handleStatusChange(s.id, 'COMPLETED')}
-                              className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold"
+                              className="px-2.5 py-1 bg-stable hover:bg-stable text-brand-foreground rounded text-[11px] font-bold"
                             >
                               Complete Surgery
                             </button>
                           )}
                           <button
                             onClick={() => setChecklistSchedule(s)}
-                            className="px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded text-[11px] font-semibold border border-blue-200"
+                            className="px-2.5 py-1 bg-info-bg text-info-text hover:bg-info-bg rounded text-[11px] font-semibold border border-info-border"
                           >
                             WHO Checklist
                           </button>
@@ -420,7 +416,7 @@ export default function OTDashboard() {
                                 bloodLoss: 50,
                               });
                             }}
-                            className="px-2.5 py-1 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded text-[11px] font-semibold"
+                            className="px-2.5 py-1 bg-surface-subtle text-text hover:bg-surface-subtle rounded text-[11px] font-semibold"
                           >
                             Op Note
                           </button>
@@ -437,23 +433,23 @@ export default function OTDashboard() {
 
       {/* Schedule Slot Modal (with conflict detection) */}
       {showScheduleModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4">
-            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
+        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4">
+            <div className="border-b border-border pb-3 flex justify-between items-center">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Schedule Operating Theatre Slot</h3>
-                <p className="text-xs text-slate-500">Automated conflict detection prevents overlapping bookings.</p>
+                <h3 className="text-base font-bold text-text">Schedule Operating Theatre Slot</h3>
+                <p className="text-xs text-text-muted">Automated conflict detection prevents overlapping bookings.</p>
               </div>
-              <button onClick={() => setShowScheduleModal(false)} className="text-slate-400 font-bold">x</button>
+              <button onClick={() => setShowScheduleModal(false)} className="text-text-muted font-bold">x</button>
             </div>
 
             <form onSubmit={handleScheduleSurgery} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Select Surgery Request *</label>
+                <label className="block text-xs font-medium text-text mb-1">Select Surgery Request *</label>
                 <select
                   value={selectedRequestId}
                   onChange={(e) => setSelectedRequestId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
                   required
                 >
                   <option value="">-- Choose Request --</option>
@@ -466,16 +462,16 @@ export default function OTDashboard() {
                     ))}
                 </select>
                 {requests.filter((r) => r.status === 'REQUESTED').length === 0 && (
-                  <p className="text-[11px] text-amber-600 mt-1">No unbooked requests. Create a Surgery Request first.</p>
+                  <p className="text-[11px] text-warning mt-1">No unbooked requests. Create a Surgery Request first.</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Operating Theatre *</label>
+                <label className="block text-xs font-medium text-text mb-1">Operating Theatre *</label>
                 <select
                   value={selectedOtId}
                   onChange={(e) => setSelectedOtId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
                   required
                 >
                   <option value="">-- Choose Theatre --</option>
@@ -489,39 +485,39 @@ export default function OTDashboard() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Scheduled Start *</label>
+                  <label className="block text-xs font-medium text-text mb-1">Scheduled Start *</label>
                   <input
                     type="datetime-local"
                     value={scheduledStart}
                     onChange={(e) => setScheduledStart(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
+                    className="w-full px-3 py-1.5 border border-border rounded-lg text-xs"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Scheduled End *</label>
+                  <label className="block text-xs font-medium text-text mb-1">Scheduled End *</label>
                   <input
                     type="datetime-local"
                     value={scheduledEnd}
                     onChange={(e) => setScheduledEnd(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
+                    className="w-full px-3 py-1.5 border border-border rounded-lg text-xs"
                     required
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowScheduleModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700"
+                  className="px-4 py-2 border border-border rounded-lg text-xs text-text"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={schedulingSubmitting}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold disabled:opacity-50"
+                  className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold disabled:opacity-50"
                 >
                   {schedulingSubmitting ? 'Checking Conflict & Booking...' : 'Confirm OT Booking'}
                 </button>
@@ -533,19 +529,19 @@ export default function OTDashboard() {
 
       {/* WHO Checklist Modal */}
       {checklistSchedule && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
+        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl max-w-xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="border-b border-border pb-3 flex justify-between items-center">
               <div>
-                <h3 className="text-base font-bold text-slate-900">WHO Surgical Safety Checklist</h3>
-                <p className="text-xs text-slate-500">Sign In • Time Out • Sign Out verification</p>
+                <h3 className="text-base font-bold text-text">WHO Surgical Safety Checklist</h3>
+                <p className="text-xs text-text-muted">Sign In • Time Out • Sign Out verification</p>
               </div>
-              <button onClick={() => setChecklistSchedule(null)} className="text-slate-400 font-bold">x</button>
+              <button onClick={() => setChecklistSchedule(null)} className="text-text-muted font-bold">x</button>
             </div>
 
             <form onSubmit={handleSaveWhoChecklist} className="space-y-4 text-xs">
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg space-y-2">
-                <p className="font-bold text-blue-900 uppercase">Part 1: Sign In (Before Induction of Anaesthesia)</p>
+              <div className="p-3 bg-info-bg border border-info-border rounded-lg space-y-2">
+                <p className="font-bold text-info-text uppercase">Part 1: Sign In (Before Induction of Anaesthesia)</p>
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -572,8 +568,8 @@ export default function OTDashboard() {
                 </label>
               </div>
 
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg space-y-2">
-                <p className="font-bold text-amber-900 uppercase">Part 2: Time Out (Before Skin Incision)</p>
+              <div className="p-3 bg-warning-bg border border-warning-border rounded-lg space-y-2">
+                <p className="font-bold text-warning-text uppercase">Part 2: Time Out (Before Skin Incision)</p>
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -600,8 +596,8 @@ export default function OTDashboard() {
                 </label>
               </div>
 
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg space-y-2">
-                <p className="font-bold text-emerald-900 uppercase">Part 3: Sign Out (Before Patient Leaves OT)</p>
+              <div className="p-3 bg-stable-bg border border-stable-border rounded-lg space-y-2">
+                <p className="font-bold text-stable-text uppercase">Part 3: Sign Out (Before Patient Leaves OT)</p>
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -620,17 +616,17 @@ export default function OTDashboard() {
                 </label>
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setChecklistSchedule(null)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700"
+                  className="px-4 py-2 border border-border rounded-lg text-xs text-text"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold"
+                  className="px-4 py-2 bg-stable hover:bg-stable text-brand-foreground rounded-lg text-xs font-semibold"
                 >
                   Certify WHO Checklist
                 </button>
@@ -642,96 +638,96 @@ export default function OTDashboard() {
 
       {/* Operative Note Modal */}
       {noteSchedule && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
+        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="border-b border-border pb-3 flex justify-between items-center">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Operative Procedure Note</h3>
-                <p className="text-xs text-slate-500">Document surgical findings, technique, and estimated blood loss.</p>
+                <h3 className="text-base font-bold text-text">Operative Procedure Note</h3>
+                <p className="text-xs text-text-muted">Document surgical findings, technique, and estimated blood loss.</p>
               </div>
-              <button onClick={() => setNoteSchedule(null)} className="text-slate-400 font-bold">x</button>
+              <button onClick={() => setNoteSchedule(null)} className="text-text-muted font-bold">x</button>
             </div>
 
             <form onSubmit={handleSaveNote} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Pre-op Diagnosis *</label>
+                  <label className="block text-xs font-medium text-text mb-1">Pre-op Diagnosis *</label>
                   <input
                     type="text"
                     value={noteForm.preOpDiagnosis}
                     onChange={(e) => setNoteForm({ ...noteForm, preOpDiagnosis: e.target.value })}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                    className="w-full px-3 py-1.5 border border-border rounded text-xs"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Post-op Diagnosis *</label>
+                  <label className="block text-xs font-medium text-text mb-1">Post-op Diagnosis *</label>
                   <input
                     type="text"
                     value={noteForm.postOpDiagnosis}
                     onChange={(e) => setNoteForm({ ...noteForm, postOpDiagnosis: e.target.value })}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                    className="w-full px-3 py-1.5 border border-border rounded text-xs"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Intraoperative Findings *</label>
+                <label className="block text-xs font-medium text-text mb-1">Intraoperative Findings *</label>
                 <textarea
                   rows={2}
                   value={noteForm.findings}
                   onChange={(e) => setNoteForm({ ...noteForm, findings: e.target.value })}
                   placeholder="Pathology visual findings, tissue state..."
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                  className="w-full px-3 py-1.5 border border-border rounded text-xs"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Procedure Details / Technique *</label>
+                <label className="block text-xs font-medium text-text mb-1">Procedure Details / Technique *</label>
                 <textarea
                   rows={3}
                   value={noteForm.procedureDetails}
                   onChange={(e) => setNoteForm({ ...noteForm, procedureDetails: e.target.value })}
                   placeholder="Incision, dissection, resection, closure details..."
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                  className="w-full px-3 py-1.5 border border-border rounded text-xs"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Estimated Blood Loss (ml)</label>
+                  <label className="block text-xs font-medium text-text mb-1">Estimated Blood Loss (ml)</label>
                   <input
                     type="number"
                     value={noteForm.bloodLoss}
                     onChange={(e) => setNoteForm({ ...noteForm, bloodLoss: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                    className="w-full px-3 py-1.5 border border-border rounded text-xs"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Complications</label>
+                  <label className="block text-xs font-medium text-text mb-1">Complications</label>
                   <input
                     type="text"
                     value={noteForm.complications}
                     onChange={(e) => setNoteForm({ ...noteForm, complications: e.target.value })}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                    className="w-full px-3 py-1.5 border border-border rounded text-xs"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setNoteSchedule(null)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700"
+                  className="px-4 py-2 border border-border rounded-lg text-xs text-text"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold"
+                  className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold"
                 >
                   Save Procedure Note
                 </button>
@@ -743,19 +739,19 @@ export default function OTDashboard() {
 
       {/* New Request Modal */}
       {showRequestModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
-              <h3 className="text-base font-bold text-slate-900">New Surgery Request</h3>
-              <button onClick={() => setShowRequestModal(false)} className="text-slate-400 font-bold">x</button>
+        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div className="border-b border-border pb-3 flex justify-between items-center">
+              <h3 className="text-base font-bold text-text">New Surgery Request</h3>
+              <button onClick={() => setShowRequestModal(false)} className="text-text-muted font-bold">x</button>
             </div>
             <form onSubmit={handleCreateRequest} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Select Patient *</label>
+                <label className="block text-xs font-medium text-text mb-1">Select Patient *</label>
                 <select
                   value={selectedPatientId}
                   onChange={(e) => setSelectedPatientId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
                   required
                 >
                   <option value="">-- Choose Patient --</option>
@@ -768,34 +764,34 @@ export default function OTDashboard() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Procedure Name *</label>
+                <label className="block text-xs font-medium text-text mb-1">Procedure Name *</label>
                 <input
                   type="text"
                   value={procedureName}
                   onChange={(e) => setProcedureName(e.target.value)}
                   placeholder="e.g. Laparoscopic Cholecystectomy"
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                  className="w-full px-3 py-1.5 border border-border rounded text-xs"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Diagnosis</label>
+                <label className="block text-xs font-medium text-text mb-1">Diagnosis</label>
                 <input
                   type="text"
                   value={diagnosis}
                   onChange={(e) => setDiagnosis(e.target.value)}
                   placeholder="e.g. Symptomatic cholelithiasis"
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                  className="w-full px-3 py-1.5 border border-border rounded text-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Priority</label>
+                <label className="block text-xs font-medium text-text mb-1">Priority</label>
                 <select
                   value={priority}
                   onChange={(e) => setPriority(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
                 >
                   <option value="ROUTINE">Routine</option>
                   <option value="URGENT">Urgent</option>
@@ -803,18 +799,18 @@ export default function OTDashboard() {
                 </select>
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowRequestModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700"
+                  className="px-4 py-2 border border-border rounded-lg text-xs text-text"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={requestSubmitting}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold disabled:opacity-50"
+                  className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold disabled:opacity-50"
                 >
                   {requestSubmitting ? 'Creating...' : 'Create Request'}
                 </button>

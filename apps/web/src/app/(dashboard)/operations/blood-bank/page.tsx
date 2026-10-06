@@ -169,21 +169,21 @@ export default function BloodBankDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Blood Bank & Transfusion Medicine</h1>
-          <p className="text-slate-500 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-text tracking-tight">Blood Bank & Transfusion Medicine</h1>
+          <p className="text-text-muted text-sm mt-0.5">
             Donor screening, component fractionation, ABO/Rh crossmatching, and transfusion tracking.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowDonorModal(true)}
-            className="inline-flex items-center px-3.5 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 shadow-sm"
+            className="inline-flex items-center px-3.5 py-2 border border-border text-sm font-medium rounded-lg text-text bg-surface hover:bg-surface-subtle shadow-sm"
           >
             + Register Donor
           </button>
           <button
             onClick={() => setShowDonationModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 shadow-sm"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-brand-foreground bg-brand hover:bg-brand-hover shadow-sm"
           >
             Record Donation
           </button>
@@ -192,10 +192,9 @@ export default function BloodBankDashboard() {
 
       {notice && (
         <div
-          className={`p-3.5 rounded-lg text-xs font-medium flex justify-between items-center ${
-            notice.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border border-rose-200 text-rose-800'
+          className={`p-3.5 rounded-lg text-xs font-medium flex justify-between items-center ${ notice.type ==='success'
+              ? 'bg-stable-bg border border-stable-border text-stable-text'
+              : 'bg-critical-bg border border-critical-border text-critical-text'
           }`}
         >
           <span>{notice.text}</span>
@@ -205,66 +204,61 @@ export default function BloodBankDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Available Blood Units</p>
-          <p className="text-2xl font-bold text-rose-600 mt-2">{summary?.totalAvailableUnits ?? components.length}</p>
-          <p className="text-xs text-slate-400 mt-1">Tested & unexpired inventory</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Available Blood Units</p>
+          <p className="text-2xl font-bold text-critical mt-2">{summary?.totalAvailableUnits ?? components.length}</p>
+          <p className="text-xs text-text-muted mt-1">Tested & unexpired inventory</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Registered Donors</p>
-          <p className="text-2xl font-bold text-slate-900 mt-2">{donors.length}</p>
-          <p className="text-xs text-slate-400 mt-1">Eligible voluntary donors</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Registered Donors</p>
+          <p className="text-2xl font-bold text-text mt-2">{donors.length}</p>
+          <p className="text-xs text-text-muted mt-1">Eligible voluntary donors</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Units Issued</p>
-          <p className="text-2xl font-bold text-blue-600 mt-2">{issues.length}</p>
-          <p className="text-xs text-slate-400 mt-1">Transfusions fulfilled</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Units Issued</p>
+          <p className="text-2xl font-bold text-info mt-2">{issues.length}</p>
+          <p className="text-xs text-text-muted mt-1">Transfusions fulfilled</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Crossmatch Safety</p>
-          <p className="text-2xl font-bold text-emerald-600 mt-2">Enforced</p>
-          <p className="text-xs text-slate-400 mt-1">Zero hemolytic mismatch policy</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Crossmatch Safety</p>
+          <p className="text-2xl font-bold text-stable mt-2">Enforced</p>
+          <p className="text-xs text-text-muted mt-1">Zero hemolytic mismatch policy</p>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex border-b border-slate-200 gap-1 text-sm font-medium">
+      <div className="flex border-b border-border gap-1 text-sm font-medium">
         <button
           onClick={() => setActiveTab('inventory')}
-          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${
-            activeTab === 'inventory' ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'
+          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${ activeTab ==='inventory' ? 'border-brand text-info font-semibold' : 'border-transparent text-text-muted hover:text-text'
           }`}
         >
           Inventory Grid
         </button>
         <button
           onClick={() => setActiveTab('crossmatch')}
-          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${
-            activeTab === 'crossmatch' ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'
+          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${ activeTab ==='crossmatch' ? 'border-brand text-info font-semibold' : 'border-transparent text-text-muted hover:text-text'
           }`}
         >
           Crossmatch Checker
         </button>
         <button
           onClick={() => setActiveTab('donors')}
-          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${
-            activeTab === 'donors' ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'
+          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${ activeTab ==='donors' ? 'border-brand text-info font-semibold' : 'border-transparent text-text-muted hover:text-text'
           }`}
         >
           Donors ({donors.length})
         </button>
         <button
           onClick={() => setActiveTab('donations')}
-          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${
-            activeTab === 'donations' ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'
+          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${ activeTab ==='donations' ? 'border-brand text-info font-semibold' : 'border-transparent text-text-muted hover:text-text'
           }`}
         >
           Collections ({donations.length})
         </button>
         <button
           onClick={() => setActiveTab('issues')}
-          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${
-            activeTab === 'issues' ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'
+          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${ activeTab ==='issues' ? 'border-brand text-info font-semibold' : 'border-transparent text-text-muted hover:text-text'
           }`}
         >
           Issue & Transfusion Log ({issues.length})
@@ -274,18 +268,18 @@ export default function BloodBankDashboard() {
       {/* TAB 1: INVENTORY GRID */}
       {activeTab === 'inventory' && (
         <div className="space-y-4">
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-3">
-            <h2 className="text-base font-semibold text-slate-900">ABO & Rh Inventory Matrix</h2>
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-3">
+            <h2 className="text-base font-semibold text-text">ABO & Rh Inventory Matrix</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
               {bloodGroups.map((bg) => {
                 const bgData = summary?.summary?.[bg] || { PRBC: 0, FFP: 0, PLATELETS: 0, WHOLE_BLOOD: 0 };
                 const total = (bgData.PRBC || 0) + (bgData.FFP || 0) + (bgData.PLATELETS || 0) + (bgData.WHOLE_BLOOD || 0);
 
                 return (
-                  <div key={bg} className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center">
-                    <p className="font-extrabold text-lg text-rose-700">{bg}</p>
-                    <p className="font-bold text-sm text-slate-900 mt-0.5">{total} units</p>
-                    <div className="mt-2 pt-2 border-t border-slate-200 text-[10px] text-slate-500 text-left space-y-0.5">
+                  <div key={bg} className="p-3 bg-surface-subtle rounded-lg border border-border text-center">
+                    <p className="font-extrabold text-lg text-critical-text">{bg}</p>
+                    <p className="font-bold text-sm text-text mt-0.5">{total} units</p>
+                    <div className="mt-2 pt-2 border-t border-border text-[10px] text-text-muted text-left space-y-0.5">
                       <div>PRBC: <strong>{bgData.PRBC || 0}</strong></div>
                       <div>FFP: <strong>{bgData.FFP || 0}</strong></div>
                       <div>Plt: <strong>{bgData.PLATELETS || 0}</strong></div>
@@ -297,15 +291,15 @@ export default function BloodBankDashboard() {
           </div>
 
           {/* Available Units Table */}
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-              <h2 className="text-base font-semibold text-slate-900">Available Component Units</h2>
-              <span className="text-xs text-slate-500">{components.length} units ready</span>
+          <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-border flex justify-between items-center">
+              <h2 className="text-base font-semibold text-text">Available Component Units</h2>
+              <span className="text-xs text-text-muted">{components.length} units ready</span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-600">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+              <table className="w-full text-left text-sm text-text-muted">
+                <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                   <tr>
                     <th className="px-5 py-3">Unit ID</th>
                     <th className="px-5 py-3">Blood Group</th>
@@ -315,31 +309,31 @@ export default function BloodBankDashboard() {
                     <th className="px-5 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody className="divide-y divide-border text-xs">
                   {components.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-5 py-8 text-center text-slate-400">
+                      <td colSpan={6} className="px-5 py-8 text-center text-text-muted">
                         No blood components currently available. Record a donation to process units.
                       </td>
                     </tr>
                   ) : (
                     components.map((c) => (
-                      <tr key={c.id} className="hover:bg-slate-50/50">
-                        <td className="px-5 py-3 font-mono font-semibold text-slate-900">{c.unitId}</td>
-                        <td className="px-5 py-3 font-extrabold text-rose-700">{c.bloodGroup}</td>
-                        <td className="px-5 py-3 font-medium text-slate-800">{c.componentType}</td>
-                        <td className="px-5 py-3 text-slate-500">
+                      <tr key={c.id} className="hover:bg-surface-subtle/50">
+                        <td className="px-5 py-3 font-mono font-semibold text-text">{c.unitId}</td>
+                        <td className="px-5 py-3 font-extrabold text-critical-text">{c.bloodGroup}</td>
+                        <td className="px-5 py-3 font-medium text-text">{c.componentType}</td>
+                        <td className="px-5 py-3 text-text-muted">
                           {new Date(c.expiryDate).toLocaleDateString()}
                         </td>
                         <td className="px-5 py-3">
-                          <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                          <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-stable-bg text-stable-text">
                             {c.status}
                           </span>
                         </td>
                         <td className="px-5 py-3 text-right">
                           <button
                             onClick={() => openIssueModal(c.id)}
-                            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold"
+                            className="px-3 py-1 bg-brand hover:bg-brand-hover text-brand-foreground rounded text-xs font-semibold"
                           >
                             Issue Unit
                           </button>
@@ -356,19 +350,19 @@ export default function BloodBankDashboard() {
 
       {/* TAB 2: CROSSMATCH CHECKER */}
       {activeTab === 'crossmatch' && (
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4 max-w-xl">
-          <h2 className="text-base font-semibold text-slate-900">ABO / Rh Compatibility & Crossmatch Check</h2>
-          <p className="text-xs text-slate-500">
+        <div className="bg-surface border border-border rounded-xl p-6 shadow-sm space-y-4 max-w-xl">
+          <h2 className="text-base font-semibold text-text">ABO / Rh Compatibility & Crossmatch Check</h2>
+          <p className="text-xs text-text-muted">
             Automated serological verification against patient recipient blood group prior to issue.
           </p>
 
           <form onSubmit={handleRunCrossmatch} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Patient Blood Group</label>
+              <label className="block text-xs font-medium text-text mb-1">Patient Blood Group</label>
               <select
                 value={checkPatientGroup}
                 onChange={(e) => setCheckPatientGroup(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white font-bold"
+                className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface font-bold"
               >
                 {bloodGroups.map((bg) => (
                   <option key={bg} value={bg}>{bg}</option>
@@ -377,11 +371,11 @@ export default function BloodBankDashboard() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">Select Blood Component Unit</label>
+              <label className="block text-xs font-medium text-text mb-1">Select Blood Component Unit</label>
               <select
                 value={checkComponentId}
                 onChange={(e) => setCheckComponentId(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white"
+                className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
                 required
               >
                 <option value="">-- Choose Unit --</option>
@@ -395,7 +389,7 @@ export default function BloodBankDashboard() {
 
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold"
+              className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold"
             >
               Verify Compatibility
             </button>
@@ -403,10 +397,8 @@ export default function BloodBankDashboard() {
 
           {crossmatchResult && (
             <div
-              className={`p-4 rounded-lg border text-xs space-y-2 mt-4 ${
-                crossmatchResult.isCompatible
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                  : 'bg-rose-50 border-rose-200 text-rose-900'
+              className={`p-4 rounded-lg border text-xs space-y-2 mt-4 ${ crossmatchResult.isCompatible ?'bg-stable-bg border-stable-border text-stable-text'
+                  : 'bg-critical-bg border-critical-border text-critical-text'
               }`}
             >
               <div className="flex justify-between items-center">
@@ -425,19 +417,19 @@ export default function BloodBankDashboard() {
 
       {/* TAB 3: DONORS */}
       {activeTab === 'donors' && (
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-            <h2 className="text-base font-semibold text-slate-900">Registered Donors</h2>
+        <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-border flex justify-between items-center">
+            <h2 className="text-base font-semibold text-text">Registered Donors</h2>
             <button
               onClick={() => setShowDonorModal(true)}
-              className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold"
+              className="px-3.5 py-1.5 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold"
             >
               + Register Donor
             </button>
           </div>
 
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3">Donor ID</th>
                 <th className="px-5 py-3">Name</th>
@@ -447,24 +439,23 @@ export default function BloodBankDashboard() {
                 <th className="px-5 py-3">Eligibility</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
+            <tbody className="divide-y divide-border text-xs">
               {donors.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={6} className="px-5 py-8 text-center text-text-muted">
                     No donors registered yet.
                   </td>
                 </tr>
               ) : (
                 donors.map((d) => (
-                  <tr key={d.id} className="hover:bg-slate-50/50">
-                    <td className="px-5 py-3 font-mono font-semibold text-slate-900">{d.donorId}</td>
-                    <td className="px-5 py-3 font-medium text-slate-900">{d.firstName} {d.lastName}</td>
-                    <td className="px-5 py-3 font-extrabold text-rose-700">{d.bloodGroup}</td>
-                    <td className="px-5 py-3 text-slate-500">{d.gender} • {new Date(d.dateOfBirth).toLocaleDateString()}</td>
-                    <td className="px-5 py-3 text-slate-600">{d.mobile}</td>
+                  <tr key={d.id} className="hover:bg-surface-subtle/50">
+                    <td className="px-5 py-3 font-mono font-semibold text-text">{d.donorId}</td>
+                    <td className="px-5 py-3 font-medium text-text">{d.firstName} {d.lastName}</td>
+                    <td className="px-5 py-3 font-extrabold text-critical-text">{d.bloodGroup}</td>
+                    <td className="px-5 py-3 text-text-muted">{d.gender} • {new Date(d.dateOfBirth).toLocaleDateString()}</td>
+                    <td className="px-5 py-3 text-text-muted">{d.mobile}</td>
                     <td className="px-5 py-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        d.eligibilityStatus === 'ELIGIBLE' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${ d.eligibilityStatus ==='ELIGIBLE' ? 'bg-stable-bg text-stable-text' : 'bg-critical-bg text-critical-text'
                       }`}>
                         {d.eligibilityStatus}
                       </span>
@@ -479,19 +470,19 @@ export default function BloodBankDashboard() {
 
       {/* TAB 4: DONATIONS */}
       {activeTab === 'donations' && (
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-            <h2 className="text-base font-semibold text-slate-900">Donation Collection Log</h2>
+        <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-border flex justify-between items-center">
+            <h2 className="text-base font-semibold text-text">Donation Collection Log</h2>
             <button
               onClick={() => setShowDonationModal(true)}
-              className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold"
+              className="px-3.5 py-1.5 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold"
             >
               + Record Donation
             </button>
           </div>
 
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3">Bag ID</th>
                 <th className="px-5 py-3">Donor</th>
@@ -501,23 +492,23 @@ export default function BloodBankDashboard() {
                 <th className="px-5 py-3">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
+            <tbody className="divide-y divide-border text-xs">
               {donations.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={6} className="px-5 py-8 text-center text-text-muted">
                     No donations recorded yet.
                   </td>
                 </tr>
               ) : (
                 donations.map((don) => (
-                  <tr key={don.id} className="hover:bg-slate-50/50">
-                    <td className="px-5 py-3 font-mono font-semibold text-slate-900">{don.bagId}</td>
-                    <td className="px-5 py-3 font-medium text-slate-900">{don.donor?.firstName} {don.donor?.lastName}</td>
-                    <td className="px-5 py-3 font-extrabold text-rose-700">{don.donor?.bloodGroup}</td>
-                    <td className="px-5 py-3 text-slate-700 font-semibold">{don.volume} ml</td>
-                    <td className="px-5 py-3 text-slate-500">{new Date(don.donationDate).toLocaleString()}</td>
+                  <tr key={don.id} className="hover:bg-surface-subtle/50">
+                    <td className="px-5 py-3 font-mono font-semibold text-text">{don.bagId}</td>
+                    <td className="px-5 py-3 font-medium text-text">{don.donor?.firstName} {don.donor?.lastName}</td>
+                    <td className="px-5 py-3 font-extrabold text-critical-text">{don.donor?.bloodGroup}</td>
+                    <td className="px-5 py-3 text-text font-semibold">{don.volume} ml</td>
+                    <td className="px-5 py-3 text-text-muted">{new Date(don.donationDate).toLocaleString()}</td>
                     <td className="px-5 py-3">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-info-bg text-info-text">
                         {don.status}
                       </span>
                     </td>
@@ -531,14 +522,14 @@ export default function BloodBankDashboard() {
 
       {/* TAB 5: ISSUES */}
       {activeTab === 'issues' && (
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-            <h2 className="text-base font-semibold text-slate-900">Blood Issue & Transfusion Log</h2>
-            <span className="text-xs text-slate-500">{issues.length} issued units</span>
+        <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-border flex justify-between items-center">
+            <h2 className="text-base font-semibold text-text">Blood Issue & Transfusion Log</h2>
+            <span className="text-xs text-text-muted">{issues.length} issued units</span>
           </div>
 
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3">Issue Date</th>
                 <th className="px-5 py-3">Unit ID</th>
@@ -547,30 +538,30 @@ export default function BloodBankDashboard() {
                 <th className="px-5 py-3">Transfusion Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
+            <tbody className="divide-y divide-border text-xs">
               {issues.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={5} className="px-5 py-8 text-center text-text-muted">
                     No blood units issued yet.
                   </td>
                 </tr>
               ) : (
                 issues.map((iss) => (
-                  <tr key={iss.id} className="hover:bg-slate-50/50">
-                    <td className="px-5 py-3 text-slate-500 font-mono">
+                  <tr key={iss.id} className="hover:bg-surface-subtle/50">
+                    <td className="px-5 py-3 text-text-muted font-mono">
                       {new Date(iss.issueDate).toLocaleString()}
                     </td>
-                    <td className="px-5 py-3 font-mono font-semibold text-slate-900">
+                    <td className="px-5 py-3 font-mono font-semibold text-text">
                       {iss.component?.unitId}
                     </td>
                     <td className="px-5 py-3">
-                      <strong className="text-rose-700">{iss.component?.bloodGroup}</strong> • {iss.component?.componentType}
+                      <strong className="text-critical-text">{iss.component?.bloodGroup}</strong> • {iss.component?.componentType}
                     </td>
-                    <td className="px-5 py-3 font-medium text-slate-900">
+                    <td className="px-5 py-3 font-medium text-text">
                       {iss.patient?.firstName} {iss.patient?.lastName} (MRN: {iss.patient?.mrn})
                     </td>
                     <td className="px-5 py-3">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-stable-bg text-stable-text">
                         {iss.transfusionStatus}
                       </span>
                     </td>
@@ -584,31 +575,31 @@ export default function BloodBankDashboard() {
 
       {/* Register Donor Modal */}
       {showDonorModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
-              <h3 className="text-base font-bold text-slate-900">Register Blood Donor</h3>
-              <button onClick={() => setShowDonorModal(false)} className="text-slate-400 font-bold">x</button>
+        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div className="border-b border-border pb-3 flex justify-between items-center">
+              <h3 className="text-base font-bold text-text">Register Blood Donor</h3>
+              <button onClick={() => setShowDonorModal(false)} className="text-text-muted font-bold">x</button>
             </div>
             <form onSubmit={handleRegisterDonor} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">First Name *</label>
+                  <label className="block text-xs font-medium text-text mb-1">First Name *</label>
                   <input
                     type="text"
                     value={donorForm.firstName}
                     onChange={(e) => setDonorForm({ ...donorForm, firstName: e.target.value })}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                    className="w-full px-3 py-1.5 border border-border rounded text-xs"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Last Name *</label>
+                  <label className="block text-xs font-medium text-text mb-1">Last Name *</label>
                   <input
                     type="text"
                     value={donorForm.lastName}
                     onChange={(e) => setDonorForm({ ...donorForm, lastName: e.target.value })}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                    className="w-full px-3 py-1.5 border border-border rounded text-xs"
                     required
                   />
                 </div>
@@ -616,11 +607,11 @@ export default function BloodBankDashboard() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Blood Group *</label>
+                  <label className="block text-xs font-medium text-text mb-1">Blood Group *</label>
                   <select
                     value={donorForm.bloodGroup}
                     onChange={(e) => setDonorForm({ ...donorForm, bloodGroup: e.target.value })}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs bg-white font-bold"
+                    className="w-full px-3 py-1.5 border border-border rounded text-xs bg-surface font-bold"
                   >
                     {bloodGroups.map((bg) => (
                       <option key={bg} value={bg}>{bg}</option>
@@ -628,11 +619,11 @@ export default function BloodBankDashboard() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Gender</label>
+                  <label className="block text-xs font-medium text-text mb-1">Gender</label>
                   <select
                     value={donorForm.gender}
                     onChange={(e) => setDonorForm({ ...donorForm, gender: e.target.value })}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                    className="w-full px-3 py-1.5 border border-border rounded text-xs bg-surface"
                   >
                     <option value="MALE">Male</option>
                     <option value="FEMALE">Female</option>
@@ -643,38 +634,38 @@ export default function BloodBankDashboard() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Date of Birth</label>
+                  <label className="block text-xs font-medium text-text mb-1">Date of Birth</label>
                   <input
                     type="date"
                     value={donorForm.dateOfBirth}
                     onChange={(e) => setDonorForm({ ...donorForm, dateOfBirth: e.target.value })}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                    className="w-full px-3 py-1.5 border border-border rounded text-xs"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Mobile Phone *</label>
+                  <label className="block text-xs font-medium text-text mb-1">Mobile Phone *</label>
                   <input
                     type="text"
                     value={donorForm.mobile}
                     onChange={(e) => setDonorForm({ ...donorForm, mobile: e.target.value })}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                    className="w-full px-3 py-1.5 border border-border rounded text-xs"
                     required
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowDonorModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700"
+                  className="px-4 py-2 border border-border rounded-lg text-xs text-text"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold"
+                  className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold"
                 >
                   Register Donor
                 </button>
@@ -686,19 +677,19 @@ export default function BloodBankDashboard() {
 
       {/* Record Donation Modal */}
       {showDonationModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
-              <h3 className="text-base font-bold text-slate-900">Record Blood Donation</h3>
-              <button onClick={() => setShowDonationModal(false)} className="text-slate-400 font-bold">x</button>
+        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div className="border-b border-border pb-3 flex justify-between items-center">
+              <h3 className="text-base font-bold text-text">Record Blood Donation</h3>
+              <button onClick={() => setShowDonationModal(false)} className="text-text-muted font-bold">x</button>
             </div>
             <form onSubmit={handleRecordDonation} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Select Donor *</label>
+                <label className="block text-xs font-medium text-text mb-1">Select Donor *</label>
                 <select
                   value={selectedDonorId}
                   onChange={(e) => setSelectedDonorId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
                   required
                 >
                   <option value="">-- Choose Donor --</option>
@@ -713,32 +704,32 @@ export default function BloodBankDashboard() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Collected Volume (ml)</label>
+                <label className="block text-xs font-medium text-text mb-1">Collected Volume (ml)</label>
                 <input
                   type="number"
                   min="200"
                   max="600"
                   value={donationVolume}
                   onChange={(e) => setDonationVolume(Number(e.target.value))}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                  className="w-full px-3 py-1.5 border border-border rounded text-xs"
                 />
               </div>
 
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
+              <div className="p-3 bg-info-bg border border-info-border rounded text-xs text-info-text">
                 Automatic Fractionation: Unit will be separated into PRBC (Packed Red Cells), FFP (Fresh Frozen Plasma), and Platelets.
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowDonationModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700"
+                  className="px-4 py-2 border border-border rounded-lg text-xs text-text"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold"
+                  className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold"
                 >
                   Record & Process
                 </button>
@@ -750,19 +741,19 @@ export default function BloodBankDashboard() {
 
       {/* Issue Modal */}
       {showIssueModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
-              <h3 className="text-base font-bold text-slate-900">Issue Blood Component</h3>
-              <button onClick={() => setShowIssueModal(false)} className="text-slate-400 font-bold">x</button>
+        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div className="border-b border-border pb-3 flex justify-between items-center">
+              <h3 className="text-base font-bold text-text">Issue Blood Component</h3>
+              <button onClick={() => setShowIssueModal(false)} className="text-text-muted font-bold">x</button>
             </div>
             <form onSubmit={handleIssueBlood} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Select Recipient Patient *</label>
+                <label className="block text-xs font-medium text-text mb-1">Select Recipient Patient *</label>
                 <select
                   value={issuePatientId}
                   onChange={(e) => setIssuePatientId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
                   required
                 >
                   <option value="">-- Choose Patient --</option>
@@ -774,18 +765,18 @@ export default function BloodBankDashboard() {
                 </select>
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowIssueModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700"
+                  className="px-4 py-2 border border-border rounded-lg text-xs text-text"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={issueSubmitting}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold disabled:opacity-50"
+                  className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold disabled:opacity-50"
                 >
                   {issueSubmitting ? 'Issuing...' : 'Authorize Issue'}
                 </button>

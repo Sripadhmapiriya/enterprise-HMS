@@ -200,34 +200,34 @@ export default function ProcurementDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface p-6 rounded-xl border border-border shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+            <span className="p-2 bg-surface-subtle text-brand rounded-lg">
               <ShoppingCart className="w-5 h-5" />
             </span>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Procurement & Purchasing</h1>
+            <h1 className="text-2xl font-bold text-text tracking-tight">Procurement & Purchasing</h1>
           </div>
-          <p className="text-slate-500 text-sm mt-1">
+          <p className="text-text-muted text-sm mt-1">
             Requisition approval workflows, purchase orders (PO), goods receipts (GRN), and inventory restocking.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setShowPrModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium text-text bg-surface border border-border rounded-lg hover:bg-surface-subtle"
           >
             <Plus className="w-4 h-4" /> New Requisition (PR)
           </button>
           <button
             onClick={() => setShowPoModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium text-brand bg-surface-subtle border border-border rounded-lg hover:bg-surface-subtle"
           >
             <Plus className="w-4 h-4" /> Issue PO
           </button>
           <button
             onClick={() => setShowGrnModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-brand-foreground bg-brand rounded-lg hover:bg-brand-hover shadow-sm"
           >
             <Truck className="w-4 h-4" /> Receive Goods (GRN)
           </button>
@@ -236,64 +236,64 @@ export default function ProcurementDashboard() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Active PRs</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">{requests.length}</h3>
-              <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Active PRs</p>
+              <h3 className="text-2xl font-bold text-text mt-1">{requests.length}</h3>
+              <p className="text-xs text-warning mt-1 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" /> {requests.filter((r) => r.status === 'PENDING_APPROVAL').length} pending approval
               </p>
             </div>
-            <span className="p-2.5 bg-amber-50 text-amber-600 rounded-lg">
+            <span className="p-2.5 bg-warning-bg text-warning rounded-lg">
               <FileText className="w-5 h-5" />
             </span>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Issued POs</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">{orders.length}</h3>
-              <p className="text-xs text-indigo-600 mt-1 flex items-center gap-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Issued POs</p>
+              <h3 className="text-2xl font-bold text-text mt-1">{orders.length}</h3>
+              <p className="text-xs text-brand mt-1 flex items-center gap-1">
                 <ArrowRight className="w-3.5 h-3.5" /> {orders.filter((o) => o.status === 'SENT').length} in transit
               </p>
             </div>
-            <span className="p-2.5 bg-indigo-50 text-indigo-600 rounded-lg">
+            <span className="p-2.5 bg-surface-subtle text-brand rounded-lg">
               <ShoppingCart className="w-5 h-5" />
             </span>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Received GRNs</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">{receipts.length}</h3>
-              <p className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Received GRNs</p>
+              <h3 className="text-2xl font-bold text-text mt-1">{receipts.length}</h3>
+              <p className="text-xs text-stable mt-1 flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5" /> Restocked into pharmacy batches
               </p>
             </div>
-            <span className="p-2.5 bg-emerald-50 text-emerald-600 rounded-lg">
+            <span className="p-2.5 bg-stable-bg text-stable rounded-lg">
               <Package className="w-5 h-5" />
             </span>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Active Suppliers</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">{suppliers.length}</h3>
+              <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Active Suppliers</p>
+              <h3 className="text-2xl font-bold text-text mt-1">{suppliers.length}</h3>
               <button
                 onClick={() => setShowSupplierModal(true)}
-                className="text-xs text-indigo-600 font-medium hover:underline mt-1 block"
+                className="text-xs text-brand font-medium hover:underline mt-1 block"
               >
                 + Register New Vendor
               </button>
             </div>
-            <span className="p-2.5 bg-sky-50 text-sky-600 rounded-lg">
+            <span className="p-2.5 bg-info-bg text-info rounded-lg">
               <Building2 className="w-5 h-5" />
             </span>
           </div>
@@ -301,43 +301,39 @@ export default function ProcurementDashboard() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-slate-200 space-x-6 text-sm font-medium">
+      <div className="flex border-b border-border space-x-6 text-sm font-medium">
         <button
           onClick={() => setActiveTab('requests')}
-          className={`pb-3 relative ${
-            activeTab === 'requests'
-              ? 'text-indigo-600 border-b-2 border-indigo-600 font-semibold'
-              : 'text-slate-500 hover:text-slate-800'
+          className={`pb-3 relative ${ activeTab ==='requests'
+              ? 'text-brand border-b-2 border-brand font-semibold'
+              : 'text-text-muted hover:text-text'
           }`}
         >
           Purchase Requests ({requests.length})
         </button>
         <button
           onClick={() => setActiveTab('orders')}
-          className={`pb-3 relative ${
-            activeTab === 'orders'
-              ? 'text-indigo-600 border-b-2 border-indigo-600 font-semibold'
-              : 'text-slate-500 hover:text-slate-800'
+          className={`pb-3 relative ${ activeTab ==='orders'
+              ? 'text-brand border-b-2 border-brand font-semibold'
+              : 'text-text-muted hover:text-text'
           }`}
         >
           Purchase Orders ({orders.length})
         </button>
         <button
           onClick={() => setActiveTab('receipts')}
-          className={`pb-3 relative ${
-            activeTab === 'receipts'
-              ? 'text-indigo-600 border-b-2 border-indigo-600 font-semibold'
-              : 'text-slate-500 hover:text-slate-800'
+          className={`pb-3 relative ${ activeTab ==='receipts'
+              ? 'text-brand border-b-2 border-brand font-semibold'
+              : 'text-text-muted hover:text-text'
           }`}
         >
           Goods Receipts / GRN ({receipts.length})
         </button>
         <button
           onClick={() => setActiveTab('suppliers')}
-          className={`pb-3 relative ${
-            activeTab === 'suppliers'
-              ? 'text-indigo-600 border-b-2 border-indigo-600 font-semibold'
-              : 'text-slate-500 hover:text-slate-800'
+          className={`pb-3 relative ${ activeTab ==='suppliers'
+              ? 'text-brand border-b-2 border-brand font-semibold'
+              : 'text-text-muted hover:text-text'
           }`}
         >
           Suppliers Directory ({suppliers.length})
@@ -345,15 +341,15 @@ export default function ProcurementDashboard() {
       </div>
 
       {/* Main Table Content */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-slate-500">Loading procurement records...</div>
+          <div className="p-12 text-center text-text-muted">Loading procurement records...</div>
         ) : (
           <>
             {activeTab === 'requests' && (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-slate-600">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+                <table className="w-full text-left text-sm text-text-muted">
+                  <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                     <tr>
                       <th className="px-6 py-4">PR Number</th>
                       <th className="px-6 py-4">Items / Details</th>
@@ -363,49 +359,47 @@ export default function ProcurementDashboard() {
                       <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-border">
                     {requests.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                        <td colSpan={6} className="px-6 py-12 text-center text-text-muted">
                           No purchase requisitions found. Click &quot;New Requisition&quot; to submit a material request.
                         </td>
                       </tr>
                     ) : (
                       requests.map((r) => (
-                        <tr key={r.id} className="hover:bg-slate-50/60">
-                          <td className="px-6 py-4 font-semibold text-slate-900">{r.prNumber}</td>
+                        <tr key={r.id} className="hover:bg-surface-subtle/60">
+                          <td className="px-6 py-4 font-semibold text-text">{r.prNumber}</td>
                           <td className="px-6 py-4">
-                            <div className="font-medium text-slate-800">
+                            <div className="font-medium text-text">
                               {r.items?.map((i: any) => `${i.product?.name || 'Product'} (${i.quantity} units)`).join(', ') || 'Material Request'}
                             </div>
-                            <div className="text-xs text-slate-500 mt-0.5">{r.reason || 'Restocking'}</div>
+                            <div className="text-xs text-text-muted mt-0.5">{r.reason || 'Restocking'}</div>
                           </td>
                           <td className="px-6 py-4">
                             <span
-                              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                r.priority === 'URGENT'
-                                  ? 'bg-rose-100 text-rose-700'
+                              className={`px-2 py-0.5 rounded-full text-xs font-medium ${ r.priority ==='URGENT'
+                                  ? 'bg-critical-bg text-critical-text'
                                   : r.priority === 'HIGH'
-                                  ? 'bg-amber-100 text-amber-700'
-                                  : 'bg-slate-100 text-slate-700'
+                                  ? 'bg-warning-bg text-warning-text'
+                                  : 'bg-surface-subtle text-text'
                               }`}
                             >
                               {r.priority}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-slate-600">
+                          <td className="px-6 py-4 text-text-muted">
                             {r.requestedBy?.firstName} {r.requestedBy?.lastName}
                           </td>
                           <td className="px-6 py-4">
                             <span
-                              className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                                r.status === 'APPROVED'
-                                  ? 'bg-emerald-100 text-emerald-700'
+                              className={`px-2.5 py-1 rounded-full text-xs font-medium ${ r.status ==='APPROVED'
+                                  ? 'bg-stable-bg text-stable-text'
                                   : r.status === 'PO_CREATED'
-                                  ? 'bg-indigo-100 text-indigo-700'
+                                  ? 'bg-surface-subtle text-brand'
                                   : r.status === 'REJECTED'
-                                  ? 'bg-rose-100 text-rose-700'
-                                  : 'bg-amber-100 text-amber-700'
+                                  ? 'bg-critical-bg text-critical-text'
+                                  : 'bg-warning-bg text-warning-text'
                               }`}
                             >
                               {r.status}
@@ -416,13 +410,13 @@ export default function ProcurementDashboard() {
                               <>
                                 <button
                                   onClick={() => handleApprovePr(r.id, true)}
-                                  className="px-2.5 py-1 text-xs font-medium text-white bg-emerald-600 rounded hover:bg-emerald-700"
+                                  className="px-2.5 py-1 text-xs font-medium text-brand-foreground bg-stable rounded hover:bg-stable"
                                 >
                                   Approve
                                 </button>
                                 <button
                                   onClick={() => handleApprovePr(r.id, false)}
-                                  className="px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 rounded hover:bg-slate-200"
+                                  className="px-2.5 py-1 text-xs font-medium text-text bg-surface-subtle rounded hover:bg-surface-subtle"
                                 >
                                   Reject
                                 </button>
@@ -439,8 +433,8 @@ export default function ProcurementDashboard() {
 
             {activeTab === 'orders' && (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-slate-600">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+                <table className="w-full text-left text-sm text-text-muted">
+                  <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                     <tr>
                       <th className="px-6 py-4">PO Number</th>
                       <th className="px-6 py-4">Supplier</th>
@@ -449,28 +443,27 @@ export default function ProcurementDashboard() {
                       <th className="px-6 py-4">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-border">
                     {orders.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                        <td colSpan={5} className="px-6 py-12 text-center text-text-muted">
                           No purchase orders issued yet.
                         </td>
                       </tr>
                     ) : (
                       orders.map((o) => (
-                        <tr key={o.id} className="hover:bg-slate-50/60">
-                          <td className="px-6 py-4 font-semibold text-slate-900">{o.poNumber}</td>
-                          <td className="px-6 py-4 font-medium text-slate-800">{o.supplier?.name}</td>
+                        <tr key={o.id} className="hover:bg-surface-subtle/60">
+                          <td className="px-6 py-4 font-semibold text-text">{o.poNumber}</td>
+                          <td className="px-6 py-4 font-medium text-text">{o.supplier?.name}</td>
                           <td className="px-6 py-4">
                             {o.items?.map((i: any) => `${i.product?.name || 'Item'} (${i.quantity} @ $${i.unitPrice})`).join(', ')}
                           </td>
-                          <td className="px-6 py-4 font-semibold text-slate-900">${o.totalAmount?.toFixed(2)}</td>
+                          <td className="px-6 py-4 font-semibold text-text">${o.totalAmount?.toFixed(2)}</td>
                           <td className="px-6 py-4">
                             <span
-                              className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                                o.status === 'COMPLETED'
-                                  ? 'bg-emerald-100 text-emerald-700'
-                                  : 'bg-indigo-100 text-indigo-700'
+                              className={`px-2.5 py-1 rounded-full text-xs font-medium ${ o.status ==='COMPLETED'
+                                  ? 'bg-stable-bg text-stable-text'
+                                  : 'bg-surface-subtle text-brand'
                               }`}
                             >
                               {o.status}
@@ -486,8 +479,8 @@ export default function ProcurementDashboard() {
 
             {activeTab === 'receipts' && (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-slate-600">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+                <table className="w-full text-left text-sm text-text-muted">
+                  <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                     <tr>
                       <th className="px-6 py-4">GRN / Invoice</th>
                       <th className="px-6 py-4">Supplier</th>
@@ -496,28 +489,28 @@ export default function ProcurementDashboard() {
                       <th className="px-6 py-4">Stock Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-border">
                     {receipts.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                        <td colSpan={5} className="px-6 py-12 text-center text-text-muted">
                           No goods receipt notes recorded. Receive supplier shipments to stock pharmacy batches.
                         </td>
                       </tr>
                     ) : (
                       receipts.map((grn) => (
-                        <tr key={grn.id} className="hover:bg-slate-50/60">
-                          <td className="px-6 py-4 font-semibold text-slate-900">{grn.invoiceNumber}</td>
-                          <td className="px-6 py-4 font-medium text-slate-800">{grn.supplier?.name}</td>
+                        <tr key={grn.id} className="hover:bg-surface-subtle/60">
+                          <td className="px-6 py-4 font-semibold text-text">{grn.invoiceNumber}</td>
+                          <td className="px-6 py-4 font-medium text-text">{grn.supplier?.name}</td>
                           <td className="px-6 py-4">
                             {grn.items?.map((i: any) => (
-                              <div key={i.id} className="text-xs text-slate-700">
-                                <span className="font-medium text-slate-900">{i.product?.name}</span> (Qty: {i.quantity}) &bull; Batch: {i.batchNumber}
+                              <div key={i.id} className="text-xs text-text">
+                                <span className="font-medium text-text">{i.product?.name}</span> (Qty: {i.quantity}) &bull; Batch: {i.batchNumber}
                               </div>
                             ))}
                           </td>
-                          <td className="px-6 py-4 font-semibold text-slate-900">${grn.totalAmount?.toFixed(2)}</td>
+                          <td className="px-6 py-4 font-semibold text-text">${grn.totalAmount?.toFixed(2)}</td>
                           <td className="px-6 py-4">
-                            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 flex items-center gap-1 w-max">
+                            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-stable-bg text-stable-text flex items-center gap-1 w-max">
                               <CheckCircle2 className="w-3 h-3" /> Restocked in Batch Ledger
                             </span>
                           </td>
@@ -531,8 +524,8 @@ export default function ProcurementDashboard() {
 
             {activeTab === 'suppliers' && (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-slate-600">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+                <table className="w-full text-left text-sm text-text-muted">
+                  <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                     <tr>
                       <th className="px-6 py-4">Supplier Name</th>
                       <th className="px-6 py-4">Code</th>
@@ -541,25 +534,25 @@ export default function ProcurementDashboard() {
                       <th className="px-6 py-4">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-border">
                     {suppliers.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                        <td colSpan={5} className="px-6 py-12 text-center text-text-muted">
                           No suppliers found. Click &quot;Register New Vendor&quot; to onboard suppliers.
                         </td>
                       </tr>
                     ) : (
                       suppliers.map((s) => (
-                        <tr key={s.id} className="hover:bg-slate-50/60">
-                          <td className="px-6 py-4 font-semibold text-slate-900">{s.name}</td>
-                          <td className="px-6 py-4 text-slate-600 font-mono text-xs">{s.code}</td>
+                        <tr key={s.id} className="hover:bg-surface-subtle/60">
+                          <td className="px-6 py-4 font-semibold text-text">{s.name}</td>
+                          <td className="px-6 py-4 text-text-muted font-mono text-xs">{s.code}</td>
                           <td className="px-6 py-4">{s.contactName || '—'}</td>
-                          <td className="px-6 py-4 text-xs text-slate-600">
+                          <td className="px-6 py-4 text-xs text-text-muted">
                             <div>{s.phone || '—'}</div>
-                            <div className="text-slate-400">{s.email || '—'}</div>
+                            <div className="text-text-muted">{s.email || '—'}</div>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-stable-bg text-stable-text">
                               Active
                             </span>
                           </td>
@@ -576,18 +569,18 @@ export default function ProcurementDashboard() {
 
       {/* Modal: New Purchase Request */}
       {showPrModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Create Purchase Requisition (PR)</h3>
+        <div className="fixed inset-0 bg-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl max-w-md w-full p-6 shadow-xl border border-border">
+            <h3 className="text-lg font-bold text-text mb-4">Create Purchase Requisition (PR)</h3>
             <form onSubmit={handleCreatePr} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Product / Medication
                 </label>
                 <select
                   value={prForm.productId}
                   onChange={(e) => setPrForm({ ...prForm, productId: e.target.value })}
-                  className="w-full border border-slate-300 rounded-lg p-2 text-sm bg-white"
+                  className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
                   required
                 >
                   <option value="">Select item to restock...</option>
@@ -600,7 +593,7 @@ export default function ProcurementDashboard() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                     Quantity
                   </label>
                   <input
@@ -608,18 +601,18 @@ export default function ProcurementDashboard() {
                     min="1"
                     value={prForm.quantity}
                     onChange={(e) => setPrForm({ ...prForm, quantity: Number(e.target.value) })}
-                    className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                    className="w-full border border-border rounded-lg p-2 text-sm"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                     Priority
                   </label>
                   <select
                     value={prForm.priority}
                     onChange={(e) => setPrForm({ ...prForm, priority: e.target.value })}
-                    className="w-full border border-slate-300 rounded-lg p-2 text-sm bg-white"
+                    className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
                   >
                     <option value="LOW">Low</option>
                     <option value="MEDIUM">Medium</option>
@@ -629,27 +622,27 @@ export default function ProcurementDashboard() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Justification / Clinical Purpose
                 </label>
                 <textarea
                   value={prForm.reason}
                   onChange={(e) => setPrForm({ ...prForm, reason: e.target.value })}
                   placeholder="Low stock alert or seasonal surge requirement..."
-                  className="w-full border border-slate-300 rounded-lg p-2 text-sm h-20"
+                  className="w-full border border-border rounded-lg p-2 text-sm h-20"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowPrModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
+                  className="px-4 py-2 text-sm font-medium text-text bg-surface-subtle rounded-lg hover:bg-surface-subtle"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                  className="px-4 py-2 text-sm font-medium text-brand-foreground bg-brand rounded-lg hover:bg-brand-hover"
                 >
                   Submit Requisition
                 </button>
@@ -661,18 +654,18 @@ export default function ProcurementDashboard() {
 
       {/* Modal: New Purchase Order */}
       {showPoModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Issue Purchase Order (PO)</h3>
+        <div className="fixed inset-0 bg-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl max-w-md w-full p-6 shadow-xl border border-border">
+            <h3 className="text-lg font-bold text-text mb-4">Issue Purchase Order (PO)</h3>
             <form onSubmit={handleCreatePo} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Select Supplier
                 </label>
                 <select
                   value={poForm.supplierId}
                   onChange={(e) => setPoForm({ ...poForm, supplierId: e.target.value })}
-                  className="w-full border border-slate-300 rounded-lg p-2 text-sm bg-white"
+                  className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
                   required
                 >
                   <option value="">Choose vendor...</option>
@@ -684,13 +677,13 @@ export default function ProcurementDashboard() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Product
                 </label>
                 <select
                   value={poForm.productId}
                   onChange={(e) => setPoForm({ ...poForm, productId: e.target.value })}
-                  className="w-full border border-slate-300 rounded-lg p-2 text-sm bg-white"
+                  className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
                   required
                 >
                   <option value="">Choose product...</option>
@@ -703,7 +696,7 @@ export default function ProcurementDashboard() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                     Quantity
                   </label>
                   <input
@@ -711,12 +704,12 @@ export default function ProcurementDashboard() {
                     min="1"
                     value={poForm.quantity}
                     onChange={(e) => setPoForm({ ...poForm, quantity: Number(e.target.value) })}
-                    className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                    className="w-full border border-border rounded-lg p-2 text-sm"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                     Agreed Unit Price ($)
                   </label>
                   <input
@@ -725,7 +718,7 @@ export default function ProcurementDashboard() {
                     min="0.1"
                     value={poForm.unitPrice}
                     onChange={(e) => setPoForm({ ...poForm, unitPrice: Number(e.target.value) })}
-                    className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                    className="w-full border border-border rounded-lg p-2 text-sm"
                     required
                   />
                 </div>
@@ -734,13 +727,13 @@ export default function ProcurementDashboard() {
                 <button
                   type="button"
                   onClick={() => setShowPoModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
+                  className="px-4 py-2 text-sm font-medium text-text bg-surface-subtle rounded-lg hover:bg-surface-subtle"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                  className="px-4 py-2 text-sm font-medium text-brand-foreground bg-brand rounded-lg hover:bg-brand-hover"
                 >
                   Issue Order
                 </button>
@@ -752,18 +745,18 @@ export default function ProcurementDashboard() {
 
       {/* Modal: Receive Goods (GRN) */}
       {showGrnModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Receive Shipment & Restock (GRN)</h3>
+        <div className="fixed inset-0 bg-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl max-w-md w-full p-6 shadow-xl border border-border">
+            <h3 className="text-lg font-bold text-text mb-4">Receive Shipment & Restock (GRN)</h3>
             <form onSubmit={handleCreateGrn} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Supplier
                 </label>
                 <select
                   value={grnForm.supplierId}
                   onChange={(e) => setGrnForm({ ...grnForm, supplierId: e.target.value })}
-                  className="w-full border border-slate-300 rounded-lg p-2 text-sm bg-white"
+                  className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
                   required
                 >
                   <option value="">Select supplier...</option>
@@ -775,13 +768,13 @@ export default function ProcurementDashboard() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Product
                 </label>
                 <select
                   value={grnForm.productId}
                   onChange={(e) => setGrnForm({ ...grnForm, productId: e.target.value })}
-                  className="w-full border border-slate-300 rounded-lg p-2 text-sm bg-white"
+                  className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
                   required
                 >
                   <option value="">Select product received...</option>
@@ -794,7 +787,7 @@ export default function ProcurementDashboard() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                     Batch Number
                   </label>
                   <input
@@ -802,26 +795,26 @@ export default function ProcurementDashboard() {
                     placeholder="BATCH-2026-X"
                     value={grnForm.batchNumber}
                     onChange={(e) => setGrnForm({ ...grnForm, batchNumber: e.target.value })}
-                    className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                    className="w-full border border-border rounded-lg p-2 text-sm"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                     Expiry Date
                   </label>
                   <input
                     type="date"
                     value={grnForm.expiryDate}
                     onChange={(e) => setGrnForm({ ...grnForm, expiryDate: e.target.value })}
-                    className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                    className="w-full border border-border rounded-lg p-2 text-sm"
                     required
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                     Quantity
                   </label>
                   <input
@@ -829,12 +822,12 @@ export default function ProcurementDashboard() {
                     min="1"
                     value={grnForm.quantity}
                     onChange={(e) => setGrnForm({ ...grnForm, quantity: Number(e.target.value) })}
-                    className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                    className="w-full border border-border rounded-lg p-2 text-sm"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                     Purchase Rate ($)
                   </label>
                   <input
@@ -843,7 +836,7 @@ export default function ProcurementDashboard() {
                     min="0.1"
                     value={grnForm.purchaseRate}
                     onChange={(e) => setGrnForm({ ...grnForm, purchaseRate: Number(e.target.value) })}
-                    className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                    className="w-full border border-border rounded-lg p-2 text-sm"
                     required
                   />
                 </div>
@@ -852,13 +845,13 @@ export default function ProcurementDashboard() {
                 <button
                   type="button"
                   onClick={() => setShowGrnModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
+                  className="px-4 py-2 text-sm font-medium text-text bg-surface-subtle rounded-lg hover:bg-surface-subtle"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                  className="px-4 py-2 text-sm font-medium text-brand-foreground bg-brand rounded-lg hover:bg-brand-hover"
                 >
                   Confirm & Restock Batch
                 </button>
@@ -870,12 +863,12 @@ export default function ProcurementDashboard() {
 
       {/* Modal: New Supplier */}
       {showSupplierModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Register New Supplier / Vendor</h3>
+        <div className="fixed inset-0 bg-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl max-w-md w-full p-6 shadow-xl border border-border">
+            <h3 className="text-lg font-bold text-text mb-4">Register New Supplier / Vendor</h3>
             <form onSubmit={handleCreateSupplier} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Supplier Name
                 </label>
                 <input
@@ -883,12 +876,12 @@ export default function ProcurementDashboard() {
                   placeholder="Apex Pharmaceuticals Ltd."
                   value={supplierForm.name}
                   onChange={(e) => setSupplierForm({ ...supplierForm, name: e.target.value })}
-                  className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                  className="w-full border border-border rounded-lg p-2 text-sm"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Vendor Code
                 </label>
                 <input
@@ -896,13 +889,13 @@ export default function ProcurementDashboard() {
                   placeholder="SUP-APEX-01"
                   value={supplierForm.code}
                   onChange={(e) => setSupplierForm({ ...supplierForm, code: e.target.value })}
-                  className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                  className="w-full border border-border rounded-lg p-2 text-sm"
                   required
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                     Contact Person
                   </label>
                   <input
@@ -910,11 +903,11 @@ export default function ProcurementDashboard() {
                     placeholder="Jane Doe"
                     value={supplierForm.contactName}
                     onChange={(e) => setSupplierForm({ ...supplierForm, contactName: e.target.value })}
-                    className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                    className="w-full border border-border rounded-lg p-2 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                     Phone
                   </label>
                   <input
@@ -922,7 +915,7 @@ export default function ProcurementDashboard() {
                     placeholder="+1 555-0199"
                     value={supplierForm.phone}
                     onChange={(e) => setSupplierForm({ ...supplierForm, phone: e.target.value })}
-                    className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                    className="w-full border border-border rounded-lg p-2 text-sm"
                   />
                 </div>
               </div>
@@ -930,13 +923,13 @@ export default function ProcurementDashboard() {
                 <button
                   type="button"
                   onClick={() => setShowSupplierModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
+                  className="px-4 py-2 text-sm font-medium text-text bg-surface-subtle rounded-lg hover:bg-surface-subtle"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                  className="px-4 py-2 text-sm font-medium text-brand-foreground bg-brand rounded-lg hover:bg-brand-hover"
                 >
                   Save Supplier
                 </button>

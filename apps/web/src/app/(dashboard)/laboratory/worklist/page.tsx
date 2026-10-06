@@ -123,30 +123,30 @@ export default function LaboratoryWorklist() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <FlaskConical className="w-6 h-6 text-sky-600" />
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Laboratory Worklist & Queue</h1>
+            <FlaskConical className="w-6 h-6 text-info" />
+            <h1 className="text-2xl font-bold text-text tracking-tight">Laboratory Worklist & Queue</h1>
           </div>
-          <p className="text-slate-500 mt-1">Specimen collection barcode printing, parameter result capture, and validation</p>
+          <p className="text-text-muted mt-1">Specimen collection barcode printing, parameter result capture, and validation</p>
         </div>
         <Button variant="secondary" onClick={() => loadWorklist()} disabled={loading}>
-          <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ?'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border bg-surface-subtle/60 flex items-center justify-between">
           <Input
             placeholder="Search by Test, Patient, or MRN..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full sm:w-80 bg-white"
+            className="w-full sm:w-80 bg-surface"
           />
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3.5">Investigation Test</th>
                 <th className="px-5 py-3.5">Patient Details</th>
@@ -155,34 +155,34 @@ export default function LaboratoryWorklist() {
                 <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border">
               {filteredItems.map((item) => {
                 const sample = item.sample;
                 const status = sample ? sample.status : 'PENDING';
                 return (
-                  <tr key={item.id} className="hover:bg-slate-50/60 transition-colors">
+                  <tr key={item.id} className="hover:bg-surface-subtle/60 transition-colors">
                     <td className="px-5 py-3.5">
-                      <div className="font-bold text-slate-900">{item.testName}</div>
-                      <div className="text-xs text-slate-500 font-mono">{item.testCode}</div>
+                      <div className="font-bold text-text">{item.testName}</div>
+                      <div className="text-xs text-text-muted font-mono">{item.testCode}</div>
                     </td>
                     <td className="px-5 py-3.5">
-                      <div className="font-semibold text-slate-900">
+                      <div className="font-semibold text-text">
                         {item.order?.patient?.firstName} {item.order?.patient?.lastName}
                       </div>
-                      <div className="text-xs text-slate-500 font-mono">
+                      <div className="text-xs text-text-muted font-mono">
                         MRN: {item.order?.patient?.mrn} &bull; {item.order?.patient?.gender}
                       </div>
                     </td>
                     <td className="px-5 py-3.5">
                       {sample ? (
                         <div>
-                          <span className="font-mono font-bold text-slate-900 text-xs bg-slate-100 px-2 py-0.5 rounded">
+                          <span className="font-mono font-bold text-text text-xs bg-surface-subtle px-2 py-0.5 rounded">
                             {sample.sampleId}
                           </span>
-                          <div className="text-xs text-slate-500 mt-1">{sample.specimenType?.name}</div>
+                          <div className="text-xs text-text-muted mt-1">{sample.specimenType?.name}</div>
                         </div>
                       ) : (
-                        <span className="text-xs text-slate-400 italic">Not yet collected</span>
+                        <span className="text-xs text-text-muted italic">Not yet collected</span>
                       )}
                     </td>
                     <td className="px-5 py-3.5">
@@ -222,7 +222,7 @@ export default function LaboratoryWorklist() {
                           href={laboratoryApi.getReportPdfUrl(sample.id)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50"
+                          className="inline-flex items-center text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-border text-text hover:bg-surface-subtle"
                         >
                           <Download className="w-3.5 h-3.5 mr-1" />
                           Report PDF
@@ -234,7 +234,7 @@ export default function LaboratoryWorklist() {
               })}
               {filteredItems.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-sm text-slate-500">
+                  <td colSpan={5} className="px-5 py-8 text-center text-sm text-text-muted">
                     No active lab worklist items found.
                   </td>
                 </tr>
@@ -247,17 +247,17 @@ export default function LaboratoryWorklist() {
       {/* Collect Sample Modal */}
       <Dialog isOpen={isCollectOpen} onClose={() => setIsCollectOpen(false)} title="Collect Specimen Sample">
         <form onSubmit={handleCollect} className="space-y-4">
-          <div className="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
-            <div className="font-semibold text-slate-900">{selectedItem?.testName}</div>
-            <div className="text-slate-500">
+          <div className="p-3 bg-surface-subtle rounded-lg text-xs space-y-1">
+            <div className="font-semibold text-text">{selectedItem?.testName}</div>
+            <div className="text-text-muted">
               Patient: {selectedItem?.order?.patient?.firstName} {selectedItem?.order?.patient?.lastName}
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Specimen Tube / Type *</label>
+            <label className="block text-xs font-semibold text-text mb-1">Specimen Tube / Type *</label>
             <select
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
               value={specimenType}
               onChange={(e) => setSpecimenType(e.target.value)}
             >
@@ -269,7 +269,7 @@ export default function LaboratoryWorklist() {
             </select>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end space-x-3 pt-3 border-t border-border">
             <Button variant="secondary" type="button" onClick={() => setIsCollectOpen(false)}>
               Cancel
             </Button>
@@ -284,30 +284,30 @@ export default function LaboratoryWorklist() {
       <Dialog isOpen={isResultOpen} onClose={() => setIsResultOpen(false)} title="Enter Test Parameter Result">
         <form onSubmit={handleEnterResult} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Parameter Name *</label>
+            <label className="block text-xs font-semibold text-text mb-1">Parameter Name *</label>
             <Input value={paramName} onChange={(e) => setParamName(e.target.value)} required />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Observed Value *</label>
+              <label className="block text-xs font-semibold text-text mb-1">Observed Value *</label>
               <Input value={paramVal} onChange={(e) => setParamVal(e.target.value)} required />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Unit</label>
+              <label className="block text-xs font-semibold text-text mb-1">Unit</label>
               <Input value={paramUnit} onChange={(e) => setParamUnit(e.target.value)} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Reference Range</label>
+              <label className="block text-xs font-semibold text-text mb-1">Reference Range</label>
               <Input value={paramRange} onChange={(e) => setParamRange(e.target.value)} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Flag</label>
+              <label className="block text-xs font-semibold text-text mb-1">Flag</label>
               <select
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
                 value={paramFlag}
                 onChange={(e: any) => setParamFlag(e.target.value)}
               >
@@ -319,7 +319,7 @@ export default function LaboratoryWorklist() {
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end space-x-3 pt-3 border-t border-border">
             <Button variant="secondary" type="button" onClick={() => setIsResultOpen(false)}>
               Cancel
             </Button>

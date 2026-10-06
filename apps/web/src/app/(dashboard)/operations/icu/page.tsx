@@ -104,14 +104,14 @@ export default function ICUDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">ICU Critical Care Dashboard</h1>
-          <p className="text-slate-500 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-text tracking-tight">ICU Critical Care Dashboard</h1>
+          <p className="text-text-muted text-sm mt-0.5">
             Continuous organ dysfunction telemetry, ventilator charting, and critical range alerts.
           </p>
         </div>
         <button
           onClick={() => openLogModal()}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 shadow-sm"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-brand-foreground bg-brand hover:bg-brand-hover shadow-sm"
         >
           + Record Flowsheet Entry
         </button>
@@ -119,10 +119,9 @@ export default function ICUDashboard() {
 
       {notice && (
         <div
-          className={`p-3.5 rounded-lg text-xs font-medium flex justify-between items-center ${
-            notice.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border border-rose-200 text-rose-800'
+          className={`p-3.5 rounded-lg text-xs font-medium flex justify-between items-center ${ notice.type ==='success'
+              ? 'bg-stable-bg border border-stable-border text-stable-text'
+              : 'bg-critical-bg border border-critical-border text-critical-text'
           }`}
         >
           <span>{notice.text}</span>
@@ -132,50 +131,50 @@ export default function ICUDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">ICU Active Census</p>
-          <p className="text-2xl font-bold text-slate-900 mt-2">{activeIcuPatients.length}</p>
-          <p className="text-xs text-slate-400 mt-1">Patients in critical care units</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">ICU Active Census</p>
+          <p className="text-2xl font-bold text-text mt-2">{activeIcuPatients.length}</p>
+          <p className="text-xs text-text-muted mt-1">Patients in critical care units</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Flowsheets Charted</p>
-          <p className="text-2xl font-bold text-blue-600 mt-2">{flowsheets.length}</p>
-          <p className="text-xs text-slate-400 mt-1">Total rounds documented</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Flowsheets Charted</p>
+          <p className="text-2xl font-bold text-info mt-2">{flowsheets.length}</p>
+          <p className="text-xs text-text-muted mt-1">Total rounds documented</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Mechanical Ventilation</p>
-          <p className="text-2xl font-bold text-slate-900 mt-2">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Mechanical Ventilation</p>
+          <p className="text-2xl font-bold text-text mt-2">
             {flowsheets.filter((f) => f.ventilatorParams?.mode).length > 0 ? 'Active' : 'Standby'}
           </p>
-          <p className="text-xs text-slate-400 mt-1">Invasive and non-invasive</p>
+          <p className="text-xs text-text-muted mt-1">Invasive and non-invasive</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Active Alarms</p>
-          <p className="text-2xl font-bold text-rose-600 mt-2">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Active Alarms</p>
+          <p className="text-2xl font-bold text-critical mt-2">
             {flowsheets.reduce((acc, f) => acc + (f.criticalAlarms?.length || 0), 0)}
           </p>
-          <p className="text-xs text-slate-400 mt-1">Parameters outside safe range</p>
+          <p className="text-xs text-text-muted mt-1">Parameters outside safe range</p>
         </div>
       </div>
 
       {/* Active ICU Patients Card Grid */}
       {activeIcuPatients.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-base font-semibold text-slate-900">Current Inpatients in Critical Care</h2>
+          <h2 className="text-base font-semibold text-text">Current Inpatients in Critical Care</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {activeIcuPatients.map((adm) => (
-              <div key={adm.admissionId} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+              <div key={adm.admissionId} className="bg-surface border border-border rounded-xl p-4 shadow-sm space-y-3">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-bold text-sm text-slate-900">
+                    <h3 className="font-bold text-sm text-text">
                       {adm.patient?.firstName} {adm.patient?.lastName}
                     </h3>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-text-muted">
                       MRN: {adm.patient?.mrn} • Bed: <strong>{adm.bed?.bedNumber || 'ICU Bed'}</strong>
                     </p>
                   </div>
                   {adm.sofaScore && (
-                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-info-bg text-info-text border border-info-border">
                       SOFA: {adm.sofaScore.score}
                     </span>
                   )}
@@ -184,40 +183,40 @@ export default function ICUDashboard() {
                 {adm.criticalAlarms && adm.criticalAlarms.length > 0 && (
                   <div className="space-y-1">
                     {adm.criticalAlarms.map((a: string, idx: number) => (
-                      <span key={idx} className="block text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                      <span key={idx} className="block text-[11px] font-bold text-critical-text bg-critical-bg px-2 py-0.5 rounded border border-critical-border">
                         {a}
                       </span>
                     ))}
                   </div>
                 )}
 
-                <div className="grid grid-cols-3 gap-2 text-xs pt-2 border-t border-slate-100 text-slate-600">
+                <div className="grid grid-cols-3 gap-2 text-xs pt-2 border-t border-border text-text-muted">
                   <div>
-                    <span className="text-slate-400 block text-[10px]">HR</span>
-                    <strong className="text-slate-800">{adm.latestVitals?.heartRate || '—'} bpm</strong>
+                    <span className="text-text-muted block text-[10px]">HR</span>
+                    <strong className="text-text">{adm.latestVitals?.heartRate || '—'} bpm</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">BP / MAP</span>
-                    <strong className="text-slate-800">
+                    <span className="text-text-muted block text-[10px]">BP / MAP</span>
+                    <strong className="text-text">
                       {adm.latestVitals?.bpSystolic ? `${adm.latestVitals.bpSystolic}/${adm.latestVitals.bpDiastolic}` : '—'}
                     </strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">SpO2</span>
-                    <strong className="text-slate-800">{adm.latestVitals?.spo2 ? `${adm.latestVitals.spo2}%` : '—'}</strong>
+                    <span className="text-text-muted block text-[10px]">SpO2</span>
+                    <strong className="text-text">{adm.latestVitals?.spo2 ? `${adm.latestVitals.spo2}%` : '—'}</strong>
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <div className="flex justify-end gap-2 pt-2 border-t border-border">
                   <button
                     onClick={() => openLogModal(adm.encounterId)}
-                    className="text-xs font-semibold text-blue-600 hover:text-blue-800"
+                    className="text-xs font-semibold text-info hover:text-info-text"
                   >
                     + Add Flowsheet
                   </button>
                   <Link
                     href={`/ipd/chart/${adm.admissionId}`}
-                    className="text-xs font-semibold text-slate-600 hover:text-slate-900"
+                    className="text-xs font-semibold text-text-muted hover:text-text"
                   >
                     Full Chart →
                   </Link>
@@ -229,15 +228,15 @@ export default function ICUDashboard() {
       )}
 
       {/* Recent Flowsheet Log */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-          <h2 className="text-base font-semibold text-slate-900">Recent ICU Flowsheets & Scoring</h2>
-          <span className="text-xs text-slate-500">{flowsheets.length} charted records</span>
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border flex justify-between items-center">
+          <h2 className="text-base font-semibold text-text">Recent ICU Flowsheets & Scoring</h2>
+          <span className="text-xs text-text-muted">{flowsheets.length} charted records</span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3">Time</th>
                 <th className="px-5 py-3">Patient</th>
@@ -248,16 +247,16 @@ export default function ICUDashboard() {
                 <th className="px-5 py-3">Critical Alarms</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
+            <tbody className="divide-y divide-border text-xs">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={7} className="px-5 py-8 text-center text-text-muted">
                     Loading flowsheet records...
                   </td>
                 </tr>
               ) : flowsheets.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={7} className="px-5 py-8 text-center text-text-muted">
                     No flowsheet entries recorded yet.
                   </td>
                 </tr>
@@ -270,62 +269,62 @@ export default function ICUDashboard() {
                   const sofa = f.sofaScore;
 
                   return (
-                    <tr key={f.id} className="hover:bg-slate-50/50">
-                      <td className="px-5 py-4 text-slate-500 font-mono whitespace-nowrap">
+                    <tr key={f.id} className="hover:bg-surface-subtle/50">
+                      <td className="px-5 py-4 text-text-muted font-mono whitespace-nowrap">
                         {new Date(f.recordTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
-                        <span className="text-[10px] text-slate-400 block">by {f.recordedBy?.name || 'Staff'}</span>
+                        <span className="text-[10px] text-text-muted block">by {f.recordedBy?.name || 'Staff'}</span>
                       </td>
                       <td className="px-5 py-4">
-                        <strong className="text-slate-900">
+                        <strong className="text-text">
                           {f.encounter?.patient?.firstName} {f.encounter?.patient?.lastName}
                         </strong>
-                        <span className="text-slate-400 block text-[11px]">
+                        <span className="text-text-muted block text-[11px]">
                           MRN: {f.encounter?.patient?.mrn}
                         </span>
                       </td>
                       <td className="px-5 py-4">
                         <div>HR: <strong>{vs.heartRate || '—'}</strong> | BP: <strong>{vs.bpSystolic}/{vs.bpDiastolic}</strong></div>
-                        <div className="text-slate-400">SpO2: <strong>{vs.spo2}%</strong> | RR: {vs.respRate} | T: {vs.temperature}°C</div>
+                        <div className="text-text-muted">SpO2: <strong>{vs.spo2}%</strong> | RR: {vs.respRate} | T: {vs.temperature}°C</div>
                       </td>
                       <td className="px-5 py-4">
                         {vp.mode ? (
                           <div>
-                            <span className="font-semibold text-slate-800">{vp.mode}</span>
-                            <span className="text-slate-400 block text-[11px]">
+                            <span className="font-semibold text-text">{vp.mode}</span>
+                            <span className="text-text-muted block text-[11px]">
                               FiO2: {(vp.fio2 * 100).toFixed(0)}% • PEEP: {vp.peep} • Ppeak: {vp.peakPressure}
                             </span>
                           </div>
                         ) : (
-                          <span className="text-slate-400 italic">Room Air / Standby</span>
+                          <span className="text-text-muted italic">Room Air / Standby</span>
                         )}
                       </td>
                       <td className="px-5 py-4">
                         <div>In: {fb.intakeTotal || 0} ml • Out: {fb.outputTotal || 0} ml</div>
-                        <div className={`font-semibold ${(fb.netBalance || 0) >= 0 ? 'text-emerald-700' : 'text-blue-700'}`}>
+                        <div className={`font-semibold ${(fb.netBalance || 0) >= 0 ?'text-stable-text' : 'text-info-text'}`}>
                           Net: {fb.netBalance || 0} ml
                         </div>
                       </td>
                       <td className="px-5 py-4">
                         {sofa ? (
                           <div>
-                            <span className="font-bold text-slate-900 text-sm">{sofa.score}</span>
-                            <span className="text-[10px] text-slate-400 block">{sofa.riskCategory}</span>
+                            <span className="font-bold text-text text-sm">{sofa.score}</span>
+                            <span className="text-[10px] text-text-muted block">{sofa.riskCategory}</span>
                           </div>
                         ) : (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-text-muted">—</span>
                         )}
                       </td>
                       <td className="px-5 py-4">
                         {alarms.length > 0 ? (
                           <div className="space-y-1">
                             {alarms.map((al: string, i: number) => (
-                              <span key={i} className="inline-block bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded text-[10px] font-bold">
+                              <span key={i} className="inline-block bg-critical-bg text-critical-text border border-critical-border px-2 py-0.5 rounded text-[10px] font-bold">
                                 {al}
                               </span>
                             ))}
                           </div>
                         ) : (
-                          <span className="text-emerald-700 font-medium">Safe Ranges</span>
+                          <span className="text-stable-text font-medium">Safe Ranges</span>
                         )}
                       </td>
                     </tr>
@@ -339,23 +338,23 @@ export default function ICUDashboard() {
 
       {/* Record Flowsheet Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
+        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="border-b border-border pb-3 flex justify-between items-center">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Record ICU Flowsheet Entry</h3>
-                <p className="text-xs text-slate-500">Comprehensive vital signs, ventilator telemetry, and fluid balance</p>
+                <h3 className="text-base font-bold text-text">Record ICU Flowsheet Entry</h3>
+                <p className="text-xs text-text-muted">Comprehensive vital signs, ventilator telemetry, and fluid balance</p>
               </div>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 font-bold">x</button>
+              <button onClick={() => setShowModal(false)} className="text-text-muted font-bold">x</button>
             </div>
 
             <form onSubmit={handleSaveFlowsheet} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Select Patient Encounter *</label>
+                <label className="block text-xs font-medium text-text mb-1">Select Patient Encounter *</label>
                 <select
                   value={selectedEncounterId}
                   onChange={(e) => setSelectedEncounterId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
                   required
                 >
                   <option value="">-- Choose Encounter --</option>
@@ -368,81 +367,81 @@ export default function ICUDashboard() {
               </div>
 
               {/* Vitals Section */}
-              <div className="p-3 border border-slate-200 rounded-lg bg-slate-50 space-y-2">
-                <p className="text-xs font-bold text-slate-800 uppercase">Vital Signs & Neurological</p>
+              <div className="p-3 border border-border rounded-lg bg-surface-subtle space-y-2">
+                <p className="text-xs font-bold text-text uppercase">Vital Signs & Neurological</p>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-[11px] text-slate-600">Heart Rate (bpm)</label>
+                    <label className="block text-[11px] text-text-muted">Heart Rate (bpm)</label>
                     <input
                       type="number"
                       value={vitals.heartRate}
                       onChange={(e) => setVitals({ ...vitals, heartRate: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-600">BP Systolic</label>
+                    <label className="block text-[11px] text-text-muted">BP Systolic</label>
                     <input
                       type="number"
                       value={vitals.bpSystolic}
                       onChange={(e) => setVitals({ ...vitals, bpSystolic: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-600">BP Diastolic</label>
+                    <label className="block text-[11px] text-text-muted">BP Diastolic</label>
                     <input
                       type="number"
                       value={vitals.bpDiastolic}
                       onChange={(e) => setVitals({ ...vitals, bpDiastolic: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-[11px] text-slate-600">SpO2 (%)</label>
+                    <label className="block text-[11px] text-text-muted">SpO2 (%)</label>
                     <input
                       type="number"
                       value={vitals.spo2}
                       onChange={(e) => setVitals({ ...vitals, spo2: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-600">Respiratory Rate (/min)</label>
+                    <label className="block text-[11px] text-text-muted">Respiratory Rate (/min)</label>
                     <input
                       type="number"
                       value={vitals.respRate}
                       onChange={(e) => setVitals({ ...vitals, respRate: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-600">Glasgow Coma (3-15)</label>
+                    <label className="block text-[11px] text-text-muted">Glasgow Coma (3-15)</label>
                     <input
                       type="number"
                       min="3"
                       max="15"
                       value={vitals.gcs}
                       onChange={(e) => setVitals({ ...vitals, gcs: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Ventilator Section */}
-              <div className="p-3 border border-slate-200 rounded-lg bg-slate-50 space-y-2">
-                <p className="text-xs font-bold text-slate-800 uppercase">Ventilator Settings</p>
+              <div className="p-3 border border-border rounded-lg bg-surface-subtle space-y-2">
+                <p className="text-xs font-bold text-text uppercase">Ventilator Settings</p>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-[11px] text-slate-600">Mode</label>
+                    <label className="block text-[11px] text-text-muted">Mode</label>
                     <select
                       value={ventilator.mode}
                       onChange={(e) => setVentilator({ ...ventilator, mode: e.target.value })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     >
                       <option value="AC">Assist Control (AC)</option>
                       <option value="SIMV">SIMV</option>
@@ -451,7 +450,7 @@ export default function ICUDashboard() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-600">FiO2 (0.21 - 1.0)</label>
+                    <label className="block text-[11px] text-text-muted">FiO2 (0.21 - 1.0)</label>
                     <input
                       type="number"
                       step="0.05"
@@ -459,87 +458,87 @@ export default function ICUDashboard() {
                       max="1.0"
                       value={ventilator.fio2}
                       onChange={(e) => setVentilator({ ...ventilator, fio2: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-600">PEEP (cmH2O)</label>
+                    <label className="block text-[11px] text-text-muted">PEEP (cmH2O)</label>
                     <input
                       type="number"
                       value={ventilator.peep}
                       onChange={(e) => setVentilator({ ...ventilator, peep: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Fluid Balance Section */}
-              <div className="p-3 border border-slate-200 rounded-lg bg-slate-50 space-y-2">
-                <p className="text-xs font-bold text-slate-800 uppercase">Fluid Balance (ml)</p>
+              <div className="p-3 border border-border rounded-lg bg-surface-subtle space-y-2">
+                <p className="text-xs font-bold text-text uppercase">Fluid Balance (ml)</p>
                 <div className="grid grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-[11px] text-slate-600">IV Intake</label>
+                    <label className="block text-[11px] text-text-muted">IV Intake</label>
                     <input
                       type="number"
                       value={fluid.ivIntake}
                       onChange={(e) => setFluid({ ...fluid, ivIntake: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-600">Enteral Intake</label>
+                    <label className="block text-[11px] text-text-muted">Enteral Intake</label>
                     <input
                       type="number"
                       value={fluid.enteralIntake}
                       onChange={(e) => setFluid({ ...fluid, enteralIntake: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-600">Urine Output</label>
+                    <label className="block text-[11px] text-text-muted">Urine Output</label>
                     <input
                       type="number"
                       value={fluid.urineOutput}
                       onChange={(e) => setFluid({ ...fluid, urineOutput: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-600">Drain Output</label>
+                    <label className="block text-[11px] text-text-muted">Drain Output</label>
                     <input
                       type="number"
                       value={fluid.drainOutput}
                       onChange={(e) => setFluid({ ...fluid, drainOutput: Number(e.target.value) })}
-                      className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                      className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
                     />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Clinical Notes</label>
+                <label className="block text-xs font-medium text-text mb-1">Clinical Notes</label>
                 <textarea
                   rows={2}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Inotropes/vasopressors, sedation state, arterial line wave..."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700"
+                  className="px-4 py-2 border border-border rounded-lg text-xs text-text"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold disabled:opacity-50"
+                  className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold disabled:opacity-50"
                 >
                   {submitting ? 'Recording...' : 'Commit Flowsheet'}
                 </button>

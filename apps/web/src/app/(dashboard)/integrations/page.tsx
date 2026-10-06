@@ -188,17 +188,17 @@ export default function IntegrationsDashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <Network className="w-7 h-7 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-text tracking-tight flex items-center gap-2">
+            <Network className="w-7 h-7 text-brand" />
             Interoperability & Integrations Hub
           </h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <p className="text-text-muted text-sm mt-1">
             ABDM Sandbox, HL7 FHIR R4 interfaces, automated laboratory instrument feeds, and payment gateways.
           </p>
         </div>
 
         <Button variant="outline" size="sm" onClick={loadStatus} disabled={loading}>
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 mr-2 ${loading ?'animate-spin' : ''}`} />
           Refresh Adapters
         </Button>
       </div>
@@ -214,21 +214,21 @@ export default function IntegrationsDashboardPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {adapters.map((a: any) => (
-            <div key={a.id} className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-3">
+            <div key={a.id} className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-3">
               <div className="flex justify-between items-start">
-                <span className="font-semibold text-slate-900 text-sm">{a.name}</span>
+                <span className="font-semibold text-text text-sm">{a.name}</span>
                 <Badge variant={a.status.includes('ACTIVE') ? 'stable' : 'info'}>
                   {a.status}
                 </Badge>
               </div>
-              <div className="text-xs text-slate-500 space-y-1">
-                <p>Type: <span className="font-medium text-slate-700">{a.type}</span></p>
-                <p>Version: <span className="font-medium text-slate-700">{a.version}</span></p>
-                <p>Adapter Mode: <span className="font-medium text-indigo-600">{a.isSimulator ? 'Local Sandbox Simulator' : 'Live Gateway'}</span></p>
+              <div className="text-xs text-text-muted space-y-1">
+                <p>Type: <span className="font-medium text-text">{a.type}</span></p>
+                <p>Version: <span className="font-medium text-text">{a.version}</span></p>
+                <p>Adapter Mode: <span className="font-medium text-brand">{a.isSimulator ? 'Local Sandbox Simulator' : 'Live Gateway'}</span></p>
               </div>
               <div className="flex flex-wrap gap-1 pt-2">
                 {a.capabilities.map((c: string, idx: number) => (
-                  <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[11px]">
+                  <span key={idx} className="px-2 py-0.5 bg-surface-subtle text-text-muted rounded text-[11px]">
                     {c}
                   </span>
                 ))}
@@ -239,41 +239,37 @@ export default function IntegrationsDashboardPage() {
       )}
 
       {/* INTERACTIVE TEST CONSOLES */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="border-b border-slate-200 p-4 bg-slate-50 flex items-center justify-between">
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="border-b border-border p-4 bg-surface-subtle flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Activity className="w-5 h-5 text-indigo-600" />
-            <h3 className="font-semibold text-slate-900 text-sm">Interactive Integration Test Consoles</h3>
+            <Activity className="w-5 h-5 text-brand" />
+            <h3 className="font-semibold text-text text-sm">Interactive Integration Test Consoles</h3>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => setActiveConsole('abdm')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-                activeConsole === 'abdm' ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-700'
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole ==='abdm' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text'
               }`}
             >
               ABDM ABHA M1/M2
             </button>
             <button
               onClick={() => setActiveConsole('fhir')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-                activeConsole === 'fhir' ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-700'
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole ==='fhir' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text'
               }`}
             >
               FHIR R4 Inspector
             </button>
             <button
               onClick={() => setActiveConsole('analyzer')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-                activeConsole === 'analyzer' ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-700'
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole ==='analyzer' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text'
               }`}
             >
               LIS Analyzer Feed
             </button>
             <button
               onClick={() => setActiveConsole('payment')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-                activeConsole === 'payment' ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-700'
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole ==='payment' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text'
               }`}
             >
               Payment Gateway
@@ -285,28 +281,28 @@ export default function IntegrationsDashboardPage() {
           {/* CONSOLE 1: ABDM */}
           {activeConsole === 'abdm' && (
             <div className="space-y-4 max-w-xl">
-              <h4 className="font-bold text-slate-900 text-sm">ABDM Sandbox ABHA Registration & OTP Flow</h4>
-              <p className="text-xs text-slate-500">
+              <h4 className="font-bold text-text text-sm">ABDM Sandbox ABHA Registration & OTP Flow</h4>
+              <p className="text-xs text-text-muted">
                 Emulates the National Health Authority ABDM M1 protocol. Generates 14-digit ABHA ID and links hospital care context.
               </p>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Aadhaar / Mobile Number</label>
+                  <label className="text-xs font-semibold text-text">Aadhaar / Mobile Number</label>
                   <input
                     type="text"
                     value={abdmAadhaar}
                     onChange={(e) => setAbdmAadhaar(e.target.value)}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
+                    className="w-full mt-1 px-3 py-2 border border-border rounded-lg text-sm bg-surface"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Full Name</label>
+                  <label className="text-xs font-semibold text-text">Full Name</label>
                   <input
                     type="text"
                     value={abdmName}
                     onChange={(e) => setAbdmName(e.target.value)}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
+                    className="w-full mt-1 px-3 py-2 border border-border rounded-lg text-sm bg-surface"
                   />
                 </div>
               </div>
@@ -319,17 +315,17 @@ export default function IntegrationsDashboardPage() {
               </div>
 
               {abdmTxnId && (
-                <div className="p-4 bg-indigo-50/50 border border-indigo-100 rounded-xl space-y-3">
-                  <p className="text-xs font-semibold text-indigo-900">Step 2: Enter OTP (Sandbox fixed OTP: 123456)</p>
+                <div className="p-4 bg-surface-subtle/50 border border-border rounded-xl space-y-3">
+                  <p className="text-xs font-semibold text-brand">Step 2: Enter OTP (Sandbox fixed OTP: 123456)</p>
                   <div className="flex gap-2 items-center">
                     <input
                       type="text"
                       value={abdmOtp}
                       onChange={(e) => setAbdmOtp(e.target.value)}
-                      className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm w-32 bg-white"
+                      className="px-3 py-1.5 border border-border rounded-lg text-sm w-32 bg-surface"
                       placeholder="123456"
                     />
-                    <Button size="sm" onClick={handleVerifyOtp} disabled={abdmLoading} className="bg-emerald-600 hover:bg-emerald-700">
+                    <Button size="sm" onClick={handleVerifyOtp} disabled={abdmLoading} className="bg-stable hover:bg-stable">
                       Verify & Generate ABHA
                     </Button>
                   </div>
@@ -337,7 +333,7 @@ export default function IntegrationsDashboardPage() {
               )}
 
               {abdmResult && (
-                <div className="p-4 bg-slate-900 text-slate-100 rounded-xl text-xs font-mono overflow-x-auto">
+                <div className="p-4 bg-surface text-text rounded-xl text-xs font-mono overflow-x-auto">
                   <pre>{JSON.stringify(abdmResult, null, 2)}</pre>
                 </div>
               )}
@@ -347,8 +343,8 @@ export default function IntegrationsDashboardPage() {
           {/* CONSOLE 2: FHIR R4 */}
           {activeConsole === 'fhir' && (
             <div className="space-y-4 max-w-xl">
-              <h4 className="font-bold text-slate-900 text-sm">HL7 FHIR R4 Resource Query</h4>
-              <p className="text-xs text-slate-500">
+              <h4 className="font-bold text-text text-sm">HL7 FHIR R4 Resource Query</h4>
+              <p className="text-xs text-text-muted">
                 Transforms relational patient and encounter records into standard HL7 FHIR R4 JSON resources.
               </p>
 
@@ -358,7 +354,7 @@ export default function IntegrationsDashboardPage() {
                   value={fhirPatientId}
                   onChange={(e) => setFhirPatientId(e.target.value)}
                   placeholder="Enter Patient ID (or leave blank for test)"
-                  className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
+                  className="flex-1 px-3 py-2 border border-border rounded-lg text-sm bg-surface"
                 />
                 <Button size="sm" onClick={handleFetchFhir} disabled={fhirLoading}>
                   <Play className="w-3.5 h-3.5 mr-1.5" />
@@ -367,7 +363,7 @@ export default function IntegrationsDashboardPage() {
               </div>
 
               {fhirOutput && (
-                <div className="p-4 bg-slate-900 text-emerald-400 rounded-xl text-xs font-mono overflow-x-auto max-h-96">
+                <div className="p-4 bg-surface text-stable rounded-xl text-xs font-mono overflow-x-auto max-h-96">
                   <pre>{JSON.stringify(fhirOutput, null, 2)}</pre>
                 </div>
               )}
@@ -377,37 +373,37 @@ export default function IntegrationsDashboardPage() {
           {/* CONSOLE 3: ANALYZER FEED */}
           {activeConsole === 'analyzer' && (
             <div className="space-y-4 max-w-xl">
-              <h4 className="font-bold text-slate-900 text-sm">Automated Laboratory Instrument Ingestion</h4>
-              <p className="text-xs text-slate-500">
+              <h4 className="font-bold text-text text-sm">Automated Laboratory Instrument Ingestion</h4>
+              <p className="text-xs text-text-muted">
                 Simulates ASTM E1394 serial/network packet from a 5-part hematology automated cell counter.
               </p>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Specimen Barcode Label</label>
+                <label className="text-xs font-semibold text-text">Specimen Barcode Label</label>
                 <input
                   type="text"
                   value={sampleBarcode}
                   onChange={(e) => setSampleBarcode(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
+                  className="w-full mt-1 px-3 py-2 border border-border rounded-lg text-sm bg-surface"
                 />
               </div>
 
-              <Button size="sm" onClick={handleSimulateAnalyzer} disabled={analyzerLoading} className="bg-indigo-600 hover:bg-indigo-700">
+              <Button size="sm" onClick={handleSimulateAnalyzer} disabled={analyzerLoading} className="bg-brand hover:bg-brand-hover">
                 <FlaskConical className="w-3.5 h-3.5 mr-1.5" />
                 Trigger Automated Instrument Feed
               </Button>
 
               {analyzerResult && (
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                <div className="p-4 bg-surface-subtle border border-border rounded-xl space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="font-semibold text-slate-900 text-xs">Specimen {analyzerResult.sampleBarcode}</span>
+                    <span className="font-semibold text-text text-xs">Specimen {analyzerResult.sampleBarcode}</span>
                     <Badge variant="stable">{analyzerResult.status}</Badge>
                   </div>
                   <div className="space-y-1.5">
                     {analyzerResult.processedResults.map((r: any, idx: number) => (
-                      <div key={idx} className="flex justify-between text-xs py-1 border-b border-slate-200/60">
-                        <span className="text-slate-600 font-medium">{r.parameter}</span>
-                        <span className="tabular-nums font-bold text-slate-900">{r.value} {r.unit}</span>
+                      <div key={idx} className="flex justify-between text-xs py-1 border-b border-border/60">
+                        <span className="text-text-muted font-medium">{r.parameter}</span>
+                        <span className="tabular-nums font-bold text-text">{r.value} {r.unit}</span>
                       </div>
                     ))}
                   </div>
@@ -419,18 +415,18 @@ export default function IntegrationsDashboardPage() {
           {/* CONSOLE 4: PAYMENT GATEWAY */}
           {activeConsole === 'payment' && (
             <div className="space-y-4 max-w-xl">
-              <h4 className="font-bold text-slate-900 text-sm">Payment Gateway Checkout & Verification</h4>
-              <p className="text-xs text-slate-500">
+              <h4 className="font-bold text-text text-sm">Payment Gateway Checkout & Verification</h4>
+              <p className="text-xs text-text-muted">
                 Simulates Razorpay / Stripe payment order creation, digital signature generation, and webhook verification.
               </p>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Payment Amount ($ USD)</label>
+                <label className="text-xs font-semibold text-text">Payment Amount ($ USD)</label>
                 <input
                   type="number"
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
+                  className="w-full mt-1 px-3 py-2 border border-border rounded-lg text-sm bg-surface"
                 />
               </div>
 
@@ -442,17 +438,17 @@ export default function IntegrationsDashboardPage() {
               </div>
 
               {paymentOrder && (
-                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-3 text-xs">
-                  <p className="font-bold text-emerald-900">Order Generated: {paymentOrder.orderId}</p>
-                  <p className="text-emerald-700">Amount: ${paymentOrder.amount} {paymentOrder.currency}</p>
-                  <Button size="sm" onClick={handleVerifyPayment} disabled={paymentLoading} className="bg-emerald-600 hover:bg-emerald-700">
+                <div className="p-4 bg-stable-bg border border-stable-border rounded-xl space-y-3 text-xs">
+                  <p className="font-bold text-stable-text">Order Generated: {paymentOrder.orderId}</p>
+                  <p className="text-stable-text">Amount: ${paymentOrder.amount} {paymentOrder.currency}</p>
+                  <Button size="sm" onClick={handleVerifyPayment} disabled={paymentLoading} className="bg-stable hover:bg-stable">
                     Simulate Payment Captured & Signature Verify
                   </Button>
                 </div>
               )}
 
               {paymentVerified && (
-                <div className="p-4 bg-slate-900 text-emerald-400 rounded-xl text-xs font-mono">
+                <div className="p-4 bg-surface text-stable rounded-xl text-xs font-mono">
                   <pre>{JSON.stringify(paymentVerified, null, 2)}</pre>
                 </div>
               )}

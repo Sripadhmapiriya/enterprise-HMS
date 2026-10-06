@@ -212,10 +212,10 @@ function AppointmentsContent() {
         header: 'Date & Time',
         cell: ({ row }) => (
           <div>
-            <div className="font-semibold text-slate-900 tabular-nums">
+            <div className="font-semibold text-text tabular-nums">
               {new Date(row.original.appointmentDate).toLocaleDateString()}
             </div>
-            <div className="text-xs text-slate-500 tabular-nums">
+            <div className="text-xs text-text-muted tabular-nums">
               {new Date(row.original.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </div>
           </div>
@@ -227,11 +227,11 @@ function AppointmentsContent() {
           <div>
             <Link
               href={`/patients/${row.original.patient?.id}`}
-              className="font-medium text-slate-900 hover:text-cyan-700 hover:underline"
+              className="font-medium text-text hover:text-info-text hover:underline"
             >
               {row.original.patient?.firstName} {row.original.patient?.lastName}
             </Link>
-            <p className="text-xs text-slate-500 font-mono tabular-nums">
+            <p className="text-xs text-text-muted font-mono tabular-nums">
               MRN: {row.original.patient?.mrn}
             </p>
           </div>
@@ -241,10 +241,10 @@ function AppointmentsContent() {
         header: 'Doctor & Department',
         cell: ({ row }) => (
           <div>
-            <div className="font-medium text-slate-900">
+            <div className="font-medium text-text">
               Dr. {row.original.doctor?.user?.firstName} {row.original.doctor?.user?.lastName}
             </div>
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-text-muted">
               {row.original.department?.name || 'General OPD'}
             </div>
           </div>
@@ -304,7 +304,7 @@ function AppointmentsContent() {
                       setSelectedAppointment(apt);
                       setIsCancelOpen(true);
                     }}
-                    className="text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                    className="text-critical hover:text-critical-text hover:bg-critical-bg"
                   >
                     <XCircle className="w-3.5 h-3.5" />
                   </Button>
@@ -323,10 +323,10 @@ function AppointmentsContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-text">
             Appointments & Doctor Schedules
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-text-muted mt-1">
             Book visits, manage slots with overbooking control, and check in patients to the live OPD queue.
           </p>
         </div>
@@ -345,7 +345,7 @@ function AppointmentsContent() {
       </div>
 
       {/* Filter Bar */}
-      <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex flex-wrap items-center gap-4">
+      <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex flex-wrap items-center gap-4">
         <div className="w-48">
           <Input
             type="date"
@@ -384,7 +384,7 @@ function AppointmentsContent() {
 
       {/* Appointments Table */}
       {loading && appointments.length === 0 ? (
-        <div className="bg-white p-6 rounded-xl border border-slate-200">
+        <div className="bg-surface p-6 rounded-xl border border-border">
           <TableSkeletonRows rows={5} cols={5} />
         </div>
       ) : error ? (
@@ -395,14 +395,14 @@ function AppointmentsContent() {
         />
       ) : appointments.length === 0 ? (
         <EmptyState
-          icon={<Calendar className="w-8 h-8 text-slate-400" />}
+          icon={<Calendar className="w-8 h-8 text-text-muted" />}
           title="No Appointments Found"
           description="There are no scheduled patient appointments matching the current filters."
           actionLabel="Book New Appointment"
           onAction={() => setIsBookOpen(true)}
         />
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+        <div className="bg-surface rounded-xl border border-border shadow-sm p-4">
           <DataTable
             data={appointments}
             columns={columns}
@@ -523,7 +523,7 @@ export default function AppointmentsPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-6 bg-white rounded-xl border border-slate-200">
+        <div className="p-6 bg-surface rounded-xl border border-border">
           <TableSkeletonRows rows={5} cols={5} />
         </div>
       }

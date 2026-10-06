@@ -180,7 +180,7 @@ export default function PatientsDirectoryPage() {
         accessorKey: 'mrn',
         header: 'MRN',
         cell: ({ row }) => (
-          <span className="font-mono text-sm font-semibold text-cyan-800 tabular-nums">
+          <span className="font-mono text-sm font-semibold text-info-text tabular-nums">
             {row.original.mrn}
           </span>
         ),
@@ -192,12 +192,12 @@ export default function PatientsDirectoryPage() {
           <div>
             <Link
               href={'/patients/' + row.original.id}
-              className="font-medium text-slate-900 hover:text-cyan-700 hover:underline"
+              className="font-medium text-text hover:text-info-text hover:underline"
             >
               {row.original.firstName} {row.original.lastName}
             </Link>
             {row.original.email && (
-              <p className="text-xs text-slate-500">{row.original.email}</p>
+              <p className="text-xs text-text-muted">{row.original.email}</p>
             )}
           </div>
         ),
@@ -209,7 +209,7 @@ export default function PatientsDirectoryPage() {
           const dob = new Date(row.original.dateOfBirth);
           const age = now.getFullYear() - dob.getFullYear();
           return (
-            <span className="text-sm text-slate-700 tabular-nums">
+            <span className="text-sm text-text tabular-nums">
               {age}y / {row.original.gender.charAt(0).toUpperCase()}
             </span>
           );
@@ -219,7 +219,7 @@ export default function PatientsDirectoryPage() {
         accessorKey: 'mobile',
         header: 'Mobile Phone',
         cell: ({ row }) => (
-          <span className="text-sm font-mono tabular-nums text-slate-700">
+          <span className="text-sm font-mono tabular-nums text-text">
             {row.original.mobile}
           </span>
         ),
@@ -231,7 +231,7 @@ export default function PatientsDirectoryPage() {
           row.original.bloodGroup ? (
             <Badge variant="neutral">{row.original.bloodGroup.replace('_', ' ')}</Badge>
           ) : (
-            <span className="text-xs text-slate-400">Not Recorded</span>
+            <span className="text-xs text-text-muted">Not Recorded</span>
           ),
       },
       {
@@ -241,7 +241,7 @@ export default function PatientsDirectoryPage() {
           const allergyCount = row.original.allergies?.length || 0;
 
           if (alertCount === 0 && allergyCount === 0) {
-            return <span className="text-xs text-slate-400">None</span>;
+            return <span className="text-xs text-text-muted">None</span>;
           }
 
           return (
@@ -299,10 +299,10 @@ export default function PatientsDirectoryPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-text">
             Master Patient Index
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-text-muted mt-1">
             Search, register, and manage patient health records across hospital branches.
           </p>
         </div>
@@ -316,7 +316,7 @@ export default function PatientsDirectoryPage() {
 
       {/* Directory Table */}
       {loading && patients.length === 0 ? (
-        <div className="bg-white p-6 rounded-xl border border-slate-200">
+        <div className="bg-surface p-6 rounded-xl border border-border">
           <TableSkeletonRows rows={5} cols={5} />
         </div>
       ) : error ? (
@@ -327,14 +327,14 @@ export default function PatientsDirectoryPage() {
         />
       ) : patients.length === 0 ? (
         <EmptyState
-          icon={<Users className="w-8 h-8 text-slate-400" />}
+          icon={<Users className="w-8 h-8 text-text-muted" />}
           title="No Patients Registered"
           description="Register a new patient to initialize their medical record number and start clinical encounters."
           actionLabel="Register First Patient"
           onAction={() => setIsRegisterOpen(true)}
         />
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+        <div className="bg-surface rounded-xl border border-border shadow-sm p-4">
           <DataTable
             data={patients}
             columns={columns}
@@ -354,13 +354,12 @@ export default function PatientsDirectoryPage() {
       >
         <form onSubmit={handleCreatePatient} className="space-y-5">
           {/* Registration Mode Selector */}
-          <div className="flex items-center gap-4 p-1.5 bg-slate-100 rounded-lg">
+          <div className="flex items-center gap-4 p-1.5 bg-surface-subtle rounded-lg">
             <button
               type="button"
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-                regMode === 'quick'
-                  ? 'bg-white text-cyan-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${ regMode ==='quick'
+                  ? 'bg-surface text-info-text shadow-sm'
+                  : 'text-text-muted hover:text-text'
               }`}
               onClick={() => setRegMode('quick')}
             >
@@ -368,10 +367,9 @@ export default function PatientsDirectoryPage() {
             </button>
             <button
               type="button"
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-                regMode === 'full'
-                  ? 'bg-white text-cyan-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${ regMode ==='full'
+                  ? 'bg-surface text-info-text shadow-sm'
+                  : 'text-text-muted hover:text-text'
               }`}
               onClick={() => setRegMode('full')}
             >
@@ -381,9 +379,9 @@ export default function PatientsDirectoryPage() {
 
           {/* Duplicate Detection Alert */}
           {duplicates.length > 0 && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2.5">
-              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <div className="text-xs text-amber-900">
+            <div className="p-3 bg-warning-bg border border-warning-border rounded-lg flex items-start gap-2.5">
+              <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+              <div className="text-xs text-warning-text">
                 <span className="font-semibold">Possible Duplicate Record Detected:</span>
                 <p className="mt-0.5">
                   Found {duplicates.length} existing record(s) matching this name or mobile:
@@ -470,8 +468,8 @@ export default function PatientsDirectoryPage() {
           </div>
 
           {regMode === 'full' && (
-            <div className="space-y-4 pt-2 border-t border-slate-200">
-              <h4 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            <div className="space-y-4 pt-2 border-t border-border">
+              <h4 className="text-xs font-semibold text-text uppercase tracking-wider">
                 Address & Emergency Contact
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -525,7 +523,7 @@ export default function PatientsDirectoryPage() {
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
             <Button
               type="button"
               variant="outline"

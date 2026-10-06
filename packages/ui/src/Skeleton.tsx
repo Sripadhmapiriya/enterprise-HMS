@@ -24,7 +24,7 @@ export function Skeleton({
   return (
     <div
       aria-hidden="true"
-      className={cn('animate-pulse bg-slate-200 dark:bg-slate-800', variants[variant], className)}
+      className={cn('animate-pulse bg-surface-subtle', variants[variant], className)}
       style={{
         width: typeof width === 'number' ? `${width}px` : width,
         height: typeof height === 'number' ? `${height}px` : height,

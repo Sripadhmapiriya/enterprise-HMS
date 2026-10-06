@@ -106,14 +106,14 @@ export default function InsuranceDashboard() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <ShieldCheck className="w-6 h-6 text-sky-600" />
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Insurance & Third-Party Claims</h1>
+            <ShieldCheck className="w-6 h-6 text-info" />
+            <h1 className="text-2xl font-bold text-text tracking-tight">Insurance & Third-Party Claims</h1>
           </div>
-          <p className="text-slate-500 mt-1">Pre-authorization, payer master, claims adjudication, and cashless settlements</p>
+          <p className="text-text-muted mt-1">Pre-authorization, payer master, claims adjudication, and cashless settlements</p>
         </div>
         <div className="flex space-x-3">
           <Button variant="secondary" onClick={() => loadData()} disabled={loading}>
-            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ?'animate-spin' : ''}`} />
             Refresh
           </Button>
           <Button onClick={() => setIsSubmitOpen(true)}>
@@ -124,30 +124,30 @@ export default function InsuranceDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <span className="text-xs font-semibold text-slate-500 uppercase">Recognized Payers & TPAs</span>
-          <p className="text-3xl font-bold text-slate-900 mt-2">{providers.length}</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <span className="text-xs font-semibold text-text-muted uppercase">Recognized Payers & TPAs</span>
+          <p className="text-3xl font-bold text-text mt-2">{providers.length}</p>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-amber-200 shadow-sm bg-amber-50/20">
-          <span className="text-xs font-semibold text-amber-800 uppercase">Active / Pending Adjudication</span>
-          <p className="text-3xl font-bold text-amber-700 mt-2">{activeCount}</p>
+        <div className="bg-surface p-5 rounded-xl border border-warning-border shadow-sm bg-warning-bg/20">
+          <span className="text-xs font-semibold text-warning-text uppercase">Active / Pending Adjudication</span>
+          <p className="text-3xl font-bold text-warning-text mt-2">{activeCount}</p>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <span className="text-xs font-semibold text-slate-500 uppercase">Total Claimed Value</span>
-          <p className="text-3xl font-bold text-emerald-600 mt-2 tabular-nums">${totalClaimed.toFixed(2)}</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <span className="text-xs font-semibold text-text-muted uppercase">Total Claimed Value</span>
+          <p className="text-3xl font-bold text-stable mt-2 tabular-nums">${totalClaimed.toFixed(2)}</p>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-100 bg-slate-50/60">
-          <h3 className="font-semibold text-slate-800 text-sm">Insurance Claims Ledger</h3>
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border bg-surface-subtle/60">
+          <h3 className="font-semibold text-text text-sm">Insurance Claims Ledger</h3>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3.5">Claim # / Date</th>
                 <th className="px-5 py-3.5">Patient</th>
@@ -158,25 +158,25 @@ export default function InsuranceDashboard() {
                 <th className="px-5 py-3.5 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border">
               {claims.map((c) => (
-                <tr key={c.id} className="hover:bg-slate-50/60 transition-colors">
+                <tr key={c.id} className="hover:bg-surface-subtle/60 transition-colors">
                   <td className="px-5 py-3.5">
-                    <span className="font-bold font-mono text-slate-900">{c.claimNumber}</span>
-                    <div className="text-xs text-slate-500">{new Date(c.submissionDate).toLocaleDateString()}</div>
+                    <span className="font-bold font-mono text-text">{c.claimNumber}</span>
+                    <div className="text-xs text-text-muted">{new Date(c.submissionDate).toLocaleDateString()}</div>
                   </td>
-                  <td className="px-5 py-3.5 font-semibold text-slate-900">
+                  <td className="px-5 py-3.5 font-semibold text-text">
                     {c.bill?.patient?.firstName} {c.bill?.patient?.lastName}
-                    <div className="text-xs text-slate-500 font-mono">Bill: {c.bill?.billNumber}</div>
+                    <div className="text-xs text-text-muted font-mono">Bill: {c.bill?.billNumber}</div>
                   </td>
-                  <td className="px-5 py-3.5 font-medium text-slate-800">
+                  <td className="px-5 py-3.5 font-medium text-text">
                     {c.provider?.name}
-                    {c.tpa && <div className="text-xs text-slate-500">TPA: {c.tpa.name}</div>}
+                    {c.tpa && <div className="text-xs text-text-muted">TPA: {c.tpa.name}</div>}
                   </td>
-                  <td className="px-5 py-3.5 text-right font-bold text-slate-900 tabular-nums">
+                  <td className="px-5 py-3.5 text-right font-bold text-text tabular-nums">
                     ${(c.claimedAmount || 0).toFixed(2)}
                   </td>
-                  <td className="px-5 py-3.5 text-right font-bold text-emerald-600 tabular-nums">
+                  <td className="px-5 py-3.5 text-right font-bold text-stable tabular-nums">
                     {c.approvedAmount != null ? `$${c.approvedAmount.toFixed(2)}` : '—'}
                   </td>
                   <td className="px-5 py-3.5">
@@ -204,7 +204,7 @@ export default function InsuranceDashboard() {
               ))}
               {claims.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-sm text-slate-500">
+                  <td colSpan={7} className="px-5 py-8 text-center text-sm text-text-muted">
                     No insurance claims submitted yet.
                   </td>
                 </tr>
@@ -218,9 +218,9 @@ export default function InsuranceDashboard() {
       <Dialog isOpen={isSubmitOpen} onClose={() => setIsSubmitOpen(false)} title="Submit Insurance Claim">
         <form onSubmit={handleSubmitClaim} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Select Bill Invoice *</label>
+            <label className="block text-xs font-semibold text-text mb-1">Select Bill Invoice *</label>
             <select
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
               value={selectedBillId}
               onChange={(e) => {
                 setSelectedBillId(e.target.value);
@@ -239,9 +239,9 @@ export default function InsuranceDashboard() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Insurance Provider *</label>
+            <label className="block text-xs font-semibold text-text mb-1">Insurance Provider *</label>
             <select
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
               value={selectedProviderId}
               onChange={(e) => setSelectedProviderId(e.target.value)}
               required
@@ -256,7 +256,7 @@ export default function InsuranceDashboard() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Claimed Amount ($) *</label>
+            <label className="block text-xs font-semibold text-text mb-1">Claimed Amount ($) *</label>
             <Input
               type="number"
               step="0.01"
@@ -267,7 +267,7 @@ export default function InsuranceDashboard() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Remarks / Diagnosis Notes</label>
+            <label className="block text-xs font-semibold text-text mb-1">Remarks / Diagnosis Notes</label>
             <Input
               value={claimRemarks}
               onChange={(e) => setClaimRemarks(e.target.value)}
@@ -275,7 +275,7 @@ export default function InsuranceDashboard() {
             />
           </div>
 
-          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end space-x-3 pt-3 border-t border-border">
             <Button variant="secondary" type="button" onClick={() => setIsSubmitOpen(false)}>
               Cancel
             </Button>
@@ -289,19 +289,19 @@ export default function InsuranceDashboard() {
       {/* Settle Claim Modal */}
       <Dialog isOpen={isSettleOpen} onClose={() => setIsSettleOpen(false)} title={`Settle Claim ${activeClaim?.claimNumber}`}>
         <form onSubmit={handleProcessSettle} className="space-y-4">
-          <div className="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
+          <div className="p-3 bg-surface-subtle rounded-lg text-xs space-y-1">
             <div className="flex justify-between">
-              <span className="text-slate-500">Payer:</span>
-              <span className="font-semibold text-slate-800">{activeClaim?.provider?.name}</span>
+              <span className="text-text-muted">Payer:</span>
+              <span className="font-semibold text-text">{activeClaim?.provider?.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Claimed Amount:</span>
-              <span className="font-bold text-slate-900">${(activeClaim?.claimedAmount || 0).toFixed(2)}</span>
+              <span className="text-text-muted">Claimed Amount:</span>
+              <span className="font-bold text-text">${(activeClaim?.claimedAmount || 0).toFixed(2)}</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Approved Settlement Amount ($) *</label>
+            <label className="block text-xs font-semibold text-text mb-1">Approved Settlement Amount ($) *</label>
             <Input
               type="number"
               step="0.01"
@@ -312,7 +312,7 @@ export default function InsuranceDashboard() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Deduction / Patient Responsibility ($)</label>
+            <label className="block text-xs font-semibold text-text mb-1">Deduction / Patient Responsibility ($)</label>
             <Input
               type="number"
               step="0.01"
@@ -322,7 +322,7 @@ export default function InsuranceDashboard() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Settlement Bank / NEFT Ref #</label>
+            <label className="block text-xs font-semibold text-text mb-1">Settlement Bank / NEFT Ref #</label>
             <Input
               value={settleRef}
               onChange={(e) => setSettleRef(e.target.value)}
@@ -330,7 +330,7 @@ export default function InsuranceDashboard() {
             />
           </div>
 
-          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end space-x-3 pt-3 border-t border-border">
             <Button variant="secondary" type="button" onClick={() => setIsSettleOpen(false)}>
               Cancel
             </Button>

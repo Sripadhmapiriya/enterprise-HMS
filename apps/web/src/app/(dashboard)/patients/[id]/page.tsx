@@ -247,14 +247,14 @@ export default function PatientDetailPage({
     <div className="space-y-6">
       {/* Merged Patient Notice */}
       {patient.mergedIntoPatientId && (
-        <div className="p-4 bg-amber-50 border border-amber-300 rounded-xl flex items-center justify-between">
+        <div className="p-4 bg-warning-bg border border-warning-border rounded-xl flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <GitMerge className="w-5 h-5 text-amber-600" />
+            <GitMerge className="w-5 h-5 text-warning" />
             <div>
-              <p className="font-semibold text-amber-900 text-sm">
+              <p className="font-semibold text-warning-text text-sm">
                 This record has been merged into a primary patient record.
               </p>
-              <p className="text-xs text-amber-700">
+              <p className="text-xs text-warning-text">
                 All clinical records and appointments have been moved.
               </p>
             </div>
@@ -274,7 +274,7 @@ export default function PatientDetailPage({
       />
 
       {/* Quick Action Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-surface border border-border rounded-xl shadow-sm">
         <div className="flex items-center gap-2">
           <Button
             variant="primary"
@@ -298,7 +298,7 @@ export default function PatientDetailPage({
             size="sm"
             onClick={() => setIsAddAllergyOpen(true)}
           >
-            <ShieldAlert className="w-3.5 h-3.5 mr-1 text-amber-600" />
+            <ShieldAlert className="w-3.5 h-3.5 mr-1 text-warning" />
             + Allergy
           </Button>
           <Button
@@ -306,7 +306,7 @@ export default function PatientDetailPage({
             size="sm"
             onClick={() => setIsAddAlertOpen(true)}
           >
-            <AlertTriangle className="w-3.5 h-3.5 mr-1 text-rose-600" />
+            <AlertTriangle className="w-3.5 h-3.5 mr-1 text-critical" />
             + Alert
           </Button>
           <Button
@@ -314,14 +314,14 @@ export default function PatientDetailPage({
             size="sm"
             onClick={() => setIsAddDocOpen(true)}
           >
-            <FilePlus className="w-3.5 h-3.5 mr-1 text-cyan-600" />
+            <FilePlus className="w-3.5 h-3.5 mr-1 text-info" />
             + Document
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsMergeOpen(true)}
-            className="text-slate-600"
+            className="text-text-muted"
           >
             <GitMerge className="w-3.5 h-3.5 mr-1" />
             Merge Record
@@ -330,7 +330,7 @@ export default function PatientDetailPage({
       </div>
 
       {/* 360 Tabs */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-6">
+      <div className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-6">
         <Tabs
           tabs={[
             { id: 'encounters', label: 'Consultations & Encounters', count: patient.encounters?.length },
@@ -355,15 +355,15 @@ export default function PatientDetailPage({
                 onAction={handleStartConsultation}
               />
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-border">
                 {patient.encounters.map((enc: any) => (
                   <div
                     key={enc.id}
-                    className="py-4 flex items-center justify-between hover:bg-slate-50/50 px-2 rounded-lg transition-colors"
+                    className="py-4 flex items-center justify-between hover:bg-surface-subtle/50 px-2 rounded-lg transition-colors"
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-slate-900 text-sm">
+                        <span className="font-semibold text-text text-sm">
                           {enc.type} Consultation
                         </span>
                         <Badge
@@ -378,12 +378,12 @@ export default function PatientDetailPage({
                           {enc.status}
                         </Badge>
                       </div>
-                      <p className="text-xs text-slate-500 mt-1">
+                      <p className="text-xs text-text-muted mt-1">
                         Doctor: Dr. {enc.doctor?.user?.firstName} {enc.doctor?.user?.lastName} • Date: {new Date(enc.startTime).toLocaleDateString()}
                       </p>
                       {enc.diagnoses?.length > 0 && (
                         <div className="flex items-center gap-1.5 mt-2">
-                          <span className="text-xs font-medium text-slate-600">Diagnosis:</span>
+                          <span className="text-xs font-medium text-text-muted">Diagnosis:</span>
                           {enc.diagnoses.map((d: any) => (
                             <Badge key={d.id} variant="neutral">
                               {d.diagnosisCode ? `${d.diagnosisCode} - ` : ''}{d.description}
@@ -408,24 +408,24 @@ export default function PatientDetailPage({
         {activeTab === 'timeline' && (
           <div className="space-y-4">
             {timeline.length === 0 ? (
-              <p className="text-sm text-slate-400 py-6 text-center">No timeline events recorded yet.</p>
+              <p className="text-sm text-text-muted py-6 text-center">No timeline events recorded yet.</p>
             ) : (
-              <div className="relative pl-6 border-l-2 border-slate-200 space-y-6">
+              <div className="relative pl-6 border-l-2 border-border space-y-6">
                 {timeline.map((event: any, idx: number) => (
                   <div key={idx} className="relative">
-                    <div className="absolute -left-[31px] top-1 w-3.5 h-3.5 rounded-full bg-cyan-600 border-2 border-white shadow-sm" />
-                    <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
-                      <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                        <span className="font-semibold text-slate-800">{event.title}</span>
+                    <div className="absolute -left-[31px] top-1 w-3.5 h-3.5 rounded-full bg-brand border-2 border-border shadow-sm" />
+                    <div className="bg-surface-subtle p-3.5 rounded-lg border border-border">
+                      <div className="flex items-center justify-between text-xs text-text-muted mb-1">
+                        <span className="font-semibold text-text">{event.title}</span>
                         <span className="tabular-nums">{new Date(event.date).toLocaleDateString()}</span>
                       </div>
                       {event.details?.diagnoses?.length > 0 && (
-                        <p className="text-xs text-slate-600">
+                        <p className="text-xs text-text-muted">
                           Diagnoses: {event.details.diagnoses.join(', ')}
                         </p>
                       )}
                       {event.details?.vitals && (
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-xs text-text-muted mt-1">
                           Vitals: BP {event.details.vitals.bpSystolic}/{event.details.vitals.bpDiastolic} mmHg • Pulse {event.details.vitals.pulse} bpm
                         </p>
                       )}
@@ -449,14 +449,14 @@ export default function PatientDetailPage({
                 onAction={() => router.push(`/appointments?patientId=${patient.id}`)}
               />
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-border">
                 {patient.appointments.map((apt: any) => (
                   <div key={apt.id} className="py-3 flex items-center justify-between">
                     <div>
-                      <span className="font-medium text-slate-900 text-sm">
+                      <span className="font-medium text-text text-sm">
                         Dr. {apt.doctor?.user?.firstName} {apt.doctor?.user?.lastName}
                       </span>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-text-muted">
                         {new Date(apt.appointmentDate).toLocaleDateString()} • {apt.type} • Status: {apt.status}
                       </p>
                     </div>
@@ -474,10 +474,10 @@ export default function PatientDetailPage({
         {activeTab === 'safety' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Allergies Card */}
-            <div className="p-4 border border-amber-200 bg-amber-50/40 rounded-xl space-y-3">
+            <div className="p-4 border border-warning-border bg-warning-bg/40 rounded-xl space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="font-semibold text-sm text-amber-900 flex items-center gap-1.5">
-                  <ShieldAlert className="w-4 h-4 text-amber-600" />
+                <h4 className="font-semibold text-sm text-warning-text flex items-center gap-1.5">
+                  <ShieldAlert className="w-4 h-4 text-warning" />
                   Known Allergies
                 </h4>
                 <Button variant="outline" size="sm" onClick={() => setIsAddAllergyOpen(true)}>
@@ -485,16 +485,16 @@ export default function PatientDetailPage({
                 </Button>
               </div>
               {patient.allergies?.length === 0 ? (
-                <p className="text-xs text-slate-500">No known allergies documented (NKA).</p>
+                <p className="text-xs text-text-muted">No known allergies documented (NKA).</p>
               ) : (
                 <div className="space-y-2">
                   {patient.allergies.map((alg: any) => (
-                    <div key={alg.id} className="bg-white p-2.5 rounded-lg border border-amber-200 text-xs">
+                    <div key={alg.id} className="bg-surface p-2.5 rounded-lg border border-warning-border text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-slate-900">{alg.allergen}</span>
+                        <span className="font-semibold text-text">{alg.allergen}</span>
                         <Badge variant="warning">{alg.severity}</Badge>
                       </div>
-                      {alg.reaction && <p className="text-slate-600 mt-1">Reaction: {alg.reaction}</p>}
+                      {alg.reaction && <p className="text-text-muted mt-1">Reaction: {alg.reaction}</p>}
                     </div>
                   ))}
                 </div>
@@ -502,10 +502,10 @@ export default function PatientDetailPage({
             </div>
 
             {/* Alerts Card */}
-            <div className="p-4 border border-rose-200 bg-rose-50/40 rounded-xl space-y-3">
+            <div className="p-4 border border-critical-border bg-critical-bg/40 rounded-xl space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="font-semibold text-sm text-rose-900 flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4 text-rose-600" />
+                <h4 className="font-semibold text-sm text-critical-text flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 text-critical" />
                   Clinical & Safety Alerts
                 </h4>
                 <Button variant="outline" size="sm" onClick={() => setIsAddAlertOpen(true)}>
@@ -513,16 +513,16 @@ export default function PatientDetailPage({
                 </Button>
               </div>
               {patient.alerts?.length === 0 ? (
-                <p className="text-xs text-slate-500">No active clinical alerts.</p>
+                <p className="text-xs text-text-muted">No active clinical alerts.</p>
               ) : (
                 <div className="space-y-2">
                   {patient.alerts.map((alt: any) => (
-                    <div key={alt.id} className="bg-white p-2.5 rounded-lg border border-rose-200 text-xs">
+                    <div key={alt.id} className="bg-surface p-2.5 rounded-lg border border-critical-border text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-slate-900">{alt.description}</span>
+                        <span className="font-semibold text-text">{alt.description}</span>
                         <Badge variant="critical">{alt.severity}</Badge>
                       </div>
-                      <p className="text-slate-500 mt-0.5">{alt.alertType} Alert</p>
+                      <p className="text-text-muted mt-0.5">{alt.alertType} Alert</p>
                     </div>
                   ))}
                 </div>
@@ -535,22 +535,22 @@ export default function PatientDetailPage({
         {activeTab === 'documents' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h4 className="font-semibold text-sm text-slate-900">Patient Documents & Consent Records</h4>
+              <h4 className="font-semibold text-sm text-text">Patient Documents & Consent Records</h4>
               <Button variant="outline" size="sm" onClick={() => setIsAddDocOpen(true)}>
                 + Upload Document
               </Button>
             </div>
             {patient.documents?.length === 0 ? (
-              <p className="text-xs text-slate-400 py-4">No documents uploaded yet.</p>
+              <p className="text-xs text-text-muted py-4">No documents uploaded yet.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {patient.documents.map((doc: any) => (
-                  <div key={doc.id} className="p-3 border border-slate-200 rounded-lg bg-slate-50 flex items-center justify-between">
+                  <div key={doc.id} className="p-3 border border-border rounded-lg bg-surface-subtle flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-cyan-700" />
+                      <FileText className="w-4 h-4 text-info-text" />
                       <div>
-                        <p className="text-xs font-semibold text-slate-900">{doc.title}</p>
-                        <p className="text-[11px] text-slate-500">{doc.documentType}</p>
+                        <p className="text-xs font-semibold text-text">{doc.title}</p>
+                        <p className="text-[11px] text-text-muted">{doc.documentType}</p>
                       </div>
                     </div>
                     <Badge variant="neutral">Verified</Badge>
@@ -685,7 +685,7 @@ export default function PatientDetailPage({
         description="Permanently moves all clinical encounters, appointments, allergies, and alerts into a primary patient record."
       >
         <form onSubmit={handleMerge} className="space-y-4">
-          <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900">
+          <div className="p-3 bg-warning-bg border border-warning-border rounded-lg text-xs text-warning-text">
             <p className="font-semibold">Irreversible Clinical Merge Action:</p>
             <p className="mt-1">
               This record ({patient.mrn}) will be marked as merged and become read-only. All historical consultations will appear under the target record.

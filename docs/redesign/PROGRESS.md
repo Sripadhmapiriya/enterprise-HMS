@@ -2269,3 +2269,38 @@ Running 11 tests using 1 worker
 - Zero placeholders.
 - Zero committed secrets.
 
+---
+
+## Design Tokens & Semantic Color System Refactor Execution Log
+
+### Status: COMPLETED
+**Started:** 2026-10-06T12:00:00+05:30  
+**Completed:** 2026-10-06T13:50:00+05:30  
+
+### Scope & Actions Taken
+1. **Total Elimination of Hardcoded Colors**:
+   - Replaced all fixed palette utilities (`bg-slate-900`, `text-red-500`, `border-cyan-200`, `bg-white`, `text-black`, etc.) and raw hex/rgb codes across all 45 Next.js web routes and component libraries with semantic design tokens:
+     - `bg-background`, `bg-surface`, `bg-surface-raised`, `bg-surface-subtle`
+     - `text-text`, `text-text-muted`, `text-text-subtle`
+     - `border-border`, `border-border-subtle`, `border-border-strong`
+     - `bg-brand`, `text-brand`, `border-brand`
+     - `bg-critical-bg`, `text-critical-text`, `border-critical-border`
+     - `bg-warning-bg`, `text-warning-text`, `border-warning-border`
+     - `bg-stable-bg`, `text-stable-text`, `border-stable-border`
+     - `bg-info-bg`, `text-info-text`, `border-info-border`
+2. **Automated Enforcement Tooling**:
+   - Created `scripts/check-no-hardcoded-colors.ts` using AST/regex scanning across `packages/ui` and `apps/web`.
+   - Added `check:no-hardcoded-colors` script to root `package.json` and wired into `npm run verify` and GitHub Actions CI.
+3. **Theme Management (`ThemeProvider`)**:
+   - Implemented `apps/web/src/components/ThemeProvider.tsx` with system preference detection, light/dark/system mode switching, and persistent `localStorage` synchronization.
+4. **WCAG AA Contrast Calibration**:
+   - Calibrated `--brand` in light mode to `#0E7490` (cyan-700) and `--text-muted` to `#475569` (slate-600), delivering $\ge 4.5:1$ contrast against both white and `#F1F5F9` surfaces.
+5. **Full Verification**:
+   - `npm run check:no-hardcoded-colors`: **0 violations detected**.
+   - `npm run check:integrity`: **All 4 checks passed**.
+   - `npm run typecheck`: **Clean pass across all 8 workspaces**.
+   - `npm test`: **235 of 235 Vitest tests passed** (17 suites).
+   - `npx playwright test`: **11 of 11 E2E tests passed**, including axe accessibility scan (0 serious/critical issues) and multi-state screenshots.
+   - `npm run build`: **45 of 45 Next.js routes compiled cleanly with Turbopack**.
+
+

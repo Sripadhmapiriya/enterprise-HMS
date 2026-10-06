@@ -104,14 +104,14 @@ export default function DietaryDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Clinical Dietary & Kitchen Services</h1>
-          <p className="text-slate-500 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-text tracking-tight">Clinical Dietary & Kitchen Services</h1>
+          <p className="text-text-muted text-sm mt-0.5">
             Nutritional therapy orders, food allergies/restrictions, and kitchen meal tray delivery worklists.
           </p>
         </div>
         <button
           onClick={openOrderModal}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 shadow-sm"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-brand-foreground bg-brand hover:bg-brand-hover shadow-sm"
         >
           + Prescribe Diet Order
         </button>
@@ -119,10 +119,9 @@ export default function DietaryDashboard() {
 
       {notice && (
         <div
-          className={`p-3.5 rounded-lg text-xs font-medium flex justify-between items-center ${
-            notice.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border border-rose-200 text-rose-800'
+          className={`p-3.5 rounded-lg text-xs font-medium flex justify-between items-center ${ notice.type ==='success'
+              ? 'bg-stable-bg border border-stable-border text-stable-text'
+              : 'bg-critical-bg border border-critical-border text-critical-text'
           }`}
         >
           <span>{notice.text}</span>
@@ -132,56 +131,53 @@ export default function DietaryDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Total Meals to Prepare</p>
-          <p className="text-2xl font-bold text-slate-900 mt-2">{kitchenData?.totalMeals ?? worklist.length}</p>
-          <p className="text-xs text-slate-400 mt-1">Active inpatient census trays</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Total Meals to Prepare</p>
+          <p className="text-2xl font-bold text-text mt-2">{kitchenData?.totalMeals ?? worklist.length}</p>
+          <p className="text-xs text-text-muted mt-1">Active inpatient census trays</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Therapeutic Diets</p>
-          <p className="text-2xl font-bold text-blue-600 mt-2">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Therapeutic Diets</p>
+          <p className="text-2xl font-bold text-info mt-2">
             {Object.keys(summary).length}
           </p>
-          <p className="text-xs text-slate-400 mt-1">Specialized nutrition profiles</p>
+          <p className="text-xs text-text-muted mt-1">Specialized nutrition profiles</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">NPO Orders</p>
-          <p className="text-2xl font-bold text-rose-600 mt-2">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">NPO Orders</p>
+          <p className="text-2xl font-bold text-critical mt-2">
             {worklist.filter((w: any) => w.isNpo).length}
           </p>
-          <p className="text-xs text-slate-400 mt-1">Nil per os (Withhold food & fluid)</p>
+          <p className="text-xs text-text-muted mt-1">Nil per os (Withhold food & fluid)</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Clinical Prescriptions</p>
-          <p className="text-2xl font-bold text-emerald-600 mt-2">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Clinical Prescriptions</p>
+          <p className="text-2xl font-bold text-stable mt-2">
             {orders.filter((o) => o.status === 'ACTIVE').length}
           </p>
-          <p className="text-xs text-slate-400 mt-1">Active physician orders</p>
+          <p className="text-xs text-text-muted mt-1">Active physician orders</p>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex border-b border-slate-200 gap-1 text-sm font-medium">
+      <div className="flex border-b border-border gap-1 text-sm font-medium">
         <button
           onClick={() => setActiveTab('worklist')}
-          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${
-            activeTab === 'worklist' ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'
+          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${ activeTab ==='worklist' ? 'border-brand text-info font-semibold' : 'border-transparent text-text-muted hover:text-text'
           }`}
         >
           Kitchen Tray Delivery Worklist ({worklist.length})
         </button>
         <button
           onClick={() => setActiveTab('orders')}
-          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${
-            activeTab === 'orders' ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'
+          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${ activeTab ==='orders' ? 'border-brand text-info font-semibold' : 'border-transparent text-text-muted hover:text-text'
           }`}
         >
           Physician Diet Orders ({orders.length})
         </button>
         <button
           onClick={() => setActiveTab('types')}
-          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${
-            activeTab === 'types' ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'
+          className={`px-4 py-2.5 border-b-2 whitespace-nowrap ${ activeTab ==='types' ? 'border-brand text-info font-semibold' : 'border-transparent text-text-muted hover:text-text'
           }`}
         >
           Diet Types Catalog ({dietTypes.length})
@@ -194,21 +190,21 @@ export default function DietaryDashboard() {
           {/* Diet Summary Pill Strip */}
           <div className="flex flex-wrap gap-2">
             {Object.entries(summary).map(([diet, count]) => (
-              <span key={diet} className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 shadow-sm">
-                {diet}: <strong className="text-blue-600 font-bold">{count as number}</strong>
+              <span key={diet} className="px-3 py-1 bg-surface border border-border rounded-lg text-xs font-semibold text-text shadow-sm">
+                {diet}: <strong className="text-info font-bold">{count as number}</strong>
               </span>
             ))}
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-              <h2 className="text-base font-semibold text-slate-900">Current Inpatient Meal Assembly Worklist</h2>
-              <span className="text-xs text-slate-500">Live roster from inpatient census</span>
+          <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-border flex justify-between items-center">
+              <h2 className="text-base font-semibold text-text">Current Inpatient Meal Assembly Worklist</h2>
+              <span className="text-xs text-text-muted">Live roster from inpatient census</span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-600">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+              <table className="w-full text-left text-sm text-text-muted">
+                <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                   <tr>
                     <th className="px-5 py-3">Ward & Bed</th>
                     <th className="px-5 py-3">Patient</th>
@@ -217,55 +213,55 @@ export default function DietaryDashboard() {
                     <th className="px-5 py-3">Meal Tray Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody className="divide-y divide-border text-xs">
                   {loading ? (
                     <tr>
-                      <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
+                      <td colSpan={5} className="px-5 py-8 text-center text-text-muted">
                         Loading kitchen delivery worklist...
                       </td>
                     </tr>
                   ) : worklist.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
+                      <td colSpan={5} className="px-5 py-8 text-center text-text-muted">
                         No active inpatients in census.
                       </td>
                     </tr>
                   ) : (
                     worklist.map((item: any) => (
-                      <tr key={item.admissionId} className={item.isNpo ? 'bg-rose-50/40' : 'hover:bg-slate-50/50'}>
+                      <tr key={item.admissionId} className={item.isNpo ? 'bg-critical-bg/40' : 'hover:bg-surface-subtle/50'}>
                         <td className="px-5 py-4">
-                          <strong className="text-slate-900 block text-sm">{item.bedNumber}</strong>
-                          <span className="text-slate-500 text-[11px]">{item.wardName}</span>
+                          <strong className="text-text block text-sm">{item.bedNumber}</strong>
+                          <span className="text-text-muted text-[11px]">{item.wardName}</span>
                         </td>
-                        <td className="px-5 py-4 font-semibold text-slate-900">
+                        <td className="px-5 py-4 font-semibold text-text">
                           {item.patientName}
-                          <span className="text-slate-400 block text-[11px] font-normal">{item.gender}</span>
+                          <span className="text-text-muted block text-[11px] font-normal">{item.gender}</span>
                         </td>
                         <td className="px-5 py-4">
                           {item.isNpo ? (
-                            <span className="px-2.5 py-0.5 rounded-full font-bold text-xs bg-rose-200 text-rose-900">
+                            <span className="px-2.5 py-0.5 rounded-full font-bold text-xs bg-critical-bg text-critical-text">
                               NPO (DO NOT FEED)
                             </span>
                           ) : (
-                            <span className="font-bold text-slate-800">
+                            <span className="font-bold text-text">
                               {item.dietType}
                             </span>
                           )}
                         </td>
-                        <td className="px-5 py-4 text-slate-700">
+                        <td className="px-5 py-4 text-text">
                           {item.restrictions !== 'None' ? (
-                            <span className="bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded font-medium text-[11px]">
+                            <span className="bg-warning-bg text-warning-text border border-warning-border px-2 py-0.5 rounded font-medium text-[11px]">
                               {item.restrictions}
                             </span>
                           ) : (
-                            <span className="text-slate-400">No restrictions</span>
+                            <span className="text-text-muted">No restrictions</span>
                           )}
                         </td>
                         <td className="px-5 py-4">
                           {item.isNpo ? (
-                            <span className="text-rose-700 font-bold">Withheld</span>
+                            <span className="text-critical-text font-bold">Withheld</span>
                           ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-stable-bg text-stable-text border border-stable-border">
                               Tray Prepared
                             </span>
                           )}
@@ -282,19 +278,19 @@ export default function DietaryDashboard() {
 
       {/* TAB 2: PHYSICIAN ORDERS */}
       {activeTab === 'orders' && (
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-            <h2 className="text-base font-semibold text-slate-900">Clinical Diet Orders Log</h2>
+        <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-border flex justify-between items-center">
+            <h2 className="text-base font-semibold text-text">Clinical Diet Orders Log</h2>
             <button
               onClick={openOrderModal}
-              className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold"
+              className="px-3.5 py-1.5 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold"
             >
               + Prescribe Diet Order
             </button>
           </div>
 
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3">Order Date</th>
                 <th className="px-5 py-3">Patient</th>
@@ -305,34 +301,33 @@ export default function DietaryDashboard() {
                 <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
+            <tbody className="divide-y divide-border text-xs">
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={7} className="px-5 py-8 text-center text-text-muted">
                     No diet orders placed yet.
                   </td>
                 </tr>
               ) : (
                 orders.map((o) => (
-                  <tr key={o.id} className="hover:bg-slate-50/50">
-                    <td className="px-5 py-3 text-slate-500 font-mono">
+                  <tr key={o.id} className="hover:bg-surface-subtle/50">
+                    <td className="px-5 py-3 text-text-muted font-mono">
                       {new Date(o.startDate || o.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-3 font-semibold text-slate-900">
+                    <td className="px-5 py-3 font-semibold text-text">
                       {o.patient?.firstName} {o.patient?.lastName}
                     </td>
-                    <td className="px-5 py-3 font-bold text-slate-800">
+                    <td className="px-5 py-3 font-bold text-text">
                       {o.dietType?.name}
                     </td>
-                    <td className="px-5 py-3 text-slate-700">
+                    <td className="px-5 py-3 text-text">
                       {o.restrictions || 'None'}
                     </td>
-                    <td className="px-5 py-3 text-slate-600">
+                    <td className="px-5 py-3 text-text-muted">
                       Dr. {o.doctor?.user?.name || 'Attending'}
                     </td>
                     <td className="px-5 py-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        o.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${ o.status ==='ACTIVE' ? 'bg-stable-bg text-stable-text' : 'bg-surface-subtle text-text-muted'
                       }`}>
                         {o.status}
                       </span>
@@ -341,7 +336,7 @@ export default function DietaryDashboard() {
                       {o.status === 'ACTIVE' && (
                         <button
                           onClick={() => handleDiscontinue(o.id)}
-                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-medium"
+                          className="px-2.5 py-1 bg-surface-subtle hover:bg-surface-subtle text-text rounded text-[11px] font-medium"
                         >
                           Discontinue
                         </button>
@@ -359,14 +354,14 @@ export default function DietaryDashboard() {
       {activeTab === 'types' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {dietTypes.map((dt) => (
-            <div key={dt.id} className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-2">
+            <div key={dt.id} className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-2">
               <div className="flex justify-between items-center">
-                <span className="font-bold text-sm text-slate-900">{dt.name}</span>
-                <span className="font-mono text-xs text-blue-700 bg-blue-50 px-2 py-0.5 rounded font-bold">
+                <span className="font-bold text-sm text-text">{dt.name}</span>
+                <span className="font-mono text-xs text-info-text bg-info-bg px-2 py-0.5 rounded font-bold">
                   {dt.code}
                 </span>
               </div>
-              <p className="text-xs text-slate-600">{dt.description || 'Standard therapeutic diet profile.'}</p>
+              <p className="text-xs text-text-muted">{dt.description || 'Standard therapeutic diet profile.'}</p>
             </div>
           ))}
         </div>
@@ -374,23 +369,23 @@ export default function DietaryDashboard() {
 
       {/* Prescribe Diet Order Modal */}
       {showOrderModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
+        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div className="border-b border-border pb-3 flex justify-between items-center">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Prescribe Clinical Diet Order</h3>
-                <p className="text-xs text-slate-500">Therapeutic diet profile and restrictions</p>
+                <h3 className="text-base font-bold text-text">Prescribe Clinical Diet Order</h3>
+                <p className="text-xs text-text-muted">Therapeutic diet profile and restrictions</p>
               </div>
-              <button onClick={() => setShowOrderModal(false)} className="text-slate-400 font-bold">x</button>
+              <button onClick={() => setShowOrderModal(false)} className="text-text-muted font-bold">x</button>
             </div>
 
             <form onSubmit={handleCreateOrder} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Select Patient *</label>
+                <label className="block text-xs font-medium text-text mb-1">Select Patient *</label>
                 <select
                   value={selectedPatientId}
                   onChange={(e) => setSelectedPatientId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
                   required
                 >
                   <option value="">-- Choose Patient --</option>
@@ -403,11 +398,11 @@ export default function DietaryDashboard() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Diet Type *</label>
+                <label className="block text-xs font-medium text-text mb-1">Diet Type *</label>
                 <select
                   value={selectedDietTypeId}
                   onChange={(e) => setSelectedDietTypeId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white font-semibold"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface font-semibold"
                   required
                 >
                   {dietTypes.map((dt) => (
@@ -419,28 +414,28 @@ export default function DietaryDashboard() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Clinical Restrictions / Allergies</label>
+                <label className="block text-xs font-medium text-text mb-1">Clinical Restrictions / Allergies</label>
                 <input
                   type="text"
                   value={restrictions}
                   onChange={(e) => setRestrictions(e.target.value)}
                   placeholder="e.g. Low sodium, gluten-free, puree consistency..."
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                  className="w-full px-3 py-1.5 border border-border rounded text-xs"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowOrderModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700"
+                  className="px-4 py-2 border border-border rounded-lg text-xs text-text"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold disabled:opacity-50"
+                  className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold disabled:opacity-50"
                 >
                   {submitting ? 'Prescribing...' : 'Prescribe Diet'}
                 </button>

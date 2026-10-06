@@ -129,36 +129,36 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background text-text flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Brand Icon & Heading */}
         <div className="flex justify-center items-center gap-2 mb-2">
-          <div className="w-10 h-10 rounded-lg bg-[#0891B2] flex items-center justify-center text-white shadow-md">
+          <div className="w-10 h-10 rounded-lg bg-brand flex items-center justify-center text-brand-foreground shadow-md">
             <Activity className="w-6 h-6" aria-hidden="true" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-slate-900">
-            Enterprise <span className="text-[#0891B2]">HMS</span>
+          <span className="text-xl font-bold tracking-tight text-text">
+            Enterprise <span className="text-brand">HMS</span>
           </span>
         </div>
 
-        <h2 className="text-center text-xl font-semibold text-slate-800">
+        <h2 className="text-center text-xl font-semibold text-text">
           Clinical & Enterprise Portal
         </h2>
-        <p className="mt-1 text-center text-xs text-slate-500 flex items-center justify-center gap-1">
-          <Building2 className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
+        <p className="mt-1 text-center text-xs text-text-muted flex items-center justify-center gap-1">
+          <Building2 className="w-3.5 h-3.5 text-text-muted" aria-hidden="true" />
           <span>Unified Hospital Management System</span>
         </p>
       </div>
 
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white py-8 px-6 shadow-sm border border-slate-200 rounded-xl sm:px-10">
+        <div className="bg-surface py-8 px-6 shadow-sm border border-border rounded-xl sm:px-10">
           {/* Error Banner */}
           {errorMessage && (
             <div
               role="alert"
-              className="mb-5 flex items-start gap-2.5 p-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-xs"
+              className="mb-5 flex items-start gap-2.5 p-3 rounded-lg bg-critical-bg border border-critical-border text-critical-text text-xs"
             >
-              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" aria-hidden="true" />
+              <AlertCircle className="w-4 h-4 text-critical shrink-0 mt-0.5" aria-hidden="true" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -167,9 +167,9 @@ export default function LoginPage() {
           {successMessage && (
             <div
               role="status"
-              className="mb-5 flex items-center gap-2 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs"
+              className="mb-5 flex items-center gap-2 p-3 rounded-lg bg-stable-bg border border-stable-border text-stable-text text-xs"
             >
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
+              <CheckCircle2 className="w-4 h-4 text-stable shrink-0" aria-hidden="true" />
               <span>{successMessage}</span>
             </div>
           )}
@@ -179,11 +179,11 @@ export default function LoginPage() {
               <>
                 {/* Email Input */}
                 <div>
-                  <label htmlFor="email" className="block text-xs font-semibold text-slate-700 mb-1">
-                    Work Email Address <span className="text-red-500">*</span>
+                  <label htmlFor="email" className="block text-xs font-semibold text-text mb-1">
+                    Work Email Address <span className="text-critical">*</span>
                   </label>
                   <div className="relative flex items-center">
-                    <Mail className="w-4 h-4 absolute left-3 text-slate-400 pointer-events-none" aria-hidden="true" />
+                    <Mail className="w-4 h-4 absolute left-3 text-text-muted pointer-events-none" aria-hidden="true" />
                     <input
                       id="email"
                       type="email"
@@ -192,7 +192,7 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="physician@hospital.org"
-                      className="w-full text-xs rounded-md border border-slate-300 pl-9 pr-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0891B2] focus:border-[#0891B2]"
+                      className="w-full text-xs rounded-md border border-border bg-surface pl-9 pr-3 py-2 text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                     />
                   </div>
                 </div>
@@ -200,8 +200,8 @@ export default function LoginPage() {
                 {/* Password Input */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label htmlFor="password" className="block text-xs font-semibold text-slate-700">
-                      Password <span className="text-red-500">*</span>
+                    <label htmlFor="password" className="block text-xs font-semibold text-text">
+                      Password <span className="text-critical">*</span>
                     </label>
                     <a
                       href="#forgot-password"
@@ -209,13 +209,13 @@ export default function LoginPage() {
                         e.preventDefault();
                         alert('Please contact your hospital IT administrator to reset credentials.');
                       }}
-                      className="text-xs text-[#0891B2] hover:underline"
+                      className="text-xs text-brand hover:underline"
                     >
                       Forgot password?
                     </a>
                   </div>
                   <div className="relative flex items-center">
-                    <Lock className="w-4 h-4 absolute left-3 text-slate-400 pointer-events-none" aria-hidden="true" />
+                    <Lock className="w-4 h-4 absolute left-3 text-text-muted pointer-events-none" aria-hidden="true" />
                     <input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
@@ -224,13 +224,13 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full text-xs rounded-md border border-slate-300 pl-9 pr-9 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0891B2] focus:border-[#0891B2]"
+                      className="w-full text-xs rounded-md border border-border bg-surface pl-9 pr-9 py-2 text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      className="absolute right-3 text-slate-400 hover:text-slate-600 cursor-pointer"
+                      className="absolute right-3 text-text-muted hover:text-text cursor-pointer"
                     >
                       {showPassword ? (
                         <EyeOff className="w-4 h-4" aria-hidden="true" />
@@ -248,9 +248,9 @@ export default function LoginPage() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 text-[#0891B2] focus:ring-[#0891B2]"
+                    className="h-4 w-4 rounded border-border text-brand focus:ring-brand"
                   />
-                  <label htmlFor="remember-me" className="ml-2 block text-xs text-slate-600 cursor-pointer">
+                  <label htmlFor="remember-me" className="ml-2 block text-xs text-text-muted cursor-pointer">
                     Remember this workstation for 30 days
                   </label>
                 </div>
@@ -258,20 +258,20 @@ export default function LoginPage() {
             ) : (
               /* Two-Factor Authentication Step */
               <div className="space-y-4">
-                <div className="p-3 bg-cyan-50 border border-cyan-200 rounded-lg text-xs text-cyan-900">
+                <div className="p-3 bg-info-bg border border-info-border rounded-lg text-xs text-info-text">
                   <div className="font-semibold flex items-center gap-1.5 mb-1">
-                    <ShieldCheck className="w-4 h-4 text-[#0891B2]" aria-hidden="true" />
+                    <ShieldCheck className="w-4 h-4 text-brand" aria-hidden="true" />
                     <span>Two-Factor Authentication Required</span>
                   </div>
                   Enter the 6-digit verification code from your authenticator app.
                 </div>
 
                 <div>
-                  <label htmlFor="mfa-code" className="block text-xs font-semibold text-slate-700 mb-1">
-                    Security Passcode <span className="text-red-500">*</span>
+                  <label htmlFor="mfa-code" className="block text-xs font-semibold text-text mb-1">
+                    Security Passcode <span className="text-critical">*</span>
                   </label>
                   <div className="relative flex items-center">
-                    <KeyRound className="w-4 h-4 absolute left-3 text-slate-400 pointer-events-none" aria-hidden="true" />
+                    <KeyRound className="w-4 h-4 absolute left-3 text-text-muted pointer-events-none" aria-hidden="true" />
                     <input
                       id="mfa-code"
                       type="text"
@@ -282,7 +282,7 @@ export default function LoginPage() {
                       value={mfaCode}
                       onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
                       placeholder="123456"
-                      className="w-full text-center tracking-widest text-lg font-mono rounded-md border border-slate-300 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0891B2]"
+                      className="w-full text-center tracking-widest text-lg font-mono rounded-md border border-border bg-surface py-2 text-text focus:outline-none focus:ring-2 focus:ring-brand"
                     />
                   </div>
                 </div>
@@ -290,7 +290,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setIsMfaRequired(false)}
-                  className="text-xs text-slate-500 hover:text-slate-800 underline block text-center w-full"
+                  className="text-xs text-text-muted hover:text-text underline block text-center w-full"
                 >
                   ← Back to Email and Password
                 </button>
@@ -311,29 +311,29 @@ export default function LoginPage() {
           </form>
 
           {/* Quick Demo Credentials */}
-          <div className="mt-5 pt-4 border-t border-slate-100">
+          <div className="mt-5 pt-4 border-t border-border">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+              <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">
                 Quick Demo Access
               </p>
-              <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+              <span className="text-[10px] font-mono text-text-muted bg-surface-subtle border border-border px-1.5 py-0.5 rounded">
                 Password: password123
               </span>
             </div>
             <div className="grid grid-cols-1 gap-2">
-              <div className="flex items-center justify-between p-2.5 bg-cyan-50/70 border border-cyan-200 rounded-lg transition-colors">
+              <div className="flex items-center justify-between p-2.5 bg-info-bg/50 border border-info-border rounded-lg transition-colors">
                 <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-xs text-[#0891B2] flex items-center gap-1.5">
+                  <div className="font-semibold text-xs text-brand flex items-center gap-1.5">
                     <span>Priya (Admin)</span>
-                    <span className="text-[10px] font-normal text-slate-500 font-mono">password123</span>
+                    <span className="text-[10px] font-normal text-text-muted font-mono">password123</span>
                   </div>
-                  <div className="text-[11px] text-slate-600 font-mono truncate">priya.s@vedichealth.org</div>
+                  <div className="text-[11px] text-text-muted font-mono truncate">priya.s@vedichealth.org</div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0 ml-2">
                   <button
                     type="button"
                     onClick={() => applyCredentials('priya.s@vedichealth.org', 'password123')}
-                    className="px-2 py-1 text-[11px] text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded hover:bg-slate-50 font-medium transition-colors cursor-pointer"
+                    className="px-2 py-1 text-[11px] text-text hover:text-brand bg-surface border border-border rounded hover:bg-surface-subtle font-medium transition-colors cursor-pointer"
                   >
                     Fill
                   </button>
@@ -341,26 +341,26 @@ export default function LoginPage() {
                     type="button"
                     disabled={isLoading}
                     onClick={() => handleQuickLogin('priya.s@vedichealth.org', 'password123')}
-                    className="px-2.5 py-1 text-[11px] text-white bg-[#0891B2] hover:bg-[#0e7490] rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                    className="px-2.5 py-1 text-[11px] text-brand-foreground bg-brand hover:bg-brand-hover rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                   >
                     1-Click Sign In
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+              <div className="flex items-center justify-between p-2.5 bg-surface-subtle border border-border rounded-lg hover:border-border-strong transition-colors">
                 <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-xs text-slate-800 flex items-center gap-1.5">
+                  <div className="font-semibold text-xs text-text flex items-center gap-1.5">
                     <span>Doctor Role</span>
-                    <span className="text-[10px] font-normal text-slate-400 font-mono">password123</span>
+                    <span className="text-[10px] font-normal text-text-muted font-mono">password123</span>
                   </div>
-                  <div className="text-[11px] text-slate-500 font-mono truncate">doctor@demo.com</div>
+                  <div className="text-[11px] text-text-muted font-mono truncate">doctor@demo.com</div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0 ml-2">
                   <button
                     type="button"
                     onClick={() => applyCredentials('doctor@demo.com', 'password123')}
-                    className="px-2 py-1 text-[11px] text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded hover:bg-slate-50 font-medium transition-colors cursor-pointer"
+                    className="px-2 py-1 text-[11px] text-text hover:text-brand bg-surface border border-border rounded hover:bg-surface-subtle font-medium transition-colors cursor-pointer"
                   >
                     Fill
                   </button>
@@ -368,26 +368,26 @@ export default function LoginPage() {
                     type="button"
                     disabled={isLoading}
                     onClick={() => handleQuickLogin('doctor@demo.com', 'password123')}
-                    className="px-2.5 py-1 text-[11px] text-white bg-slate-700 hover:bg-slate-800 rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                    className="px-2.5 py-1 text-[11px] text-text bg-surface-raised hover:bg-surface border border-border rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                   >
                     1-Click Sign In
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+              <div className="flex items-center justify-between p-2.5 bg-surface-subtle border border-border rounded-lg hover:border-border-strong transition-colors">
                 <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-xs text-slate-800 flex items-center gap-1.5">
+                  <div className="font-semibold text-xs text-text flex items-center gap-1.5">
                     <span>Super Admin</span>
-                    <span className="text-[10px] font-normal text-slate-400 font-mono">password123</span>
+                    <span className="text-[10px] font-normal text-text-muted font-mono">password123</span>
                   </div>
-                  <div className="text-[11px] text-slate-500 font-mono truncate">admin@enterprise-hms.com</div>
+                  <div className="text-[11px] text-text-muted font-mono truncate">admin@enterprise-hms.com</div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0 ml-2">
                   <button
                     type="button"
                     onClick={() => applyCredentials('admin@enterprise-hms.com', 'password123')}
-                    className="px-2 py-1 text-[11px] text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded hover:bg-slate-50 font-medium transition-colors cursor-pointer"
+                    className="px-2 py-1 text-[11px] text-text hover:text-brand bg-surface border border-border rounded hover:bg-surface-subtle font-medium transition-colors cursor-pointer"
                   >
                     Fill
                   </button>
@@ -395,7 +395,7 @@ export default function LoginPage() {
                     type="button"
                     disabled={isLoading}
                     onClick={() => handleQuickLogin('admin@enterprise-hms.com', 'password123')}
-                    className="px-2.5 py-1 text-[11px] text-white bg-slate-700 hover:bg-slate-800 rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                    className="px-2.5 py-1 text-[11px] text-text bg-surface-raised hover:bg-surface border border-border rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                   >
                     1-Click Sign In
                   </button>
@@ -405,12 +405,12 @@ export default function LoginPage() {
           </div>
 
           {/* Compliance & Security Audit Footnote */}
-          <div className="mt-6 pt-5 border-t border-slate-100 text-center">
-            <div className="flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-500">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#059669]" aria-hidden="true" />
+          <div className="mt-6 pt-5 border-t border-border text-center">
+            <div className="flex items-center justify-center gap-1.5 text-[11px] font-medium text-text-muted">
+              <ShieldCheck className="w-3.5 h-3.5 text-stable" aria-hidden="true" />
               <span>Protected Health Information (PHI) Secure System</span>
             </div>
-            <p className="mt-1 text-[10px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+            <p className="mt-1 text-[10px] text-text-muted max-w-xs mx-auto leading-relaxed">
               Authorized clinical personnel only. All access, lookups, and modifications are
               cryptographically logged and audited for compliance.
             </p>

@@ -169,10 +169,10 @@ export default function BiomedicalAssetsDashboard() {
       {/* Top Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-text">
             Biomedical Engineering & CMMS
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-text-muted mt-1">
             Clinical device asset register, maintenance work orders, breakdown triage, and calibration compliance.
           </p>
         </div>
@@ -180,21 +180,21 @@ export default function BiomedicalAssetsDashboard() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-text bg-surface border border-border rounded-lg hover:bg-surface-subtle"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ?'animate-spin' : ''}`} />
             Refresh
           </button>
           <button
             onClick={() => setIsReportBreakdownOpen(true)}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg hover:bg-rose-100"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-critical-text bg-critical-bg border border-critical-border rounded-lg hover:bg-critical-bg"
           >
-            <ShieldAlert className="w-4 h-4 text-rose-600" />
+            <ShieldAlert className="w-4 h-4 text-critical" />
             Report Breakdown
           </button>
           <button
             onClick={() => setIsRegisterAssetOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-foreground bg-surface rounded-lg hover:bg-surface-raised shadow-sm"
           >
             <Plus className="w-4 h-4" />
             Register Device
@@ -204,60 +204,59 @@ export default function BiomedicalAssetsDashboard() {
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Device Inventory</p>
-            <p className="text-2xl font-bold text-slate-900 mt-1">{totalAssets}</p>
-            <p className="text-xs text-slate-500 mt-1">Biomedical equipment units</p>
+            <p className="text-xs font-medium text-text-muted uppercase">Device Inventory</p>
+            <p className="text-2xl font-bold text-text mt-1">{totalAssets}</p>
+            <p className="text-xs text-text-muted mt-1">Biomedical equipment units</p>
           </div>
-          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+          <div className="p-3 bg-surface-subtle text-brand rounded-lg">
             <Activity className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Active & In Service</p>
-            <p className="text-2xl font-bold text-emerald-600 mt-1">{activeAssets}</p>
-            <p className="text-xs text-slate-500 mt-1">Clinical uptime verified</p>
+            <p className="text-xs font-medium text-text-muted uppercase">Active & In Service</p>
+            <p className="text-2xl font-bold text-stable mt-1">{activeAssets}</p>
+            <p className="text-xs text-text-muted mt-1">Clinical uptime verified</p>
           </div>
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+          <div className="p-3 bg-stable-bg text-stable rounded-lg">
             <CheckCircle2 className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Out for Maintenance</p>
-            <p className="text-2xl font-bold text-rose-600 mt-1">{inMaintenance}</p>
-            <p className="text-xs text-rose-600 mt-1">Breakdown / Calibration lock</p>
+            <p className="text-xs font-medium text-text-muted uppercase">Out for Maintenance</p>
+            <p className="text-2xl font-bold text-critical mt-1">{inMaintenance}</p>
+            <p className="text-xs text-critical mt-1">Breakdown / Calibration lock</p>
           </div>
-          <div className="p-3 bg-rose-50 text-rose-600 rounded-lg">
+          <div className="p-3 bg-critical-bg text-critical rounded-lg">
             <AlertTriangle className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Open Work Orders</p>
-            <p className="text-2xl font-bold text-amber-600 mt-1">{pendingTasks}</p>
-            <p className="text-xs text-slate-500 mt-1">CMMS maintenance queue</p>
+            <p className="text-xs font-medium text-text-muted uppercase">Open Work Orders</p>
+            <p className="text-2xl font-bold text-warning mt-1">{pendingTasks}</p>
+            <p className="text-xs text-text-muted mt-1">CMMS maintenance queue</p>
           </div>
-          <div className="p-3 bg-amber-50 text-amber-600 rounded-lg">
+          <div className="p-3 bg-warning-bg text-warning rounded-lg">
             <Wrench className="w-6 h-6" />
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-slate-200 bg-white rounded-t-xl px-4 pt-3">
+      <div className="border-b border-border bg-surface rounded-t-xl px-4 pt-3">
         <div className="flex space-x-6">
           <button
             onClick={() => setActiveTab('assets')}
-            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${
-              activeTab === 'assets'
-                ? 'border-slate-900 text-slate-900'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${ activeTab ==='assets'
+                ? 'border-border text-text'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             <Activity className="w-4 h-4" />
@@ -265,16 +264,15 @@ export default function BiomedicalAssetsDashboard() {
           </button>
           <button
             onClick={() => setActiveTab('maintenance')}
-            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${
-              activeTab === 'maintenance'
-                ? 'border-slate-900 text-slate-900'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${ activeTab ==='maintenance'
+                ? 'border-border text-text'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             <Wrench className="w-4 h-4" />
             CMMS Work Orders ({tasks.length})
             {inMaintenance > 0 && (
-              <span className="px-2 py-0.5 text-xs bg-rose-100 text-rose-800 rounded-full font-bold">
+              <span className="px-2 py-0.5 text-xs bg-critical-bg text-critical-text rounded-full font-bold">
                 {inMaintenance} in service
               </span>
             )}
@@ -284,12 +282,12 @@ export default function BiomedicalAssetsDashboard() {
 
       {/* Error Banner */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 flex items-center justify-between">
+        <div className="p-4 bg-critical-bg border border-critical-border rounded-xl text-critical-text flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 text-red-600" />
+            <AlertTriangle className="w-5 h-5 text-critical" />
             <span className="text-sm font-medium">{error}</span>
           </div>
-          <button onClick={loadData} className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-800 rounded text-xs font-semibold">
+          <button onClick={loadData} className="px-3 py-1 bg-critical-bg hover:bg-critical-bg text-critical-text rounded text-xs font-semibold">
             Retry
           </button>
         </div>
@@ -298,43 +296,43 @@ export default function BiomedicalAssetsDashboard() {
       {/* TAB 1: ASSET REGISTER */}
       {activeTab === 'assets' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-3 border border-slate-200 rounded-xl">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 bg-surface p-3 border border-border rounded-xl">
             <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Search className="w-4 h-4 text-text-muted absolute left-3 top-3" />
               <input
                 type="text"
                 placeholder="Search device code, name, model..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                className="w-full pl-9 pr-3 py-1.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-500 uppercase">Status:</span>
+              <span className="text-xs font-semibold text-text-muted uppercase">Status:</span>
               <button
                 onClick={() => setStatusFilter('ALL')}
-                className={`px-3 py-1 text-xs rounded-lg font-medium ${statusFilter === 'ALL' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'}`}
+                className={`px-3 py-1 text-xs rounded-lg font-medium ${statusFilter ==='ALL' ? 'bg-surface text-brand-foreground' : 'bg-surface-subtle text-text'}`}
               >
                 All
               </button>
               <button
                 onClick={() => setStatusFilter('ACTIVE')}
-                className={`px-3 py-1 text-xs rounded-lg font-medium ${statusFilter === 'ACTIVE' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+                className={`px-3 py-1 text-xs rounded-lg font-medium ${statusFilter ==='ACTIVE' ? 'bg-stable text-brand-foreground' : 'bg-surface-subtle text-text'}`}
               >
                 Active
               </button>
               <button
                 onClick={() => setStatusFilter('MAINTENANCE')}
-                className={`px-3 py-1 text-xs rounded-lg font-medium ${statusFilter === 'MAINTENANCE' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+                className={`px-3 py-1 text-xs rounded-lg font-medium ${statusFilter ==='MAINTENANCE' ? 'bg-critical text-brand-foreground' : 'bg-surface-subtle text-text'}`}
               >
                 Maintenance
               </button>
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+            <table className="w-full text-left text-sm text-text-muted">
+              <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                 <tr>
                   <th className="px-6 py-4">Asset Code</th>
                   <th className="px-6 py-4">Device Name</th>
@@ -344,34 +342,33 @@ export default function BiomedicalAssetsDashboard() {
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {filteredAssets.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                    <td colSpan={6} className="px-6 py-12 text-center text-text-muted">
                       No assets found. Click &quot;Register Device&quot; to add biomedical equipment.
                     </td>
                   </tr>
                 ) : (
                   filteredAssets.map((asset) => (
-                    <tr key={asset.id} className="hover:bg-slate-50/80">
-                      <td className="px-6 py-4 font-mono font-bold text-slate-900">{asset.assetCode}</td>
+                    <tr key={asset.id} className="hover:bg-surface-subtle/80">
+                      <td className="px-6 py-4 font-mono font-bold text-text">{asset.assetCode}</td>
                       <td className="px-6 py-4">
-                        <div className="font-semibold text-slate-800">{asset.name}</div>
-                        <div className="text-xs text-slate-400">{asset.category}</div>
+                        <div className="font-semibold text-text">{asset.name}</div>
+                        <div className="text-xs text-text-muted">{asset.category}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-slate-800">{asset.department || 'General'}</div>
-                        <div className="text-xs text-slate-400">{asset.location || 'Central Depot'}</div>
+                        <div className="text-text">{asset.department || 'General'}</div>
+                        <div className="text-xs text-text-muted">{asset.location || 'Central Depot'}</div>
                       </td>
                       <td className="px-6 py-4 font-mono text-xs">
                         <div>Model: {asset.model || 'Standard'}</div>
-                        <div className="text-slate-400">S/N: {asset.serialNumber || '—'}</div>
+                        <div className="text-text-muted">S/N: {asset.serialNumber || '—'}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                          asset.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' :
-                          asset.status === 'MAINTENANCE' ? 'bg-rose-100 text-rose-800 animate-pulse' :
-                          'bg-slate-100 text-slate-700'
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${ asset.status ==='ACTIVE' ? 'bg-stable-bg text-stable-text' :
+                          asset.status === 'MAINTENANCE' ? 'bg-critical-bg text-critical-text animate-pulse' :
+                          'bg-surface-subtle text-text'
                         }`}>
                           {asset.status}
                         </span>
@@ -383,7 +380,7 @@ export default function BiomedicalAssetsDashboard() {
                               setBreakdownForm((prev) => ({ ...prev, assetId: asset.id }));
                               setIsReportBreakdownOpen(true);
                             }}
-                            className="px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-50 rounded"
+                            className="px-2.5 py-1 text-xs font-semibold text-critical-text hover:bg-critical-bg rounded"
                           >
                             Report Fault
                           </button>
@@ -401,16 +398,16 @@ export default function BiomedicalAssetsDashboard() {
       {/* TAB 2: CMMS WORK ORDERS */}
       {activeTab === 'maintenance' && (
         <div className="space-y-4">
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-slate-200 flex justify-between items-center">
+          <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-border flex justify-between items-center">
               <div>
-                <h2 className="text-sm font-bold text-slate-900">Work Orders & Calibration Queue</h2>
-                <p className="text-xs text-slate-500">Scheduled maintenance, breakdown resolutions, and safety certifications</p>
+                <h2 className="text-sm font-bold text-text">Work Orders & Calibration Queue</h2>
+                <p className="text-xs text-text-muted">Scheduled maintenance, breakdown resolutions, and safety certifications</p>
               </div>
             </div>
 
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+            <table className="w-full text-left text-sm text-text-muted">
+              <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                 <tr>
                   <th className="px-6 py-4">Asset</th>
                   <th className="px-6 py-4">Task Type & Description</th>
@@ -420,29 +417,28 @@ export default function BiomedicalAssetsDashboard() {
                   <th className="px-6 py-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {tasks.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                    <td colSpan={6} className="px-6 py-12 text-center text-text-muted">
                       No maintenance tasks queued. All equipment is fully serviced.
                     </td>
                   </tr>
                 ) : (
                   tasks.map((task) => (
-                    <tr key={task.id} className="hover:bg-slate-50/80">
+                    <tr key={task.id} className="hover:bg-surface-subtle/80">
                       <td className="px-6 py-4">
-                        <div className="font-mono font-bold text-slate-900">{task.asset?.assetCode}</div>
-                        <div className="text-xs text-slate-500">{task.asset?.name}</div>
+                        <div className="font-mono font-bold text-text">{task.asset?.assetCode}</div>
+                        <div className="text-xs text-text-muted">{task.asset?.name}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-semibold text-slate-800">{task.taskType}</div>
-                        <div className="text-xs text-slate-500 max-w-xs">{task.description}</div>
+                        <div className="font-semibold text-text">{task.taskType}</div>
+                        <div className="text-xs text-text-muted max-w-xs">{task.description}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                          task.priority === 'CRITICAL' ? 'bg-rose-100 text-rose-800' :
-                          task.priority === 'HIGH' ? 'bg-amber-100 text-amber-800' :
-                          'bg-blue-100 text-blue-800'
+                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${ task.priority ==='CRITICAL' ? 'bg-critical-bg text-critical-text' :
+                          task.priority === 'HIGH' ? 'bg-warning-bg text-warning-text' :
+                          'bg-info-bg text-info-text'
                         }`}>
                           {task.priority}
                         </span>
@@ -451,10 +447,9 @@ export default function BiomedicalAssetsDashboard() {
                         {new Date(task.scheduledDate).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                          task.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' :
-                          task.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
-                          'bg-amber-100 text-amber-800'
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${ task.status ==='COMPLETED' ? 'bg-stable-bg text-stable-text' :
+                          task.status === 'IN_PROGRESS' ? 'bg-info-bg text-info-text' :
+                          'bg-warning-bg text-warning-text'
                         }`}>
                           {task.status}
                         </span>
@@ -466,7 +461,7 @@ export default function BiomedicalAssetsDashboard() {
                               setSelectedTask(task);
                               setIsCompleteTaskOpen(true);
                             }}
-                            className="px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-sm"
+                            className="px-3 py-1.5 text-xs font-semibold text-brand-foreground bg-surface hover:bg-surface-raised rounded-lg shadow-sm"
                           >
                             Resolve & Certify
                           </button>
@@ -483,24 +478,24 @@ export default function BiomedicalAssetsDashboard() {
 
       {/* MODAL 1: REGISTER ASSET */}
       {isRegisterAssetOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h2 className="text-lg font-bold text-slate-900">Register Biomedical Equipment</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
+          <div className="bg-surface rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-lg font-bold text-text">Register Biomedical Equipment</h2>
             <form onSubmit={handleRegisterAsset} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Asset Code</label>
+                  <label className="text-xs font-semibold text-text">Asset Code</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. BME-VENT-04"
                     value={assetForm.assetCode}
                     onChange={(e) => setAssetForm({ ...assetForm, assetCode: e.target.value })}
-                    className="w-full px-3 py-1.5 text-sm border rounded-lg font-mono focus:ring-2 focus:ring-slate-900"
+                    className="w-full px-3 py-1.5 text-sm border rounded-lg font-mono focus:ring-2 focus:ring-ring"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Category</label>
+                  <label className="text-xs font-semibold text-text">Category</label>
                   <select
                     value={assetForm.category}
                     onChange={(e) => setAssetForm({ ...assetForm, category: e.target.value })}
@@ -515,20 +510,20 @@ export default function BiomedicalAssetsDashboard() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Device Name / Model</label>
+                <label className="text-xs font-semibold text-text">Device Name / Model</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Puritan Bennett 980 ICU Ventilator"
                   value={assetForm.name}
                   onChange={(e) => setAssetForm({ ...assetForm, name: e.target.value })}
-                  className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-ring"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Model #</label>
+                  <label className="text-xs font-semibold text-text">Model #</label>
                   <input
                     type="text"
                     value={assetForm.model}
@@ -537,7 +532,7 @@ export default function BiomedicalAssetsDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Serial Number</label>
+                  <label className="text-xs font-semibold text-text">Serial Number</label>
                   <input
                     type="text"
                     value={assetForm.serialNumber}
@@ -549,7 +544,7 @@ export default function BiomedicalAssetsDashboard() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Department</label>
+                  <label className="text-xs font-semibold text-text">Department</label>
                   <input
                     type="text"
                     value={assetForm.department}
@@ -558,7 +553,7 @@ export default function BiomedicalAssetsDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Bed / Room Location</label>
+                  <label className="text-xs font-semibold text-text">Bed / Room Location</label>
                   <input
                     type="text"
                     value={assetForm.location}
@@ -572,13 +567,13 @@ export default function BiomedicalAssetsDashboard() {
                 <button
                   type="button"
                   onClick={() => setIsRegisterAssetOpen(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-sm text-text-muted hover:bg-surface-subtle rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow"
+                  className="px-4 py-2 text-sm font-semibold text-brand-foreground bg-surface hover:bg-surface-raised rounded-lg shadow"
                 >
                   Save Asset
                 </button>
@@ -590,23 +585,23 @@ export default function BiomedicalAssetsDashboard() {
 
       {/* MODAL 2: REPORT BREAKDOWN */}
       {isReportBreakdownOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <div className="flex items-center gap-2 text-rose-700">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
+          <div className="bg-surface rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center gap-2 text-critical-text">
               <ShieldAlert className="w-5 h-5" />
               <h2 className="text-lg font-bold">Report Equipment Breakdown</h2>
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-text-muted">
               Submitting this immediately locks the asset into MAINTENANCE status and dispatches an emergency work order.
             </p>
             <form onSubmit={handleReportBreakdown} className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-slate-700">Faulty Equipment</label>
+                <label className="text-xs font-semibold text-text">Faulty Equipment</label>
                 <select
                   required
                   value={breakdownForm.assetId}
                   onChange={(e) => setBreakdownForm({ ...breakdownForm, assetId: e.target.value })}
-                  className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-rose-500"
+                  className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-critical"
                 >
                   <option value="">Select Equipment...</option>
                   {assets.filter((a) => a.status === 'ACTIVE').map((a) => (
@@ -618,7 +613,7 @@ export default function BiomedicalAssetsDashboard() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Priority Level</label>
+                <label className="text-xs font-semibold text-text">Priority Level</label>
                 <select
                   value={breakdownForm.priority}
                   onChange={(e) => setBreakdownForm({ ...breakdownForm, priority: e.target.value })}
@@ -631,7 +626,7 @@ export default function BiomedicalAssetsDashboard() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Breakdown Symptoms / Reason</label>
+                <label className="text-xs font-semibold text-text">Breakdown Symptoms / Reason</label>
                 <textarea
                   required
                   rows={3}
@@ -646,13 +641,13 @@ export default function BiomedicalAssetsDashboard() {
                 <button
                   type="button"
                   onClick={() => setIsReportBreakdownOpen(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-sm text-text-muted hover:bg-surface-subtle rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow"
+                  className="px-4 py-2 text-sm font-semibold text-brand-foreground bg-critical hover:bg-critical rounded-lg shadow"
                 >
                   Dispatch Work Order
                 </button>
@@ -664,15 +659,15 @@ export default function BiomedicalAssetsDashboard() {
 
       {/* MODAL 3: RESOLVE WORK ORDER & CALIBRATE */}
       {isCompleteTaskOpen && selectedTask && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h2 className="text-lg font-bold text-slate-900">Complete & Calibrate Equipment</h2>
-            <p className="text-xs text-slate-500">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
+          <div className="bg-surface rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-lg font-bold text-text">Complete & Calibrate Equipment</h2>
+            <p className="text-xs text-text-muted">
               Certifying this work order restores device status back to ACTIVE for clinical usage.
             </p>
             <form onSubmit={handleCompleteTask} className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-slate-700">Resolution Notes</label>
+                <label className="text-xs font-semibold text-text">Resolution Notes</label>
                 <textarea
                   required
                   rows={2}
@@ -682,21 +677,21 @@ export default function BiomedicalAssetsDashboard() {
                 />
               </div>
 
-              <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg">
+              <div className="flex items-center gap-2 p-2 bg-surface-subtle rounded-lg">
                 <input
                   type="checkbox"
                   id="calibrationPassed"
                   checked={completeForm.calibrationPassed}
                   onChange={(e) => setCompleteForm({ ...completeForm, calibrationPassed: e.target.checked })}
-                  className="w-4 h-4 text-emerald-600 rounded"
+                  className="w-4 h-4 text-stable rounded"
                 />
-                <label htmlFor="calibrationPassed" className="text-xs font-semibold text-slate-800">
+                <label htmlFor="calibrationPassed" className="text-xs font-semibold text-text">
                   Biomedical Safety & Calibration Passed
                 </label>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Calibration Certificate #</label>
+                <label className="text-xs font-semibold text-text">Calibration Certificate #</label>
                 <input
                   type="text"
                   required
@@ -710,13 +705,13 @@ export default function BiomedicalAssetsDashboard() {
                 <button
                   type="button"
                   onClick={() => setIsCompleteTaskOpen(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-sm text-text-muted hover:bg-surface-subtle rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow"
+                  className="px-4 py-2 text-sm font-semibold text-brand-foreground bg-stable hover:bg-stable rounded-lg shadow"
                 >
                   Certify & Restore to Active
                 </button>

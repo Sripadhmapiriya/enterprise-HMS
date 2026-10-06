@@ -82,17 +82,17 @@ export default function CsvImportPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-          <FileSpreadsheet className="w-7 h-7 text-indigo-600" />
+        <h1 className="text-2xl font-bold text-text tracking-tight flex items-center gap-2">
+          <FileSpreadsheet className="w-7 h-7 text-brand" />
           Hospital Onboarding Data Import
         </h1>
-        <p className="text-slate-500 text-sm mt-1">
+        <p className="text-text-muted text-sm mt-1">
           Bulk import master records for fast hospital onboarding with schema validation and discrepancy reports.
         </p>
       </div>
 
       {/* Domain Selector Tabs */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-border">
         {[
           { id: 'patients', label: '1. Master Patients' },
           { id: 'items', label: '2. Items & Medications' },
@@ -102,10 +102,8 @@ export default function CsvImportPage() {
           <button
             key={tab.id}
             onClick={() => handleDomainChange(tab.id as any)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
-              domain === tab.id
-                ? 'border-indigo-600 text-indigo-600 font-semibold'
-                : 'border-transparent text-slate-600 hover:text-slate-900'
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${ domain === tab.id ?'border-brand text-brand font-semibold'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             {tab.label}
@@ -114,23 +112,23 @@ export default function CsvImportPage() {
       </div>
 
       {commitMessage && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-xl flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div className="p-4 bg-stable-bg border border-stable-border text-stable-text text-sm rounded-xl flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5 text-stable shrink-0" />
           <span className="font-medium">{commitMessage}</span>
         </div>
       )}
 
       {/* CSV Input Area */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+      <div className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-4">
         <div className="flex justify-between items-center">
-          <label className="text-xs font-semibold text-slate-700 uppercase flex items-center gap-2">
-            <FileText className="w-4 h-4 text-slate-400" />
+          <label className="text-xs font-semibold text-text uppercase flex items-center gap-2">
+            <FileText className="w-4 h-4 text-text-muted" />
             CSV Data Content (Comma-Separated Values)
           </label>
           <button
             type="button"
             onClick={() => setCsvContent(SAMPLE_TEMPLATES[domain])}
-            className="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1"
+            className="text-xs text-brand hover:text-brand font-medium flex items-center gap-1"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Reset to Sample Template
@@ -141,11 +139,11 @@ export default function CsvImportPage() {
           rows={8}
           value={csvContent}
           onChange={(e) => setCsvContent(e.target.value)}
-          className="w-full font-mono text-xs p-3 border border-slate-300 rounded-lg bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full font-mono text-xs p-3 border border-border rounded-lg bg-surface-subtle/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
         />
 
         <div className="flex items-center justify-between pt-2">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-text-muted">
             Click Dry-Run Validate to inspect row errors before committing records to the hospital database.
           </p>
           <div className="flex gap-2">
@@ -156,7 +154,7 @@ export default function CsvImportPage() {
               size="sm"
               onClick={handleCommit}
               disabled={loading || !csvContent.trim()}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              className="bg-brand hover:bg-brand-hover text-brand-foreground"
             >
               <Upload className="w-4 h-4 mr-1.5" />
               Commit Import
@@ -167,9 +165,9 @@ export default function CsvImportPage() {
 
       {/* Validation Report */}
       {report && (
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden space-y-4">
-          <div className="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-            <h3 className="font-semibold text-slate-900 text-sm">Validation Report Summary</h3>
+        <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden space-y-4">
+          <div className="p-4 bg-surface-subtle border-b border-border flex justify-between items-center">
+            <h3 className="font-semibold text-text text-sm">Validation Report Summary</h3>
             <div className="flex gap-2">
               <Badge variant="neutral">{report.totalRows} Total Rows</Badge>
               <Badge variant="stable">{report.validRows} Valid Rows</Badge>
@@ -180,13 +178,13 @@ export default function CsvImportPage() {
           <div className="p-4 space-y-4">
             {report.errors.length > 0 ? (
               <div className="space-y-2">
-                <h4 className="text-xs font-semibold text-rose-700 uppercase flex items-center gap-1">
+                <h4 className="text-xs font-semibold text-critical-text uppercase flex items-center gap-1">
                   <AlertTriangle className="w-4 h-4" />
                   Validation Discrepancies ({report.errors.length})
                 </h4>
-                <div className="border border-rose-200 rounded-lg overflow-hidden">
-                  <table className="w-full text-left text-xs text-slate-600">
-                    <thead className="bg-rose-50 text-rose-900 font-semibold border-b border-rose-200">
+                <div className="border border-critical-border rounded-lg overflow-hidden">
+                  <table className="w-full text-left text-xs text-text-muted">
+                    <thead className="bg-critical-bg text-critical-text font-semibold border-b border-critical-border">
                       <tr>
                         <th className="px-3 py-2">Row</th>
                         <th className="px-3 py-2">Field</th>
@@ -194,13 +192,13 @@ export default function CsvImportPage() {
                         <th className="px-3 py-2">Error Description</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-rose-100">
+                    <tbody className="divide-y divide-border">
                       {report.errors.map((err: any, idx: number) => (
-                        <tr key={idx} className="hover:bg-rose-50/50">
-                          <td className="px-3 py-2 font-bold text-slate-900">{err.row}</td>
-                          <td className="px-3 py-2 font-mono text-indigo-700">{err.field}</td>
-                          <td className="px-3 py-2 text-slate-500 font-mono">{err.value || '<empty>'}</td>
-                          <td className="px-3 py-2 text-rose-700">{err.message}</td>
+                        <tr key={idx} className="hover:bg-critical-bg/50">
+                          <td className="px-3 py-2 font-bold text-text">{err.row}</td>
+                          <td className="px-3 py-2 font-mono text-brand">{err.field}</td>
+                          <td className="px-3 py-2 text-text-muted font-mono">{err.value || '<empty>'}</td>
+                          <td className="px-3 py-2 text-critical-text">{err.message}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -208,8 +206,8 @@ export default function CsvImportPage() {
                 </div>
               </div>
             ) : (
-              <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-lg flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <div className="p-3 bg-stable-bg text-stable-text text-xs rounded-lg flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-stable" />
                 All {report.validRows} rows passed schema validation and are ready for database commit.
               </div>
             )}

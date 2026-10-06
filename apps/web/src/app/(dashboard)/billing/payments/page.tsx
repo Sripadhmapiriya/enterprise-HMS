@@ -40,30 +40,30 @@ export default function PaymentsList() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <CreditCard className="w-6 h-6 text-sky-600" />
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Payments & Receipts</h1>
+            <CreditCard className="w-6 h-6 text-info" />
+            <h1 className="text-2xl font-bold text-text tracking-tight">Payments & Receipts</h1>
           </div>
-          <p className="text-slate-500 mt-1">Audit trail of point-of-sale collections, digital transactions, and payment receipts</p>
+          <p className="text-text-muted mt-1">Audit trail of point-of-sale collections, digital transactions, and payment receipts</p>
         </div>
         <Button variant="secondary" onClick={() => loadPayments()} disabled={loading}>
-          <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ?'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border bg-surface-subtle/60 flex items-center justify-between">
           <Input
             placeholder="Search by Receipt #, Patient, or Bill #..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full sm:w-80 bg-white"
+            className="w-full sm:w-80 bg-surface"
           />
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3.5">Receipt # / Date</th>
                 <th className="px-5 py-3.5">Patient</th>
@@ -74,28 +74,28 @@ export default function PaymentsList() {
                 <th className="px-5 py-3.5 text-right">Receipt PDF</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border">
               {filteredPayments.map((p) => (
-                <tr key={p.id} className="hover:bg-slate-50/60 transition-colors">
+                <tr key={p.id} className="hover:bg-surface-subtle/60 transition-colors">
                   <td className="px-5 py-3.5">
-                    <span className="font-bold font-mono text-slate-900">{p.receiptNumber}</span>
-                    <div className="text-xs text-slate-500">{new Date(p.paymentDate).toLocaleString()}</div>
+                    <span className="font-bold font-mono text-text">{p.receiptNumber}</span>
+                    <div className="text-xs text-text-muted">{new Date(p.paymentDate).toLocaleString()}</div>
                   </td>
-                  <td className="px-5 py-3.5 font-semibold text-slate-900">
+                  <td className="px-5 py-3.5 font-semibold text-text">
                     {p.patient ? `${p.patient.firstName} ${p.patient.lastName}` : 'Walk-in'}
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-xs text-slate-700">
+                  <td className="px-5 py-3.5 font-mono text-xs text-text">
                     {p.bill?.billNumber || 'Direct Payment'}
                   </td>
                   <td className="px-5 py-3.5">
-                    <span className="font-semibold text-slate-800 text-xs px-2 py-0.5 rounded bg-slate-100">
+                    <span className="font-semibold text-text text-xs px-2 py-0.5 rounded bg-surface-subtle">
                       {p.paymentMethod}
                     </span>
                     {p.transactionRef && (
-                      <div className="text-xs text-slate-500 font-mono mt-0.5">{p.transactionRef}</div>
+                      <div className="text-xs text-text-muted font-mono mt-0.5">{p.transactionRef}</div>
                     )}
                   </td>
-                  <td className="px-5 py-3.5 text-right font-bold text-emerald-600 tabular-nums">
+                  <td className="px-5 py-3.5 text-right font-bold text-stable tabular-nums">
                     ${(p.amount || 0).toFixed(2)}
                   </td>
                   <td className="px-5 py-3.5">
@@ -108,7 +108,7 @@ export default function PaymentsList() {
                       href={billingApi.getReceiptPdfUrl(p.id)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50"
+                      className="inline-flex items-center text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-border text-text hover:bg-surface-subtle"
                     >
                       <Download className="w-3.5 h-3.5 mr-1" />
                       Receipt
@@ -118,7 +118,7 @@ export default function PaymentsList() {
               ))}
               {filteredPayments.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-sm text-slate-500">
+                  <td colSpan={7} className="px-5 py-8 text-center text-sm text-text-muted">
                     No payment receipts found.
                   </td>
                 </tr>

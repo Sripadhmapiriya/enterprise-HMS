@@ -70,64 +70,64 @@ export default function BedBoardPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Inpatient Bed Board</h1>
-          <p className="text-slate-500 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-text tracking-tight">Inpatient Bed Board</h1>
+          <p className="text-text-muted text-sm mt-0.5">
             Real-time visual telemetry of beds, occupancy, and environmental cleaning states.
           </p>
         </div>
         <Link
           href="/ipd/admissions"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 shadow-sm"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-brand-foreground bg-brand hover:bg-brand-hover shadow-sm"
         >
           View Admissions
         </Link>
       </div>
 
       {actionSuccess && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-lg flex justify-between items-center">
+        <div className="p-3 bg-stable-bg border border-stable-border text-stable-text text-xs rounded-lg flex justify-between items-center">
           <span>{actionSuccess}</span>
-          <button onClick={() => setActionSuccess('')} className="text-emerald-600 font-bold">x</button>
+          <button onClick={() => setActionSuccess('')} className="text-stable font-bold">x</button>
         </div>
       )}
       {actionError && (
-        <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-lg flex justify-between items-center">
+        <div className="p-3 bg-critical-bg border border-critical-border text-critical-text text-xs rounded-lg flex justify-between items-center">
           <span>{actionError}</span>
-          <button onClick={() => setActionError('')} className="text-rose-600 font-bold">x</button>
+          <button onClick={() => setActionError('')} className="text-critical font-bold">x</button>
         </div>
       )}
 
       {/* Overview Stat Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-medium uppercase">Total Beds</p>
-          <p className="text-xl font-bold text-slate-900 mt-1">{bedBoard?.totalBeds ?? 0}</p>
+        <div className="bg-surface p-4 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-medium uppercase">Total Beds</p>
+          <p className="text-xl font-bold text-text mt-1">{bedBoard?.totalBeds ?? 0}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-medium uppercase">Available</p>
-          <p className="text-xl font-bold text-emerald-600 mt-1">{bedBoard?.availableBeds ?? 0}</p>
+        <div className="bg-surface p-4 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-medium uppercase">Available</p>
+          <p className="text-xl font-bold text-stable mt-1">{bedBoard?.availableBeds ?? 0}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-medium uppercase">Occupied</p>
-          <p className="text-xl font-bold text-rose-600 mt-1">{bedBoard?.occupiedBeds ?? 0}</p>
+        <div className="bg-surface p-4 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-medium uppercase">Occupied</p>
+          <p className="text-xl font-bold text-critical mt-1">{bedBoard?.occupiedBeds ?? 0}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-medium uppercase">Cleaning</p>
-          <p className="text-xl font-bold text-amber-600 mt-1">{bedBoard?.cleaningBeds ?? 0}</p>
+        <div className="bg-surface p-4 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-medium uppercase">Cleaning</p>
+          <p className="text-xl font-bold text-warning mt-1">{bedBoard?.cleaningBeds ?? 0}</p>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-medium uppercase">Occupancy</p>
-          <p className="text-xl font-bold text-blue-600 mt-1">{bedBoard?.occupancyRate ?? 0}%</p>
+        <div className="bg-surface p-4 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-medium uppercase">Occupancy</p>
+          <p className="text-xl font-bold text-info mt-1">{bedBoard?.occupancyRate ?? 0}%</p>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-wrap items-center gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-wrap items-center gap-3 bg-surface p-3 rounded-xl border border-border shadow-sm">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ward:</span>
+          <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">Ward:</span>
           <select
             value={selectedWardId}
             onChange={(e) => setSelectedWardId(e.target.value)}
-            className="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+            className="px-3 py-1.5 border border-border rounded-lg text-xs font-medium focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
           >
             <option value="ALL">All Wards ({wards.length})</option>
             {wards.map((w: any) => (
@@ -139,11 +139,11 @@ export default function BedBoardPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status:</span>
+          <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">Status:</span>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+            className="px-3 py-1.5 border border-border rounded-lg text-xs font-medium focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
           >
             <option value="ALL">All Bed States</option>
             <option value="AVAILABLE">Available</option>
@@ -156,11 +156,11 @@ export default function BedBoardPage() {
 
       {/* Bed Grid by Ward */}
       {loading ? (
-        <div className="p-12 text-center text-slate-400 bg-white rounded-xl border border-slate-200">
+        <div className="p-12 text-center text-text-muted bg-surface rounded-xl border border-border">
           Loading bed board telemetry...
         </div>
       ) : filteredWards.length === 0 ? (
-        <div className="p-12 text-center text-slate-400 bg-white rounded-xl border border-slate-200">
+        <div className="p-12 text-center text-text-muted bg-surface rounded-xl border border-border">
           No wards or beds configured.
         </div>
       ) : (
@@ -170,19 +170,19 @@ export default function BedBoardPage() {
             : w.beds.filter((b: any) => b.status === statusFilter);
 
           return (
-            <div key={w.wardId} className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+            <div key={w.wardId} className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-border bg-surface-subtle flex justify-between items-center">
                 <div>
-                  <h3 className="font-semibold text-slate-900">{w.wardName}</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <h3 className="font-semibold text-text">{w.wardName}</h3>
+                  <p className="text-xs text-text-muted mt-0.5">
                     Type: {w.wardType} • Occupancy: {w.occupiedBeds} / {w.totalBeds} ({w.occupancyRate}%)
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-medium">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-stable-bg text-stable-text font-medium">
                     {w.availableBeds} Avail
                   </span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-medium">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-critical-bg text-critical-text font-medium">
                     {w.occupiedBeds} Occ
                   </span>
                 </div>
@@ -190,7 +190,7 @@ export default function BedBoardPage() {
 
               <div className="p-5">
                 {displayedBeds.length === 0 ? (
-                  <p className="text-xs text-slate-400 py-4 text-center">
+                  <p className="text-xs text-text-muted py-4 text-center">
                     No beds matching filter in this ward.
                   </p>
                 ) : (
@@ -204,64 +204,60 @@ export default function BedBoardPage() {
                       return (
                         <div
                           key={bed.bedId}
-                          className={`p-3 rounded-lg border flex flex-col justify-between transition-shadow hover:shadow-md ${
-                            isOccupied
-                              ? 'bg-rose-50/40 border-rose-200 text-rose-950'
+                          className={`p-3 rounded-lg border flex flex-col justify-between transition-shadow hover:shadow-md ${ isOccupied ?'bg-critical-bg/40 border-critical-border text-critical-text'
                               : isAvailable
-                              ? 'bg-emerald-50/40 border-emerald-200 text-emerald-950'
+                              ? 'bg-stable-bg/40 border-stable-border text-stable-text'
                               : isCleaning
-                              ? 'bg-amber-50/50 border-amber-200 text-amber-950'
-                              : 'bg-slate-100 border-slate-300 text-slate-800'
+                              ? 'bg-warning-bg/50 border-warning-border text-warning-text'
+                              : 'bg-surface-subtle border-border text-text'
                           }`}
                         >
                           <div>
                             <div className="flex justify-between items-start">
                               <span className="font-mono font-bold text-sm">{bed.bedNumber}</span>
                               <span
-                                className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${
-                                  isOccupied
-                                    ? 'bg-rose-200 text-rose-900'
+                                className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${ isOccupied ?'bg-critical-bg text-critical-text'
                                     : isAvailable
-                                    ? 'bg-emerald-200 text-emerald-900'
+                                    ? 'bg-stable-bg text-stable-text'
                                     : isCleaning
-                                    ? 'bg-amber-200 text-amber-900'
-                                    : 'bg-slate-200 text-slate-800'
+                                    ? 'bg-warning-bg text-warning-text'
+                                    : 'bg-surface-subtle text-text'
                                 }`}
                               >
                                 {bed.status}
                               </span>
                             </div>
 
-                            <p className="text-[11px] text-slate-500 mt-1">{bed.bedType}</p>
+                            <p className="text-[11px] text-text-muted mt-1">{bed.bedType}</p>
 
                             {bed.patient ? (
-                              <div className="mt-2 pt-2 border-t border-rose-100">
-                                <p className="font-semibold text-xs text-slate-900 truncate">
+                              <div className="mt-2 pt-2 border-t border-critical-border">
+                                <p className="font-semibold text-xs text-text truncate">
                                   {bed.patient.name}
                                 </p>
-                                <p className="text-[10px] text-slate-500">
+                                <p className="text-[10px] text-text-muted">
                                   MRN: {bed.patient.mrn}
                                 </p>
                                 {bed.admissionId && (
                                   <Link
                                     href={`/ipd/chart/${bed.admissionId}`}
-                                    className="text-[11px] font-semibold text-blue-600 hover:underline block mt-1"
+                                    className="text-[11px] font-semibold text-info hover:underline block mt-1"
                                   >
                                     Chart & MAR →
                                   </Link>
                                 )}
                               </div>
                             ) : (
-                              <p className="text-[11px] text-slate-400 mt-2 italic">Unoccupied</p>
+                              <p className="text-[11px] text-text-muted mt-2 italic">Unoccupied</p>
                             )}
                           </div>
 
                           {/* Quick Actions */}
-                          <div className="mt-3 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
+                          <div className="mt-3 pt-2 border-t border-border/60 flex items-center justify-between text-[11px]">
                             {isAvailable && (
                               <button
                                 onClick={() => handleRequestCleaning(bed.bedId, w.wardId)}
-                                className="text-slate-600 hover:text-slate-900 font-medium"
+                                className="text-text-muted hover:text-text font-medium"
                               >
                                 Mark Clean
                               </button>
@@ -269,7 +265,7 @@ export default function BedBoardPage() {
                             {isCleaning && (
                               <button
                                 onClick={() => handleUpdateStatus(bed.bedId, 'AVAILABLE')}
-                                className="text-emerald-700 hover:text-emerald-900 font-semibold"
+                                className="text-stable-text hover:text-stable-text font-semibold"
                               >
                                 Certify Available
                               </button>
@@ -277,7 +273,7 @@ export default function BedBoardPage() {
                             {!isOccupied && !isMaintenance && (
                               <button
                                 onClick={() => handleUpdateStatus(bed.bedId, 'MAINTENANCE')}
-                                className="text-slate-500 hover:text-slate-700"
+                                className="text-text-muted hover:text-text"
                               >
                                 Maintenance
                               </button>
@@ -285,7 +281,7 @@ export default function BedBoardPage() {
                             {isMaintenance && (
                               <button
                                 onClick={() => handleUpdateStatus(bed.bedId, 'AVAILABLE')}
-                                className="text-emerald-700 hover:text-emerald-900 font-semibold"
+                                className="text-stable-text hover:text-stable-text font-semibold"
                               >
                                 Restore
                               </button>

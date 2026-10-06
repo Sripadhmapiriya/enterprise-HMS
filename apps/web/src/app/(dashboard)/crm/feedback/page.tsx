@@ -139,10 +139,10 @@ export default function PatientCrmDashboard() {
       {/* Top Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-text">
             Patient CRM & Experience Desk
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-text-muted mt-1">
             Patient satisfaction feedback, 48-hour complaint SLA escalation tracker, and Net Promoter Score (NPS) analytics.
           </p>
         </div>
@@ -150,14 +150,14 @@ export default function PatientCrmDashboard() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-text bg-surface border border-border rounded-lg hover:bg-surface-subtle"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ?'animate-spin' : ''}`} />
             Refresh
           </button>
           <button
             onClick={() => setIsNewFeedbackOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-foreground bg-brand rounded-lg hover:bg-brand-hover shadow-sm"
           >
             <Plus className="w-4 h-4" />
             Log Feedback
@@ -167,72 +167,71 @@ export default function PatientCrmDashboard() {
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Net Promoter Score</p>
-            <p className={`text-2xl font-bold mt-1 ${npsScore >= 50 ? 'text-emerald-600' : npsScore >= 0 ? 'text-blue-600' : 'text-rose-600'}`}>
+            <p className="text-xs font-medium text-text-muted uppercase">Net Promoter Score</p>
+            <p className={`text-2xl font-bold mt-1 ${npsScore >= 50 ?'text-stable' : npsScore >= 0 ? 'text-info' : 'text-critical'}`}>
               {npsScore > 0 ? `+${npsScore}` : npsScore}
             </p>
-            <p className="text-xs text-slate-500 mt-1">Based on patient promoter %</p>
+            <p className="text-xs text-text-muted mt-1">Based on patient promoter %</p>
           </div>
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+          <div className="p-3 bg-stable-bg text-stable rounded-lg">
             <Smile className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Average Patient Rating</p>
+            <p className="text-xs font-medium text-text-muted uppercase">Average Patient Rating</p>
             <div className="flex items-center gap-1.5 mt-1">
-              <span className="text-2xl font-bold text-slate-900">{averageRating.toFixed(1)}</span>
-              <div className="flex text-amber-400">
+              <span className="text-2xl font-bold text-text">{averageRating.toFixed(1)}</span>
+              <div className="flex text-warning">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={`w-4 h-4 ${star <= Math.round(averageRating) ? 'fill-current' : 'text-slate-200'}`}
+                    className={`w-4 h-4 ${star <= Math.round(averageRating) ?'fill-current' : 'text-text-muted'}`}
                   />
                 ))}
               </div>
             </div>
-            <p className="text-xs text-slate-500 mt-1">Out of 5.0 stars</p>
+            <p className="text-xs text-text-muted mt-1">Out of 5.0 stars</p>
           </div>
-          <div className="p-3 bg-amber-50 text-amber-600 rounded-lg">
+          <div className="p-3 bg-warning-bg text-warning rounded-lg">
             <Star className="w-6 h-6 fill-current" />
           </div>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Open Inquiries / Grievances</p>
-            <p className="text-2xl font-bold text-slate-900 mt-1">{openComplaints}</p>
-            <p className="text-xs text-slate-500 mt-1">Active resolution queue</p>
+            <p className="text-xs font-medium text-text-muted uppercase">Open Inquiries / Grievances</p>
+            <p className="text-2xl font-bold text-text mt-1">{openComplaints}</p>
+            <p className="text-xs text-text-muted mt-1">Active resolution queue</p>
           </div>
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+          <div className="p-3 bg-info-bg text-info rounded-lg">
             <MessageSquare className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">48h SLA Escalations</p>
-            <p className="text-2xl font-bold text-rose-600 mt-1">{slaBreaches}</p>
-            <p className="text-xs text-rose-600 mt-1">Unresolved &gt; 48 hours</p>
+            <p className="text-xs font-medium text-text-muted uppercase">48h SLA Escalations</p>
+            <p className="text-2xl font-bold text-critical mt-1">{slaBreaches}</p>
+            <p className="text-xs text-critical mt-1">Unresolved &gt; 48 hours</p>
           </div>
-          <div className="p-3 bg-rose-50 text-rose-600 rounded-lg">
+          <div className="p-3 bg-critical-bg text-critical rounded-lg">
             <ShieldAlert className="w-6 h-6" />
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-slate-200 bg-white rounded-t-xl px-4 pt-3">
+      <div className="border-b border-border bg-surface rounded-t-xl px-4 pt-3">
         <div className="flex space-x-6">
           <button
             onClick={() => setActiveTab('feed')}
-            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${
-              activeTab === 'feed'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${ activeTab ==='feed'
+                ? 'border-brand text-brand'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             <MessageSquare className="w-4 h-4" />
@@ -240,26 +239,24 @@ export default function PatientCrmDashboard() {
           </button>
           <button
             onClick={() => setActiveTab('escalations')}
-            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${
-              activeTab === 'escalations'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${ activeTab ==='escalations'
+                ? 'border-brand text-brand'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             <ShieldAlert className="w-4 h-4" />
             48h SLA Escalation Watch
             {slaBreaches > 0 && (
-              <span className="px-2 py-0.5 text-xs bg-rose-100 text-rose-800 rounded-full font-bold">
+              <span className="px-2 py-0.5 text-xs bg-critical-bg text-critical-text rounded-full font-bold">
                 {slaBreaches} Breached
               </span>
             )}
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${
-              activeTab === 'analytics'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${ activeTab ==='analytics'
+                ? 'border-brand text-brand'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             <TrendingUp className="w-4 h-4" />
@@ -270,12 +267,12 @@ export default function PatientCrmDashboard() {
 
       {/* Error Banner */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 flex items-center justify-between">
+        <div className="p-4 bg-critical-bg border border-critical-border rounded-xl text-critical-text flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 text-red-600" />
+            <AlertTriangle className="w-5 h-5 text-critical" />
             <span className="text-sm font-medium">{error}</span>
           </div>
-          <button onClick={loadData} className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-800 rounded text-xs font-semibold">
+          <button onClick={loadData} className="px-3 py-1 bg-critical-bg hover:bg-critical-bg text-critical-text rounded text-xs font-semibold">
             Retry
           </button>
         </div>
@@ -284,23 +281,23 @@ export default function PatientCrmDashboard() {
       {/* TAB 1: FEEDBACK FEED */}
       {activeTab === 'feed' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-3 border border-slate-200 rounded-xl">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 bg-surface p-3 border border-border rounded-xl">
             <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Search className="w-4 h-4 text-text-muted absolute left-3 top-3" />
               <input
                 type="text"
                 placeholder="Search feedback comments, category or patient..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-9 pr-3 py-1.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand"
               />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-500 uppercase">Category:</span>
+              <span className="text-xs font-semibold text-text-muted uppercase">Category:</span>
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-3 py-1.5 text-xs border rounded-lg bg-white"
+                className="px-3 py-1.5 text-xs border rounded-lg bg-surface"
               >
                 <option value="ALL">All Categories</option>
                 <option value="NURSING_CARE">Nursing Care</option>
@@ -313,9 +310,9 @@ export default function PatientCrmDashboard() {
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+            <table className="w-full text-left text-sm text-text-muted">
+              <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                 <tr>
                   <th className="px-6 py-4">Patient</th>
                   <th className="px-6 py-4">Rating</th>
@@ -325,54 +322,53 @@ export default function PatientCrmDashboard() {
                   <th className="px-6 py-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {filteredFeed.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                    <td colSpan={6} className="px-6 py-12 text-center text-text-muted">
                       No patient feedback matching current criteria.
                     </td>
                   </tr>
                 ) : (
                   filteredFeed.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50/80 align-top">
+                    <tr key={item.id} className="hover:bg-surface-subtle/80 align-top">
                       <td className="px-6 py-4">
-                        <div className="font-semibold text-slate-800">
+                        <div className="font-semibold text-text">
                           {item.patient ? `${item.patient.firstName || ''} ${item.patient.lastName || ''}` : 'Anonymous Patient'}
                         </div>
                         {item.patient?.mrn && (
-                          <div className="text-xs font-mono text-slate-400">{item.patient.mrn}</div>
+                          <div className="text-xs font-mono text-text-muted">{item.patient.mrn}</div>
                         )}
-                        <div className="text-xs text-slate-400 mt-1">
+                        <div className="text-xs text-text-muted mt-1">
                           {new Date(item.createdAt).toLocaleDateString()}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-1 text-amber-500 font-bold">
+                        <div className="flex items-center gap-1 text-warning font-bold">
                           <span>{item.rating}</span>
                           <Star className="w-4 h-4 fill-current" />
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="px-2.5 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800">
+                        <span className="px-2.5 py-0.5 rounded text-xs font-medium bg-surface-subtle text-text">
                           {item.category}
                         </span>
                       </td>
                       <td className="px-6 py-4 max-w-sm">
-                        <div className="text-slate-800 text-xs italic">&quot;{item.comments}&quot;</div>
+                        <div className="text-text text-xs italic">&quot;{item.comments}&quot;</div>
                         {item.resolutionNotes && (
-                          <div className="text-xs text-emerald-700 mt-1.5 bg-emerald-50 p-1.5 rounded">
+                          <div className="text-xs text-stable-text mt-1.5 bg-stable-bg p-1.5 rounded">
                             <span className="font-semibold">Resolution: </span>
                             {item.resolutionNotes}
                           </div>
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                          item.status === 'RESOLVED' || item.status === 'CLOSED'
-                            ? 'bg-emerald-100 text-emerald-800'
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${ item.status ==='RESOLVED' || item.status === 'CLOSED'
+                            ? 'bg-stable-bg text-stable-text'
                             : item.status === 'IN_PROGRESS'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-amber-100 text-amber-800'
+                            ? 'bg-info-bg text-info-text'
+                            : 'bg-warning-bg text-warning-text'
                         }`}>
                           {item.status}
                         </span>
@@ -384,7 +380,7 @@ export default function PatientCrmDashboard() {
                               setSelectedFeedback(item);
                               setIsResolveModalOpen(true);
                             }}
-                            className="px-2.5 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 rounded"
+                            className="px-2.5 py-1 text-xs font-semibold text-brand hover:bg-surface-subtle rounded"
                           >
                             Resolve
                           </button>
@@ -402,19 +398,19 @@ export default function PatientCrmDashboard() {
       {/* TAB 2: SLA ESCALATIONS */}
       {activeTab === 'escalations' && (
         <div className="space-y-4">
-          <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 flex items-start gap-3">
-            <ShieldAlert className="w-5 h-5 text-rose-600 mt-0.5" />
+          <div className="p-4 bg-critical-bg border border-critical-border rounded-xl text-critical-text flex items-start gap-3">
+            <ShieldAlert className="w-5 h-5 text-critical mt-0.5" />
             <div>
               <h2 className="text-sm font-bold">Patient Grievance 48-Hour SLA Watchlist</h2>
-              <p className="text-xs text-rose-700 mt-0.5">
+              <p className="text-xs text-critical-text mt-0.5">
                 The complaints listed below were logged more than 48 hours ago and have not been resolved. Clinical ombudsman intervention is required.
               </p>
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+            <table className="w-full text-left text-sm text-text-muted">
+              <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                 <tr>
                   <th className="px-6 py-4">Patient</th>
                   <th className="px-6 py-4">Logged At</th>
@@ -423,10 +419,10 @@ export default function PatientCrmDashboard() {
                   <th className="px-6 py-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {escalations.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                    <td colSpan={5} className="px-6 py-12 text-center text-text-muted">
                       Zero SLA breaches! All patient feedback is being addressed within 48 hours.
                     </td>
                   </tr>
@@ -434,18 +430,18 @@ export default function PatientCrmDashboard() {
                   escalations.map((item) => {
                     const hoursAgo = Math.floor((Date.now() - new Date(item.createdAt).getTime()) / (1000 * 60 * 60));
                     return (
-                      <tr key={item.id} className="hover:bg-slate-50/80">
-                        <td className="px-6 py-4 font-semibold text-slate-800">
+                      <tr key={item.id} className="hover:bg-surface-subtle/80">
+                        <td className="px-6 py-4 font-semibold text-text">
                           {item.patient ? `${item.patient.firstName || ''} ${item.patient.lastName || ''}` : 'Anonymous'}
-                          <span className="block text-xs font-normal text-slate-400 font-mono">
+                          <span className="block text-xs font-normal text-text-muted font-mono">
                             {item.patient?.mrn || 'WALK-IN'}
                           </span>
                         </td>
                         <td className="px-6 py-4">{new Date(item.createdAt).toLocaleString()}</td>
-                        <td className="px-6 py-4 font-mono font-bold text-rose-600">
+                        <td className="px-6 py-4 font-mono font-bold text-critical">
                           {hoursAgo}h (Overdue)
                         </td>
-                        <td className="px-6 py-4 max-w-sm text-xs text-slate-700">
+                        <td className="px-6 py-4 max-w-sm text-xs text-text">
                           &quot;{item.comments}&quot;
                         </td>
                         <td className="px-6 py-4 text-right">
@@ -454,7 +450,7 @@ export default function PatientCrmDashboard() {
                               setSelectedFeedback(item);
                               setIsResolveModalOpen(true);
                             }}
-                            className="px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm"
+                            className="px-3 py-1.5 text-xs font-semibold text-brand-foreground bg-critical hover:bg-critical rounded-lg shadow-sm"
                           >
                             Expedite & Resolve
                           </button>
@@ -474,45 +470,45 @@ export default function PatientCrmDashboard() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Promoters */}
-            <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-sm text-center">
-              <Smile className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
-              <div className="text-3xl font-bold text-emerald-600 font-mono">
+            <div className="p-6 bg-surface border border-border rounded-xl shadow-sm text-center">
+              <Smile className="w-10 h-10 text-stable mx-auto mb-2" />
+              <div className="text-3xl font-bold text-stable font-mono">
                 {analytics?.promoters ?? 0}
               </div>
-              <div className="text-sm font-bold text-slate-800 mt-1">Promoters (Rating 5)</div>
-              <p className="text-xs text-slate-400 mt-1">Highly satisfied advocates</p>
+              <div className="text-sm font-bold text-text mt-1">Promoters (Rating 5)</div>
+              <p className="text-xs text-text-muted mt-1">Highly satisfied advocates</p>
             </div>
 
             {/* Passives */}
-            <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-sm text-center">
-              <Meh className="w-10 h-10 text-amber-500 mx-auto mb-2" />
-              <div className="text-3xl font-bold text-amber-600 font-mono">
+            <div className="p-6 bg-surface border border-border rounded-xl shadow-sm text-center">
+              <Meh className="w-10 h-10 text-warning mx-auto mb-2" />
+              <div className="text-3xl font-bold text-warning font-mono">
                 {analytics?.passives ?? 0}
               </div>
-              <div className="text-sm font-bold text-slate-800 mt-1">Passives (Rating 4)</div>
-              <p className="text-xs text-slate-400 mt-1">Satisfied but unenthusiastic</p>
+              <div className="text-sm font-bold text-text mt-1">Passives (Rating 4)</div>
+              <p className="text-xs text-text-muted mt-1">Satisfied but unenthusiastic</p>
             </div>
 
             {/* Detractors */}
-            <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-sm text-center">
-              <Frown className="w-10 h-10 text-rose-600 mx-auto mb-2" />
-              <div className="text-3xl font-bold text-rose-600 font-mono">
+            <div className="p-6 bg-surface border border-border rounded-xl shadow-sm text-center">
+              <Frown className="w-10 h-10 text-critical mx-auto mb-2" />
+              <div className="text-3xl font-bold text-critical font-mono">
                 {analytics?.detractors ?? 0}
               </div>
-              <div className="text-sm font-bold text-slate-800 mt-1">Detractors (Rating 1-3)</div>
-              <p className="text-xs text-slate-400 mt-1">Dissatisfied patients requiring outreach</p>
+              <div className="text-sm font-bold text-text mt-1">Detractors (Rating 1-3)</div>
+              <p className="text-xs text-text-muted mt-1">Dissatisfied patients requiring outreach</p>
             </div>
           </div>
 
           {/* Feedback by Category Breakdown */}
           {analytics?.byCategory && (
-            <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-4">
-              <h2 className="text-sm font-bold text-slate-900">Feedback Volume by Category</h2>
+            <div className="bg-surface border border-border rounded-xl shadow-sm p-6 space-y-4">
+              <h2 className="text-sm font-bold text-text">Feedback Volume by Category</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {Object.entries(analytics.byCategory).map(([cat, count]: [string, any]) => (
-                  <div key={cat} className="p-3 bg-slate-50 border rounded-lg">
-                    <span className="text-xs text-slate-500 uppercase font-semibold">{cat.replace(/_/g, ' ')}</span>
-                    <p className="text-lg font-bold text-slate-900 font-mono mt-1">{count} reviews</p>
+                  <div key={cat} className="p-3 bg-surface-subtle border rounded-lg">
+                    <span className="text-xs text-text-muted uppercase font-semibold">{cat.replace(/_/g, ' ')}</span>
+                    <p className="text-lg font-bold text-text font-mono mt-1">{count} reviews</p>
                   </div>
                 ))}
               </div>
@@ -523,12 +519,12 @@ export default function PatientCrmDashboard() {
 
       {/* MODAL 1: RECORD FEEDBACK */}
       {isNewFeedbackOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h2 className="text-lg font-bold text-slate-900">Log Patient Experience / Feedback</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
+          <div className="bg-surface rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-lg font-bold text-text">Log Patient Experience / Feedback</h2>
             <form onSubmit={handleSubmitFeedback} className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-slate-700">Patient (Optional for anonymous)</label>
+                <label className="text-xs font-semibold text-text">Patient (Optional for anonymous)</label>
                 <select
                   value={feedbackForm.patientId}
                   onChange={(e) => setFeedbackForm({ ...feedbackForm, patientId: e.target.value })}
@@ -544,7 +540,7 @@ export default function PatientCrmDashboard() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Overall Rating (1 - 5 Stars)</label>
+                <label className="text-xs font-semibold text-text">Overall Rating (1 - 5 Stars)</label>
                 <div className="flex gap-2 items-center mt-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -554,8 +550,7 @@ export default function PatientCrmDashboard() {
                       className="p-1 hover:scale-110 transition-transform"
                     >
                       <Star
-                        className={`w-7 h-7 ${
-                          star <= feedbackForm.rating ? 'text-amber-400 fill-current' : 'text-slate-200'
+                        className={`w-7 h-7 ${ star <= feedbackForm.rating ?'text-warning fill-current' : 'text-text-muted'
                         }`}
                       />
                     </button>
@@ -564,7 +559,7 @@ export default function PatientCrmDashboard() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Category</label>
+                <label className="text-xs font-semibold text-text">Category</label>
                 <select
                   value={feedbackForm.category}
                   onChange={(e) => setFeedbackForm({ ...feedbackForm, category: e.target.value })}
@@ -580,7 +575,7 @@ export default function PatientCrmDashboard() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Patient Comments</label>
+                <label className="text-xs font-semibold text-text">Patient Comments</label>
                 <textarea
                   required
                   rows={3}
@@ -595,13 +590,13 @@ export default function PatientCrmDashboard() {
                 <button
                   type="button"
                   onClick={() => setIsNewFeedbackOpen(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-sm text-text-muted hover:bg-surface-subtle rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow"
+                  className="px-4 py-2 text-sm font-semibold text-brand-foreground bg-brand hover:bg-brand-hover rounded-lg shadow"
                 >
                   Submit Feedback
                 </button>
@@ -613,16 +608,16 @@ export default function PatientCrmDashboard() {
 
       {/* MODAL 2: RESOLVE FEEDBACK */}
       {isResolveModalOpen && selectedFeedback && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h2 className="text-lg font-bold text-slate-900">Resolve Patient Feedback / Grievance</h2>
-            <div className="p-3 bg-slate-50 border rounded-lg text-xs space-y-1">
-              <span className="font-semibold text-slate-800">Original Comment:</span>
-              <p className="text-slate-600 italic">&quot;{selectedFeedback.comments}&quot;</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
+          <div className="bg-surface rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-lg font-bold text-text">Resolve Patient Feedback / Grievance</h2>
+            <div className="p-3 bg-surface-subtle border rounded-lg text-xs space-y-1">
+              <span className="font-semibold text-text">Original Comment:</span>
+              <p className="text-text-muted italic">&quot;{selectedFeedback.comments}&quot;</p>
             </div>
             <form onSubmit={handleResolveFeedback} className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-slate-700">Resolution Status</label>
+                <label className="text-xs font-semibold text-text">Resolution Status</label>
                 <select
                   value={resolveForm.status}
                   onChange={(e) => setResolveForm({ ...resolveForm, status: e.target.value })}
@@ -635,7 +630,7 @@ export default function PatientCrmDashboard() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Action Taken / Resolution Summary</label>
+                <label className="text-xs font-semibold text-text">Action Taken / Resolution Summary</label>
                 <textarea
                   required
                   rows={3}
@@ -649,13 +644,13 @@ export default function PatientCrmDashboard() {
                 <button
                   type="button"
                   onClick={() => setIsResolveModalOpen(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-sm text-text-muted hover:bg-surface-subtle rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow"
+                  className="px-4 py-2 text-sm font-semibold text-brand-foreground bg-stable hover:bg-stable rounded-lg shadow"
                 >
                   Record Resolution
                 </button>

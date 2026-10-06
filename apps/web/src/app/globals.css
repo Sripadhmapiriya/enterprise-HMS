@@ -1,46 +1,64 @@
 @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
+@import "../../../../packages/ui/src/tokens.css";
 
-:root {
-  /* Design Tokens from ui-ux-pro-max MASTER.md */
-  --font-family-sans: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-family-mono: 'JetBrains Mono', monospace;
+/* Configure Tailwind v4 class-based dark variant */
+@custom-variant dark (&:where(.dark, .dark *));
 
-  /* Surfaces & Canvas */
-  --background: #F8FAFC;
-  --foreground: #0F172A;
-  --surface: #FFFFFF;
-  --surface-border: #E2E8F0;
+@theme {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
 
-  /* Brand Colors */
-  --primary: #0891B2;
-  --primary-hover: #0E7490;
-  --secondary: #22D3EE;
-  --accent: #059669;
-  --accent-hover: #047857;
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-muted: var(--text-muted);
+  --color-subtle: var(--text-subtle);
+  --color-foreground: var(--text);
 
-  /* Clinical Semantics */
-  --clinical-critical: #DC2626;
-  --clinical-warning: #D97706;
-  --clinical-stable: #059669;
-  --clinical-info: #0891B2;
-  --clinical-neutral: #64748B;
-}
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-primary: var(--brand);
+  --color-primary-hover: var(--brand-hover);
+  --color-primary-fg: var(--brand-foreground);
+  --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
 
-[data-theme='dark'] {
-  --background: #090D16;
-  --foreground: #F8FAFC;
-  --surface: #0F172A;
-  --surface-border: #1E293B;
+  --color-critical: var(--critical);
+  --color-critical-bg: var(--critical-bg);
+  --color-critical-border: var(--critical-border);
+  --color-critical-text: var(--critical-text);
 
-  --primary: #0891B2;
-  --secondary: #22D3EE;
-  --accent: #10B981;
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-border: var(--warning-border);
+  --color-warning-text: var(--warning-text);
+
+  --color-stable: var(--stable);
+  --color-stable-bg: var(--stable-bg);
+  --color-stable-border: var(--stable-border);
+  --color-stable-text: var(--stable-text);
+
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --color-info-border: var(--info-border);
+  --color-info-text: var(--info-text);
+
+  --color-neutral: var(--neutral);
+  --color-neutral-bg: var(--neutral-bg);
+  --color-neutral-border: var(--neutral-border);
+  --color-neutral-text: var(--neutral-text);
 }
 
 body {
   background-color: var(--background);
-  color: var(--foreground);
+  color: var(--text);
   font-family: var(--font-family-sans);
   -webkit-font-smoothing: antialiased;
 }
@@ -53,43 +71,6 @@ body {
 
 /* Accessible focus ring style */
 *:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
-}
-
-/* Custom Thin Dark Scrollbar on hover */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-  transition: scrollbar-color 200ms ease;
-}
-.custom-scrollbar:hover {
-  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
-}
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: transparent;
-  border-radius: 9999px;
-  transition: background-color 200ms ease;
-}
-.custom-scrollbar:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(148, 163, 184, 0.35);
-}
-.custom-scrollbar:hover::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(148, 163, 184, 0.6);
-}
-
-/* Reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
 }

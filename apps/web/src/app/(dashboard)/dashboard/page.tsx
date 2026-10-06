@@ -93,8 +93,8 @@ export default function DashboardPage() {
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Enterprise Overview</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <h1 className="text-xl font-bold text-text tracking-tight">Enterprise Overview</h1>
+          <p className="text-xs text-text-muted mt-0.5">
             Real-time status across hospital branches, departments, and active clinical sessions.
           </p>
         </div>
@@ -103,7 +103,7 @@ export default function DashboardPage() {
             <Button
               variant="outline"
               size="sm"
-              leftIcon={<Calendar className="w-3.5 h-3.5 text-slate-500" aria-hidden="true" />}
+              leftIcon={<Calendar className="w-3.5 h-3.5 text-text-muted" aria-hidden="true" />}
             >
               Appointments
             </Button>
@@ -112,7 +112,7 @@ export default function DashboardPage() {
             <Button
               variant="primary"
               size="sm"
-              leftIcon={<Users className="w-3.5 h-3.5 text-white" aria-hidden="true" />}
+              leftIcon={<Users className="w-3.5 h-3.5 text-brand-foreground" aria-hidden="true" />}
             >
               Register Patient
             </Button>
@@ -132,7 +132,7 @@ export default function DashboardPage() {
             title="Active Personnel"
             value={metrics.activePersonnel}
             trend="+2.5%"
-            icon={<Users className="w-5 h-5 text-[#0891B2]" aria-hidden="true" />}
+            icon={<Users className="w-5 h-5 text-[var(--brand)]" aria-hidden="true" />}
             loading={loading}
           />
         </motion.div>
@@ -141,7 +141,7 @@ export default function DashboardPage() {
             title="Hospital Branches"
             value={metrics.hospitalBranches}
             trend="Active"
-            icon={<Building2 className="w-5 h-5 text-indigo-600" aria-hidden="true" />}
+            icon={<Building2 className="w-5 h-5 text-brand" aria-hidden="true" />}
             loading={loading}
           />
         </motion.div>
@@ -150,7 +150,7 @@ export default function DashboardPage() {
             title="Clinical Units"
             value={metrics.clinicalUnits}
             trend="100% online"
-            icon={<Layers className="w-5 h-5 text-[#059669]" aria-hidden="true" />}
+            icon={<Layers className="w-5 h-5 text-[var(--stable)]" aria-hidden="true" />}
             loading={loading}
           />
         </motion.div>
@@ -159,7 +159,7 @@ export default function DashboardPage() {
             title="RBAC Roles"
             value={metrics.activeRoles}
             trend="Audited"
-            icon={<ShieldCheck className="w-5 h-5 text-amber-600" aria-hidden="true" />}
+            icon={<ShieldCheck className="w-5 h-5 text-warning" aria-hidden="true" />}
             loading={loading}
           />
         </motion.div>
@@ -167,56 +167,56 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* System Activity & Clinical Volume */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs overflow-hidden">
-          <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+        <div className="lg:col-span-2 bg-surface border border-border rounded-xl shadow-xs overflow-hidden">
+          <div className="p-4 border-b border-border flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-[#0891B2]" aria-hidden="true" />
-              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Operational Throughput</h2>
+              <Activity className="w-4 h-4 text-[var(--brand)]" aria-hidden="true" />
+              <h2 className="text-sm font-semibold text-text">Operational Throughput</h2>
             </div>
-            <span className="text-xs text-slate-400">Past 24 Hours</span>
+            <span className="text-xs text-text-muted">Past 24 Hours</span>
           </div>
 
           <div className="p-5">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
-                <span className="text-xs text-slate-500 dark:text-slate-400">Outpatient Intake</span>
-                <p className="text-lg font-bold text-slate-900 dark:text-slate-100 tabular-nums mt-0.5">
+              <div className="bg-surface-subtle p-3 rounded-lg border border-border">
+                <span className="text-xs text-text-muted">Outpatient Intake</span>
+                <p className="text-lg font-bold text-text tabular-nums mt-0.5">
                   <NumberCounter value={metrics.opdIntake} />
                 </p>
-                <span className="text-[11px] text-emerald-600 font-medium">98.4% on time</span>
+                <span className="text-[11px] text-stable font-medium">98.4% on time</span>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
-                <span className="text-xs text-slate-500 dark:text-slate-400">Inpatient Bed Occ.</span>
-                <p className="text-lg font-bold text-slate-900 dark:text-slate-100 tabular-nums mt-0.5">
+              <div className="bg-surface-subtle p-3 rounded-lg border border-border">
+                <span className="text-xs text-text-muted">Inpatient Bed Occ.</span>
+                <p className="text-lg font-bold text-text tabular-nums mt-0.5">
                   <NumberCounter value={metrics.bedOccupancy} suffix="%" />
                 </p>
-                <span className="text-[11px] text-cyan-600 font-medium">Available</span>
+                <span className="text-[11px] text-info font-medium">Available</span>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
-                <span className="text-xs text-slate-500 dark:text-slate-400">Diagnostics TAT</span>
-                <p className="text-lg font-bold text-slate-900 dark:text-slate-100 tabular-nums mt-0.5">{metrics.diagnosticsTat}</p>
-                <span className="text-[11px] text-emerald-600 font-medium">Within SLA</span>
+              <div className="bg-surface-subtle p-3 rounded-lg border border-border">
+                <span className="text-xs text-text-muted">Diagnostics TAT</span>
+                <p className="text-lg font-bold text-text tabular-nums mt-0.5">{metrics.diagnosticsTat}</p>
+                <span className="text-[11px] text-stable font-medium">Within SLA</span>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
-                <span className="text-xs text-slate-500 dark:text-slate-400">Dispenses Today</span>
-                <p className="text-lg font-bold text-slate-900 dark:text-slate-100 tabular-nums mt-0.5">
+              <div className="bg-surface-subtle p-3 rounded-lg border border-border">
+                <span className="text-xs text-text-muted">Dispenses Today</span>
+                <p className="text-lg font-bold text-text tabular-nums mt-0.5">
                   <NumberCounter value={metrics.dispensesToday} />
                 </p>
-                <span className="text-[11px] text-cyan-600 font-medium">100% FEFO</span>
+                <span className="text-[11px] text-info font-medium">100% FEFO</span>
               </div>
             </div>
 
             {/* Hourly Volume Distribution */}
             <div className="space-y-2">
-              <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex justify-between text-xs text-text-muted">
                 <span>Peak Load Hours (08:00 - 18:00)</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-200">Average: 42 visits/hr</span>
+                <span className="font-semibold text-text">Average: 42 visits/hr</span>
               </div>
-              <div className="h-28 flex items-end gap-2 pt-2 pb-1 px-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
+              <div className="h-28 flex items-end gap-2 pt-2 pb-1 px-2 bg-surface-subtle rounded-lg border border-border">
                 {[30, 45, 75, 95, 88, 92, 70, 85, 60, 40, 25, 20].map((height, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center gap-1">
                     <div
-                      className="w-full bg-[#0891B2] hover:bg-[#0E7490] rounded-xs transition-all cursor-pointer"
+                      className="w-full bg-[var(--brand)] hover:bg-[var(--brand-hover)] rounded-xs transition-all cursor-pointer"
                       style={{ height: `${height}%` }}
                     />
                   </div>
@@ -227,16 +227,16 @@ export default function DashboardPage() {
         </div>
 
         {/* Real-time Audit & Event Feed */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Live Clinical Activity</h2>
-            <Link href="/enterprise/admin" className="text-xs text-[#0891B2] hover:underline flex items-center gap-1">
+        <div className="bg-surface border border-border rounded-xl shadow-xs overflow-hidden flex flex-col">
+          <div className="p-4 border-b border-border flex justify-between items-center">
+            <h2 className="text-sm font-semibold text-text">Live Clinical Activity</h2>
+            <Link href="/enterprise/admin" className="text-xs text-[var(--brand)] hover:underline flex items-center gap-1">
               <span>Audit Trail</span>
               <ArrowRight className="w-3 h-3" aria-hidden="true" />
             </Link>
           </div>
 
-          <div className="p-4 flex-1 divide-y divide-slate-100 dark:divide-slate-800 overflow-y-auto max-h-[340px]">
+          <div className="p-4 flex-1 divide-y divide-border overflow-y-auto max-h-[340px]">
             {loading ? (
               <div className="space-y-3 py-2">
                 <Skeleton height="36px" />
@@ -247,12 +247,12 @@ export default function DashboardPage() {
               recentAudit.map((event) => (
                 <div key={event.id} className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between text-xs">
                   <div>
-                    <span className="font-medium text-slate-800 dark:text-slate-200 block">{event.action.replace(/_/g, ' ')}</span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="font-medium text-text block">{event.action.replace(/_/g, ' ')}</span>
+                    <span className="text-[11px] text-text-muted">
                       {event.entity} {event.entityId ? `• ${event.entityId}` : ''}
                     </span>
                   </div>
-                  <span className="text-[10px] text-slate-400 tabular-nums">
+                  <span className="text-[10px] text-text-muted tabular-nums">
                     {new Date(event.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
@@ -279,21 +279,21 @@ function StatCard({
   loading?: boolean;
 }) {
   return (
-    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+    <div className="bg-surface p-4 rounded-xl border border-border shadow-xs flex flex-col justify-between hover:border-border-strong transition-colors">
       <div className="flex justify-between items-start">
-        <div className="w-9 h-9 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center">
+        <div className="w-9 h-9 rounded-lg bg-surface-subtle border border-border flex items-center justify-center">
           {icon}
         </div>
-        <span className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800 px-2 py-0.5 rounded-full">
+        <span className="text-[11px] font-medium text-stable-text bg-stable-bg border border-stable-border px-2 py-0.5 rounded-full">
           {trend}
         </span>
       </div>
       <div className="mt-3">
-        <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400">{title}</h3>
+        <h3 className="text-xs font-medium text-text-muted">{title}</h3>
         {loading ? (
           <Skeleton width="60px" height="28px" className="mt-1" />
         ) : (
-          <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5 tracking-tight tabular-nums">
+          <p className="text-2xl font-bold text-text mt-0.5 tracking-tight tabular-nums">
             <NumberCounter value={value} />
           </p>
         )}

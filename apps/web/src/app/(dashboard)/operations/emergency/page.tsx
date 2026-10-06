@@ -197,14 +197,14 @@ export default function EmergencyDashboard() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <Activity className="w-6 h-6 text-rose-600" />
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Emergency Department (ER)</h1>
+            <Activity className="w-6 h-6 text-critical" />
+            <h1 className="text-2xl font-bold text-text tracking-tight">Emergency Department (ER)</h1>
           </div>
-          <p className="text-slate-500 mt-1">Live ESI Triage tracking board, trauma intake, and resuscitation management.</p>
+          <p className="text-text-muted mt-1">Live ESI Triage tracking board, trauma intake, and resuscitation management.</p>
         </div>
         <div className="flex items-center space-x-3">
           <Button variant="secondary" onClick={() => fetchBoard()} disabled={loading}>
-            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ?'animate-spin' : ''}`} />
             Refresh
           </Button>
           <Button variant="destructive" onClick={() => setIsFastRegOpen(true)}>
@@ -216,73 +216,73 @@ export default function EmergencyDashboard() {
 
       {/* Triage Acuity Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        <div className="bg-rose-50 border border-rose-200 p-4 rounded-xl">
-          <div className="flex items-center space-x-1.5 text-rose-700 text-xs font-semibold uppercase">
+        <div className="bg-critical-bg border border-critical-border p-4 rounded-xl">
+          <div className="flex items-center space-x-1.5 text-critical-text text-xs font-semibold uppercase">
             <Flame className="w-4 h-4" />
             <span>Level 1: Red</span>
           </div>
-          <div className="text-2xl font-bold text-rose-900 mt-1 tabular-nums">
+          <div className="text-2xl font-bold text-critical-text mt-1 tabular-nums">
             {boardData.counts.red}
           </div>
-          <span className="text-xs text-rose-600">Immediate / Resus</span>
+          <span className="text-xs text-critical">Immediate / Resus</span>
         </div>
 
-        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl">
-          <div className="flex items-center space-x-1.5 text-amber-700 text-xs font-semibold uppercase">
+        <div className="bg-warning-bg border border-warning-border p-4 rounded-xl">
+          <div className="flex items-center space-x-1.5 text-warning-text text-xs font-semibold uppercase">
             <AlertOctagon className="w-4 h-4" />
             <span>Level 2: Orange</span>
           </div>
-          <div className="text-2xl font-bold text-amber-900 mt-1 tabular-nums">
+          <div className="text-2xl font-bold text-warning-text mt-1 tabular-nums">
             {boardData.counts.orange}
           </div>
-          <span className="text-xs text-amber-600">Emergent (&lt;15m)</span>
+          <span className="text-xs text-warning">Emergent (&lt;15m)</span>
         </div>
 
-        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl">
-          <div className="flex items-center space-x-1.5 text-yellow-700 text-xs font-semibold uppercase">
+        <div className="bg-warning-bg border border-warning-border p-4 rounded-xl">
+          <div className="flex items-center space-x-1.5 text-warning-text text-xs font-semibold uppercase">
             <Clock className="w-4 h-4" />
             <span>Level 3: Yellow</span>
           </div>
-          <div className="text-2xl font-bold text-yellow-900 mt-1 tabular-nums">
+          <div className="text-2xl font-bold text-warning-text mt-1 tabular-nums">
             {boardData.counts.yellow}
           </div>
-          <span className="text-xs text-yellow-600">Urgent (&lt;60m)</span>
+          <span className="text-xs text-warning">Urgent (&lt;60m)</span>
         </div>
 
-        <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl">
-          <div className="flex items-center space-x-1.5 text-emerald-700 text-xs font-semibold uppercase">
+        <div className="bg-stable-bg border border-stable-border p-4 rounded-xl">
+          <div className="flex items-center space-x-1.5 text-stable-text text-xs font-semibold uppercase">
             <HeartPulse className="w-4 h-4" />
             <span>Level 4: Green</span>
           </div>
-          <div className="text-2xl font-bold text-emerald-900 mt-1 tabular-nums">
+          <div className="text-2xl font-bold text-stable-text mt-1 tabular-nums">
             {boardData.counts.green}
           </div>
-          <span className="text-xs text-emerald-600">Less Urgent</span>
+          <span className="text-xs text-stable">Less Urgent</span>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl">
-          <div className="flex items-center space-x-1.5 text-blue-700 text-xs font-semibold uppercase">
+        <div className="bg-info-bg border border-info-border p-4 rounded-xl">
+          <div className="flex items-center space-x-1.5 text-info-text text-xs font-semibold uppercase">
             <User className="w-4 h-4" />
             <span>Level 5: Blue</span>
           </div>
-          <div className="text-2xl font-bold text-blue-900 mt-1 tabular-nums">
+          <div className="text-2xl font-bold text-info-text mt-1 tabular-nums">
             {boardData.counts.blue}
           </div>
-          <span className="text-xs text-blue-600">Non-Urgent</span>
+          <span className="text-xs text-info">Non-Urgent</span>
         </div>
 
-        <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
-          <div className="text-slate-500 text-xs font-semibold uppercase">Total Active</div>
-          <div className="text-2xl font-bold text-slate-800 mt-1 tabular-nums">
+        <div className="bg-surface-subtle border border-border p-4 rounded-xl">
+          <div className="text-text-muted text-xs font-semibold uppercase">Total Active</div>
+          <div className="text-2xl font-bold text-text mt-1 tabular-nums">
             {boardData.counts.total}
           </div>
-          <span className="text-xs text-slate-500">In ER</span>
+          <span className="text-xs text-text-muted">In ER</span>
         </div>
       </div>
 
       {/* Main Board Content */}
       {loading && boardData.patients.length === 0 ? (
-        <div className="space-y-3 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div className="space-y-3 bg-surface p-6 rounded-xl border border-border shadow-sm">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-10 w-full" />
@@ -298,18 +298,18 @@ export default function EmergencyDashboard() {
           onAction={() => setIsFastRegOpen(true)}
         />
       ) : (
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-100 bg-slate-50/70 flex justify-between items-center">
-            <h3 className="font-semibold text-slate-800 flex items-center">
-              <Activity className="w-4 h-4 mr-2 text-rose-600" />
+        <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-border bg-surface-subtle/70 flex justify-between items-center">
+            <h3 className="font-semibold text-text flex items-center">
+              <Activity className="w-4 h-4 mr-2 text-critical" />
               Active Emergency Triage Tracking Board
             </h3>
-            <span className="text-xs text-slate-500">Sorted by Acuity (ESI) and Wait Time</span>
+            <span className="text-xs text-text-muted">Sorted by Acuity (ESI) and Wait Time</span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+            <table className="w-full text-left text-sm text-text-muted">
+              <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                 <tr>
                   <th className="px-5 py-3">Acuity</th>
                   <th className="px-5 py-3">Patient</th>
@@ -320,9 +320,9 @@ export default function EmergencyDashboard() {
                   <th className="px-5 py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {boardData.patients.map((p) => (
-                  <tr key={p.encounterId} className="hover:bg-slate-50/60 transition-colors">
+                  <tr key={p.encounterId} className="hover:bg-surface-subtle/60 transition-colors">
                     {/* Acuity Badge */}
                     <td className="px-5 py-3">
                       <Badge variant={getPriorityBadgeVariant(p.priority)} size="md">
@@ -332,14 +332,14 @@ export default function EmergencyDashboard() {
 
                     {/* Patient MRN and Name */}
                     <td className="px-5 py-3">
-                      <div className="font-semibold text-slate-900">
+                      <div className="font-semibold text-text">
                         {p.patient.firstName} {p.patient.lastName}
                       </div>
-                      <div className="text-xs text-slate-500 font-mono">
+                      <div className="text-xs text-text-muted font-mono">
                         {p.patient.mrn} &bull; {p.patient.gender}
                       </div>
                       {p.patient.alerts && p.patient.alerts.length > 0 && (
-                        <div className="mt-1 flex items-center space-x-1 text-xs text-rose-600 font-medium">
+                        <div className="mt-1 flex items-center space-x-1 text-xs text-critical font-medium">
                           <ShieldAlert className="w-3.5 h-3.5 inline" />
                           <span>MLC / Alert</span>
                         </div>
@@ -348,10 +348,10 @@ export default function EmergencyDashboard() {
 
                     {/* Chief Complaint */}
                     <td className="px-5 py-3 max-w-[220px]">
-                      <div className="font-medium text-slate-800 line-clamp-2">
+                      <div className="font-medium text-text line-clamp-2">
                         {p.chiefComplaint}
                       </div>
-                      <span className="text-xs text-slate-400 capitalize">
+                      <span className="text-xs text-text-muted capitalize">
                         Via {p.arrivalMode.replace('_', ' ').toLowerCase()}
                       </span>
                     </td>
@@ -363,26 +363,26 @@ export default function EmergencyDashboard() {
                         {p.latestVitals?.pulseRate && <span>HR: {p.latestVitals.pulseRate} </span>}
                         {p.latestVitals?.oxygenSaturation && <span>SpO2: {p.latestVitals.oxygenSaturation}%</span>}
                       </div>
-                      <div className="text-xs text-slate-500 mt-0.5">
-                        AVPU: <span className="font-medium text-slate-700">{p.consciousness}</span>
+                      <div className="text-xs text-text-muted mt-0.5">
+                        AVPU: <span className="font-medium text-text">{p.consciousness}</span>
                         {p.painScore !== null && <span> &bull; Pain: {p.painScore}/10</span>}
                       </div>
                     </td>
 
                     {/* Elapsed Time */}
                     <td className="px-5 py-3">
-                      <div className="flex items-center text-slate-700 font-mono text-sm">
-                        <Clock className="w-3.5 h-3.5 mr-1 text-slate-400" />
+                      <div className="flex items-center text-text font-mono text-sm">
+                        <Clock className="w-3.5 h-3.5 mr-1 text-text-muted" />
                         <span className="font-bold">{p.elapsedMinutes}</span>m
                       </div>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-text-muted">
                         {new Date(p.arrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </td>
 
                     {/* Attending Doctor */}
-                    <td className="px-5 py-3 text-slate-700">
-                      {p.attendingDoctor || <span className="text-slate-400 italic">Unassigned</span>}
+                    <td className="px-5 py-3 text-text">
+                      {p.attendingDoctor || <span className="text-text-muted italic">Unassigned</span>}
                     </td>
 
                     {/* Action buttons */}
@@ -420,7 +420,7 @@ export default function EmergencyDashboard() {
         title="Fast-Track Emergency Intake"
       >
         <form onSubmit={handleFastRegister} className="space-y-4">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-text-muted">
             Rapid intake for trauma, ambulance, and unidentified walk-in patients. An emergency MRN will be auto-generated.
           </p>
 
@@ -479,16 +479,16 @@ export default function EmergencyDashboard() {
             rows={3}
           />
 
-          <div className="border border-slate-200 p-3 rounded-lg bg-slate-50 space-y-3">
+          <div className="border border-border p-3 rounded-lg bg-surface-subtle space-y-3">
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 id="isMlc"
                 checked={fastRegForm.isMlc}
                 onChange={(e) => setFastRegForm({ ...fastRegForm, isMlc: e.target.checked })}
-                className="rounded border-slate-300 text-rose-600 focus:ring-rose-500"
+                className="rounded border-border text-critical focus:ring-critical"
               />
-              <label htmlFor="isMlc" className="text-sm font-medium text-slate-800">
+              <label htmlFor="isMlc" className="text-sm font-medium text-text">
                 Medico-Legal Case (MLC)
               </label>
             </div>
@@ -503,7 +503,7 @@ export default function EmergencyDashboard() {
             )}
           </div>
 
-          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end space-x-3 pt-3 border-t border-border">
             <Button variant="secondary" type="button" onClick={() => setIsFastRegOpen(false)}>
               Cancel
             </Button>
@@ -600,7 +600,7 @@ export default function EmergencyDashboard() {
             />
           </div>
 
-          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end space-x-3 pt-3 border-t border-border">
             <Button variant="secondary" type="button" onClick={() => setIsTriageOpen(false)}>
               Cancel
             </Button>

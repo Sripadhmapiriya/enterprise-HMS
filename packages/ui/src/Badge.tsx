@@ -38,19 +38,19 @@ export function Badge({
 
   const variants: Record<string, string> = {
     critical:
-      'bg-red-50 text-red-800 border-red-200 dark:bg-red-950 dark:text-red-200 dark:border-red-900',
+      'bg-critical-bg text-critical-text border-critical-border',
     warning:
-      'bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-900',
+      'bg-warning-bg text-warning-text border-warning-border',
     stable:
-      'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-900',
+      'bg-stable-bg text-stable-text border-stable-border',
     info:
-      'bg-cyan-50 text-cyan-900 border-cyan-200 dark:bg-cyan-950 dark:text-cyan-200 dark:border-cyan-900',
+      'bg-info-bg text-info-text border-info-border',
     neutral:
-      'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+      'bg-neutral-bg text-neutral-text border-neutral-border',
     default:
-      'bg-slate-900 text-white border-transparent dark:bg-slate-100 dark:text-slate-900',
+      'bg-surface-raised text-text border-border',
     outline:
-      'bg-transparent text-slate-700 border-slate-300 dark:text-slate-300 dark:border-slate-600',
+      'bg-transparent text-text border-border',
   };
 
   const sizes = {

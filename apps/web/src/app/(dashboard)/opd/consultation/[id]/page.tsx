@@ -266,7 +266,7 @@ export default function ConsultationWorkspacePage({
       <div className="flex items-center justify-between">
         <Link
           href={`/patients/${encounter.patientId}`}
-          className="inline-flex items-center text-sm font-medium text-slate-600 hover:text-slate-900"
+          className="inline-flex items-center text-sm font-medium text-text-muted hover:text-text"
         >
           <ArrowLeft className="w-4 h-4 mr-1.5" />
           Back to Patient 360
@@ -302,10 +302,10 @@ export default function ConsultationWorkspacePage({
         {/* Left Column (2 Cols) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Vitals Form Card */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                <Activity className="w-4 h-4 text-cyan-600" />
+          <div className="bg-surface p-5 rounded-xl border border-border shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="font-bold text-text text-sm flex items-center gap-2">
+                <Activity className="w-4 h-4 text-info" />
                 Vital Signs & Anthropometry
               </h3>
               <Button
@@ -391,10 +391,10 @@ export default function ConsultationWorkspacePage({
           </div>
 
           {/* SOAP Clinical Notes Card */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                <FileText className="w-4 h-4 text-cyan-600" />
+          <div className="bg-surface p-5 rounded-xl border border-border shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="font-bold text-text text-sm flex items-center gap-2">
+                <FileText className="w-4 h-4 text-info" />
                 SOAP Consultation Workspace
               </h3>
               <Button
@@ -439,10 +439,10 @@ export default function ConsultationWorkspacePage({
         {/* Right Column: Diagnoses & Prescriptions (1 Col) */}
         <div className="space-y-6">
           {/* ICD-10 Diagnoses Card */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                <Stethoscope className="w-4 h-4 text-cyan-600" />
+          <div className="bg-surface p-5 rounded-xl border border-border shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="font-bold text-text text-sm flex items-center gap-2">
+                <Stethoscope className="w-4 h-4 text-info" />
                 ICD-10 Diagnoses
               </h3>
             </div>
@@ -452,15 +452,15 @@ export default function ConsultationWorkspacePage({
                 {encounter.diagnoses.map((d: any) => (
                   <div
                     key={d.id}
-                    className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs"
+                    className="p-2.5 bg-surface-subtle border border-border rounded-lg text-xs"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-mono font-bold text-cyan-800">
+                      <span className="font-mono font-bold text-info-text">
                         {d.diagnosisCode}
                       </span>
                       <Badge variant="neutral">{d.type}</Badge>
                     </div>
-                    <p className="text-slate-700 mt-1 font-medium">{d.description}</p>
+                    <p className="text-text mt-1 font-medium">{d.description}</p>
                   </div>
                 ))}
               </div>
@@ -496,29 +496,29 @@ export default function ConsultationWorkspacePage({
           </div>
 
           {/* E-Prescribing & Allergy Check Card */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                <Pill className="w-4 h-4 text-cyan-600" />
+          <div className="bg-surface p-5 rounded-xl border border-border shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="font-bold text-text text-sm flex items-center gap-2">
+                <Pill className="w-4 h-4 text-info" />
                 E-Prescription & Pharmacy Hook
               </h3>
             </div>
 
             {/* Allergy Conflict Alert Box */}
             {allergyConflictWarning && (
-              <div className="p-3 bg-rose-50 border border-rose-300 rounded-xl space-y-2">
+              <div className="p-3 bg-critical-bg border border-critical-border rounded-xl space-y-2">
                 <div className="flex items-start gap-2">
-                  <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-                  <p className="text-xs font-semibold text-rose-900">
+                  <AlertTriangle className="w-5 h-5 text-critical shrink-0 mt-0.5" />
+                  <p className="text-xs font-semibold text-critical-text">
                     {allergyConflictWarning}
                   </p>
                 </div>
-                <label className="flex items-center gap-2 text-xs text-rose-800 cursor-pointer pt-1">
+                <label className="flex items-center gap-2 text-xs text-critical-text cursor-pointer pt-1">
                   <input
                     type="checkbox"
                     checked={overrideAllergyAlerts}
                     onChange={(e) => setOverrideAllergyAlerts(e.target.checked)}
-                    className="rounded border-rose-300 text-rose-600 focus:ring-rose-500"
+                    className="rounded border-critical-border text-critical focus:ring-critical"
                   />
                   <span>Clinician override with informed benefit/risk rationale</span>
                 </label>
@@ -530,7 +530,7 @@ export default function ConsultationWorkspacePage({
               {prescriptionItems.map((item, idx) => (
                 <div
                   key={idx}
-                  className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2 text-xs"
+                  className="p-3 bg-surface-subtle border border-border rounded-lg space-y-2 text-xs"
                 >
                   <Input
                     label="Medication Name & Strength"

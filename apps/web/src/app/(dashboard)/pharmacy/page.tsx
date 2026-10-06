@@ -113,16 +113,16 @@ export default function PharmacyDashboard() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <Pill className="w-6 h-6 text-emerald-600" />
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Pharmacy & Dispensing</h1>
+            <Pill className="w-6 h-6 text-stable" />
+            <h1 className="text-2xl font-bold text-text tracking-tight">Pharmacy & Dispensing</h1>
           </div>
-          <p className="text-slate-500 mt-1">
+          <p className="text-text-muted mt-1">
             Prescription queue fulfillment, FEFO batch picking, walk-in POS, and stock control.
           </p>
         </div>
         <div className="flex items-center space-x-3">
           <Button variant="secondary" onClick={() => loadData()} disabled={loading}>
-            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ?'animate-spin' : ''}`} />
             Refresh
           </Button>
           <Button variant="secondary" onClick={() => { setPosSuccess(null); setIsPosOpen(true); }}>
@@ -140,46 +140,46 @@ export default function PharmacyDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <span className="text-xs font-semibold text-slate-500 uppercase">Prescriptions Waiting</span>
-          <div className="text-3xl font-bold text-slate-900 mt-1 tabular-nums">{queueCount}</div>
-          <span className="text-xs text-blue-600 font-medium">Pending fulfillment</span>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <span className="text-xs font-semibold text-text-muted uppercase">Prescriptions Waiting</span>
+          <div className="text-3xl font-bold text-text mt-1 tabular-nums">{queueCount}</div>
+          <span className="text-xs text-info font-medium">Pending fulfillment</span>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <span className="text-xs font-semibold text-slate-500 uppercase">Total Dispensed Value</span>
-          <div className="text-3xl font-bold text-emerald-600 mt-1 tabular-nums">
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <span className="text-xs font-semibold text-text-muted uppercase">Total Dispensed Value</span>
+          <div className="text-3xl font-bold text-stable mt-1 tabular-nums">
             ${revenueTotal.toFixed(2)}
           </div>
-          <span className="text-xs text-slate-500 font-medium">{dispensings.length} completed transactions</span>
+          <span className="text-xs text-text-muted font-medium">{dispensings.length} completed transactions</span>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-amber-200 shadow-sm bg-amber-50/30">
+        <div className="bg-surface p-5 rounded-xl border border-warning-border shadow-sm bg-warning-bg/30">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-700 uppercase">Low Stock Alerts</span>
-            <AlertTriangle className="w-4 h-4 text-amber-600" />
+            <span className="text-xs font-semibold text-warning-text uppercase">Low Stock Alerts</span>
+            <AlertTriangle className="w-4 h-4 text-warning" />
           </div>
-          <div className="text-3xl font-bold text-amber-700 mt-1 tabular-nums">
+          <div className="text-3xl font-bold text-warning-text mt-1 tabular-nums">
             {inventoryAlerts.lowStock.length}
           </div>
-          <span className="text-xs text-amber-600 font-medium">At or below reorder level</span>
+          <span className="text-xs text-warning font-medium">At or below reorder level</span>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-rose-200 shadow-sm bg-rose-50/30">
+        <div className="bg-surface p-5 rounded-xl border border-critical-border shadow-sm bg-critical-bg/30">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-rose-700 uppercase">Near Expiry (&lt;90d)</span>
-            <AlertOctagon className="w-4 h-4 text-rose-600" />
+            <span className="text-xs font-semibold text-critical-text uppercase">Near Expiry (&lt;90d)</span>
+            <AlertOctagon className="w-4 h-4 text-critical" />
           </div>
-          <div className="text-3xl font-bold text-rose-700 mt-1 tabular-nums">
+          <div className="text-3xl font-bold text-critical-text mt-1 tabular-nums">
             {inventoryAlerts.expiringBatches.length}
           </div>
-          <span className="text-xs text-rose-600 font-medium">Batches requiring FEFO priority</span>
+          <span className="text-xs text-critical font-medium">Batches requiring FEFO priority</span>
         </div>
       </div>
 
       {/* Main Dispensings Feed */}
       {loading && dispensings.length === 0 ? (
-        <div className="space-y-3 bg-white p-6 rounded-xl border border-slate-200">
+        <div className="space-y-3 bg-surface p-6 rounded-xl border border-border">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-10 w-full" />
@@ -194,23 +194,23 @@ export default function PharmacyDashboard() {
           onAction={() => window.location.href = '/pharmacy/prescriptions'}
         />
       ) : (
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-100 bg-slate-50/70 flex justify-between items-center">
-            <h3 className="font-semibold text-slate-800">Recent Pharmacy Dispensings</h3>
-            <span className="text-xs text-slate-500">{dispensings.length} records</span>
+        <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-border bg-surface-subtle/70 flex justify-between items-center">
+            <h3 className="font-semibold text-text">Recent Pharmacy Dispensings</h3>
+            <span className="text-xs text-text-muted">{dispensings.length} records</span>
           </div>
 
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-border">
             {dispensings.slice(0, 15).map((disp) => (
-              <div key={disp.id} className="p-4 hover:bg-slate-50/60 transition-colors flex justify-between items-center">
+              <div key={disp.id} className="p-4 hover:bg-surface-subtle/60 transition-colors flex justify-between items-center">
                 <div>
                   <div className="flex items-center space-x-2">
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-semibold text-text">
                       {disp.patient?.firstName} {disp.patient?.lastName}
                     </span>
-                    <span className="text-xs font-mono text-slate-500">MRN: {disp.patient?.mrn}</span>
+                    <span className="text-xs font-mono text-text-muted">MRN: {disp.patient?.mrn}</span>
                   </div>
-                  <div className="text-xs text-slate-500 mt-1">
+                  <div className="text-xs text-text-muted mt-1">
                     {disp.items?.length || 0} item(s) dispensed by{' '}
                     {disp.dispensedBy ? `${disp.dispensedBy.firstName} ${disp.dispensedBy.lastName}` : 'Pharmacist'}
                     {' '}&bull; {new Date(disp.createdAt).toLocaleString()}
@@ -221,7 +221,7 @@ export default function PharmacyDashboard() {
                   <Badge variant={disp.status === 'COMPLETED' ? 'stable' : 'warning'}>
                     {disp.status}
                   </Badge>
-                  <div className="text-sm font-bold text-slate-800 mt-1 tabular-nums">
+                  <div className="text-sm font-bold text-text mt-1 tabular-nums">
                     ${(disp.totalAmount || 0).toFixed(2)}
                   </div>
                 </div>
@@ -239,13 +239,13 @@ export default function PharmacyDashboard() {
       >
         {posSuccess ? (
           <div className="space-y-4 text-center py-4">
-            <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-            <h3 className="text-lg font-bold text-slate-900">Sale Completed Successfully</h3>
-            <p className="text-sm text-slate-600">
+            <CheckCircle2 className="w-12 h-12 text-stable mx-auto" />
+            <h3 className="text-lg font-bold text-text">Sale Completed Successfully</h3>
+            <p className="text-sm text-text-muted">
               Receipt <span className="font-mono font-bold">{posSuccess.receiptNumber}</span> generated.
-              Total: <span className="font-bold text-emerald-600">${posSuccess.totalAmount.toFixed(2)}</span>
+              Total: <span className="font-bold text-stable">${posSuccess.totalAmount.toFixed(2)}</span>
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-text-muted">
               Mode: {posSuccess.receiptMode} &bull; Stock ledger updated with FEFO deduction.
             </p>
             <Button variant="primary" onClick={() => setIsPosOpen(false)}>
@@ -302,7 +302,7 @@ export default function PharmacyDashboard() {
               />
             </div>
 
-            <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+            <div className="flex justify-end space-x-3 pt-3 border-t border-border">
               <Button variant="secondary" type="button" onClick={() => setIsPosOpen(false)}>
                 Cancel
               </Button>

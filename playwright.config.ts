@@ -18,9 +18,5 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'tablet',
-      use: { ...devices['iPad (gen 7)'] },
-    },
   ],
 });

@@ -175,8 +175,8 @@ export default function GeneralLedgerPage() {
       {/* Top Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Finance & General Ledger</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-bold tracking-tight text-text">Finance & General Ledger</h1>
+          <p className="text-sm text-text-muted mt-1">
             Enterprise Chart of Accounts, balanced double-entry journals, trial balance, and AP/AR aging.
           </p>
         </div>
@@ -184,14 +184,14 @@ export default function GeneralLedgerPage() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-text bg-surface border border-border rounded-lg hover:bg-surface-subtle"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ?'animate-spin' : ''}`} />
             Refresh
           </button>
           <button
             onClick={() => setIsNewJournalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-foreground bg-surface rounded-lg hover:bg-surface-raised shadow-sm"
           >
             <Plus className="w-4 h-4" />
             New Journal Entry
@@ -201,70 +201,69 @@ export default function GeneralLedgerPage() {
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Trial Balance Total</p>
-            <p className="text-2xl font-bold text-slate-900 mt-1">
+            <p className="text-xs font-medium text-text-muted uppercase">Trial Balance Total</p>
+            <p className="text-2xl font-bold text-text mt-1">
               ${Number(trialBalance?.totalDebits || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </p>
             <div className="flex items-center gap-1.5 mt-1">
-              <span className={`inline-flex items-center text-xs font-semibold ${trialBalance?.isBalanced ? 'text-emerald-700' : 'text-rose-600'}`}>
+              <span className={`inline-flex items-center text-xs font-semibold ${trialBalance?.isBalanced ?'text-stable-text' : 'text-critical'}`}>
                 {trialBalance?.isBalanced ? 'Strictly Balanced' : 'Imbalance Detected'}
               </span>
             </div>
           </div>
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+          <div className="p-3 bg-stable-bg text-stable rounded-lg">
             <Scale className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Accounts Receivable (AR)</p>
-            <p className="text-2xl font-bold text-blue-600 mt-1">
+            <p className="text-xs font-medium text-text-muted uppercase">Accounts Receivable (AR)</p>
+            <p className="text-2xl font-bold text-info mt-1">
               ${Number(agingSummary?.totalOutstandingAR || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </p>
-            <p className="text-xs text-slate-500 mt-1">Patient & Payer receivables</p>
+            <p className="text-xs text-text-muted mt-1">Patient & Payer receivables</p>
           </div>
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+          <div className="p-3 bg-info-bg text-info rounded-lg">
             <ArrowUpRight className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Accounts Payable (AP)</p>
-            <p className="text-2xl font-bold text-amber-600 mt-1">
+            <p className="text-xs font-medium text-text-muted uppercase">Accounts Payable (AP)</p>
+            <p className="text-2xl font-bold text-warning mt-1">
               ${Number(agingSummary?.totalOutstandingAP || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </p>
-            <p className="text-xs text-slate-500 mt-1">Vendor & Supplier liabilities</p>
+            <p className="text-xs text-text-muted mt-1">Vendor & Supplier liabilities</p>
           </div>
-          <div className="p-3 bg-amber-50 text-amber-600 rounded-lg">
+          <div className="p-3 bg-warning-bg text-warning rounded-lg">
             <ArrowDownLeft className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+        <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Chart of Accounts</p>
-            <p className="text-2xl font-bold text-slate-900 mt-1">{accounts.length}</p>
-            <p className="text-xs text-slate-500 mt-1">Configured general ledger codes</p>
+            <p className="text-xs font-medium text-text-muted uppercase">Chart of Accounts</p>
+            <p className="text-2xl font-bold text-text mt-1">{accounts.length}</p>
+            <p className="text-xs text-text-muted mt-1">Configured general ledger codes</p>
           </div>
-          <div className="p-3 bg-purple-50 text-purple-600 rounded-lg">
+          <div className="p-3 bg-surface-subtle text-brand rounded-lg">
             <BookOpen className="w-6 h-6" />
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-slate-200 bg-white rounded-t-xl px-4 pt-3">
+      <div className="border-b border-border bg-surface rounded-t-xl px-4 pt-3">
         <div className="flex space-x-6">
           <button
             onClick={() => setActiveTab('journals')}
-            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${
-              activeTab === 'journals'
-                ? 'border-slate-900 text-slate-900'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${ activeTab ==='journals'
+                ? 'border-border text-text'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -272,10 +271,9 @@ export default function GeneralLedgerPage() {
           </button>
           <button
             onClick={() => setActiveTab('accounts')}
-            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${
-              activeTab === 'accounts'
-                ? 'border-slate-900 text-slate-900'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${ activeTab ==='accounts'
+                ? 'border-border text-text'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             <BookOpen className="w-4 h-4" />
@@ -283,10 +281,9 @@ export default function GeneralLedgerPage() {
           </button>
           <button
             onClick={() => setActiveTab('trialBalance')}
-            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${
-              activeTab === 'trialBalance'
-                ? 'border-slate-900 text-slate-900'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${ activeTab ==='trialBalance'
+                ? 'border-border text-text'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             <Scale className="w-4 h-4" />
@@ -294,10 +291,9 @@ export default function GeneralLedgerPage() {
           </button>
           <button
             onClick={() => setActiveTab('aging')}
-            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${
-              activeTab === 'aging'
-                ? 'border-slate-900 text-slate-900'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+            className={`pb-3 text-sm font-semibold border-b-2 flex items-center gap-2 ${ activeTab ==='aging'
+                ? 'border-border text-text'
+                : 'border-transparent text-text-muted hover:text-text'
             }`}
           >
             <PieChart className="w-4 h-4" />
@@ -308,12 +304,12 @@ export default function GeneralLedgerPage() {
 
       {/* Error Banner */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 flex items-center justify-between">
+        <div className="p-4 bg-critical-bg border border-critical-border rounded-xl text-critical-text flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 text-red-600" />
+            <AlertTriangle className="w-5 h-5 text-critical" />
             <span className="text-sm font-medium">{error}</span>
           </div>
-          <button onClick={loadData} className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-800 rounded text-xs font-semibold">
+          <button onClick={loadData} className="px-3 py-1 bg-critical-bg hover:bg-critical-bg text-critical-text rounded text-xs font-semibold">
             Retry
           </button>
         </div>
@@ -322,22 +318,22 @@ export default function GeneralLedgerPage() {
       {/* TAB 1: JOURNALS */}
       {activeTab === 'journals' && (
         <div className="space-y-4">
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-slate-200 flex justify-between items-center">
+          <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-border flex justify-between items-center">
               <div>
-                <h2 className="text-sm font-bold text-slate-900">Journal Audit Trail</h2>
-                <p className="text-xs text-slate-500">Chronological posted double-entry journal transactions</p>
+                <h2 className="text-sm font-bold text-text">Journal Audit Trail</h2>
+                <p className="text-xs text-text-muted">Chronological posted double-entry journal transactions</p>
               </div>
               <button
                 onClick={() => setIsNewJournalOpen(true)}
-                className="px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg"
+                className="px-3 py-1.5 text-xs font-semibold text-brand-foreground bg-surface hover:bg-surface-raised rounded-lg"
               >
                 + Post Entry
               </button>
             </div>
 
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+            <table className="w-full text-left text-sm text-text-muted">
+              <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                 <tr>
                   <th className="px-6 py-4">Reference #</th>
                   <th className="px-6 py-4">Date</th>
@@ -346,31 +342,31 @@ export default function GeneralLedgerPage() {
                   <th className="px-6 py-4">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {journals.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                    <td colSpan={5} className="px-6 py-12 text-center text-text-muted">
                       No journals posted yet. Click &quot;New Journal Entry&quot; to record the first ledger entry.
                     </td>
                   </tr>
                 ) : (
                   journals.map((jrn) => (
-                    <tr key={jrn.id} className="hover:bg-slate-50/80 align-top">
-                      <td className="px-6 py-4 font-mono font-bold text-slate-900">{jrn.referenceNumber}</td>
+                    <tr key={jrn.id} className="hover:bg-surface-subtle/80 align-top">
+                      <td className="px-6 py-4 font-mono font-bold text-text">{jrn.referenceNumber}</td>
                       <td className="px-6 py-4">{new Date(jrn.entryDate).toLocaleDateString()}</td>
-                      <td className="px-6 py-4 font-medium text-slate-800 max-w-xs">{jrn.description}</td>
+                      <td className="px-6 py-4 font-medium text-text max-w-xs">{jrn.description}</td>
                       <td className="px-6 py-4">
                         <div className="space-y-1 font-mono text-xs">
                           {jrn.lines?.map((line: any, idx: number) => (
                             <div key={idx} className="flex justify-between items-center gap-4">
-                              <span className="text-slate-600">
+                              <span className="text-text-muted">
                                 {line.account?.accountCode} - {line.account?.accountName}
                               </span>
                               <span>
                                 {Number(line.debit) > 0 ? (
-                                  <span className="font-semibold text-emerald-700">Dr ${Number(line.debit).toFixed(2)}</span>
+                                  <span className="font-semibold text-stable-text">Dr ${Number(line.debit).toFixed(2)}</span>
                                 ) : (
-                                  <span className="font-semibold text-slate-700">Cr ${Number(line.credit).toFixed(2)}</span>
+                                  <span className="font-semibold text-text">Cr ${Number(line.credit).toFixed(2)}</span>
                                 )}
                               </span>
                             </div>
@@ -378,7 +374,7 @@ export default function GeneralLedgerPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-stable-bg text-stable-text">
                           {jrn.status}
                         </span>
                       </td>
@@ -394,29 +390,29 @@ export default function GeneralLedgerPage() {
       {/* TAB 2: CHART OF ACCOUNTS */}
       {activeTab === 'accounts' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-3 border border-slate-200 rounded-xl">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 bg-surface p-3 border border-border rounded-xl">
             <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Search className="w-4 h-4 text-text-muted absolute left-3 top-3" />
               <input
                 type="text"
                 placeholder="Search account code, title or type..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                className="w-full pl-9 pr-3 py-1.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
             <button
               onClick={() => setIsNewAccountOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-foreground bg-surface hover:bg-surface-raised rounded-lg"
             >
               <Plus className="w-3.5 h-3.5" />
               Add GL Account
             </button>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+            <table className="w-full text-left text-sm text-text-muted">
+              <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                 <tr>
                   <th className="px-6 py-4">Code</th>
                   <th className="px-6 py-4">Account Title</th>
@@ -425,24 +421,23 @@ export default function GeneralLedgerPage() {
                   <th className="px-6 py-4 text-right">Current Balance</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {filteredAccounts.map((acc) => (
-                  <tr key={acc.id} className="hover:bg-slate-50/80">
-                    <td className="px-6 py-4 font-mono font-bold text-slate-900">{acc.accountCode}</td>
-                    <td className="px-6 py-4 font-medium text-slate-800">{acc.accountName}</td>
+                  <tr key={acc.id} className="hover:bg-surface-subtle/80">
+                    <td className="px-6 py-4 font-mono font-bold text-text">{acc.accountCode}</td>
+                    <td className="px-6 py-4 font-medium text-text">{acc.accountName}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-0.5 rounded text-xs font-semibold ${
-                        acc.accountType === 'ASSET' ? 'bg-blue-100 text-blue-800' :
-                        acc.accountType === 'LIABILITY' ? 'bg-amber-100 text-amber-800' :
-                        acc.accountType === 'EQUITY' ? 'bg-purple-100 text-purple-800' :
-                        acc.accountType === 'REVENUE' ? 'bg-emerald-100 text-emerald-800' :
-                        'bg-rose-100 text-rose-800'
+                      <span className={`px-2.5 py-0.5 rounded text-xs font-semibold ${ acc.accountType ==='ASSET' ? 'bg-info-bg text-info-text' :
+                        acc.accountType === 'LIABILITY' ? 'bg-warning-bg text-warning-text' :
+                        acc.accountType === 'EQUITY' ? 'bg-surface-subtle text-brand' :
+                        acc.accountType === 'REVENUE' ? 'bg-stable-bg text-stable-text' :
+                        'bg-critical-bg text-critical-text'
                       }`}>
                         {acc.accountType}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-mono text-slate-500">{acc.currency || 'USD'}</td>
-                    <td className="px-6 py-4 text-right font-mono font-bold text-slate-900">
+                    <td className="px-6 py-4 font-mono text-text-muted">{acc.currency || 'USD'}</td>
+                    <td className="px-6 py-4 text-right font-mono font-bold text-text">
                       ${Number(acc.currentBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </td>
                   </tr>
@@ -456,27 +451,27 @@ export default function GeneralLedgerPage() {
       {/* TAB 3: TRIAL BALANCE */}
       {activeTab === 'trialBalance' && (
         <div className="space-y-4">
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 flex justify-between items-center">
+          <div className="bg-surface border border-border rounded-xl shadow-sm p-4 flex justify-between items-center">
             <div>
-              <h2 className="text-base font-bold text-slate-900">General Ledger Trial Balance</h2>
-              <p className="text-xs text-slate-500">Summary of all debit and credit positions across active accounts</p>
+              <h2 className="text-base font-bold text-text">General Ledger Trial Balance</h2>
+              <p className="text-xs text-text-muted">Summary of all debit and credit positions across active accounts</p>
             </div>
             <div>
               {trialBalance?.isBalanced ? (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-stable-bg text-stable-text rounded-full text-xs font-bold">
                   <CheckCircle2 className="w-4 h-4" /> BALANCED ($0.00 VARIANCE)
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-100 text-rose-800 rounded-full text-xs font-bold">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-critical-bg text-critical-text rounded-full text-xs font-bold">
                   <AlertTriangle className="w-4 h-4" /> OUT OF BALANCE
                 </span>
               )}
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+            <table className="w-full text-left text-sm text-text-muted">
+              <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
                 <tr>
                   <th className="px-6 py-4">Account Code</th>
                   <th className="px-6 py-4">Account Name</th>
@@ -485,12 +480,12 @@ export default function GeneralLedgerPage() {
                   <th className="px-6 py-4 text-right">Credit ($)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-mono">
+              <tbody className="divide-y divide-border font-mono">
                 {trialBalance?.accounts?.map((row: any) => (
-                  <tr key={row.accountId} className="hover:bg-slate-50/80">
-                    <td className="px-6 py-4 font-bold text-slate-900">{row.accountCode}</td>
-                    <td className="px-6 py-4 font-sans font-medium text-slate-800">{row.accountName}</td>
-                    <td className="px-6 py-4 font-sans text-xs text-slate-500">{row.accountType}</td>
+                  <tr key={row.accountId} className="hover:bg-surface-subtle/80">
+                    <td className="px-6 py-4 font-bold text-text">{row.accountCode}</td>
+                    <td className="px-6 py-4 font-sans font-medium text-text">{row.accountName}</td>
+                    <td className="px-6 py-4 font-sans text-xs text-text-muted">{row.accountType}</td>
                     <td className="px-6 py-4 text-right">
                       {row.debit > 0 ? `$${Number(row.debit).toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '—'}
                     </td>
@@ -500,13 +495,13 @@ export default function GeneralLedgerPage() {
                   </tr>
                 ))}
               </tbody>
-              <tfoot className="bg-slate-100 border-t-2 border-slate-300 font-mono font-bold text-slate-900">
+              <tfoot className="bg-surface-subtle border-t-2 border-border font-mono font-bold text-text">
                 <tr>
                   <td colSpan={3} className="px-6 py-4 text-right font-sans text-sm uppercase">Total Positions:</td>
-                  <td className="px-6 py-4 text-right text-emerald-700">
+                  <td className="px-6 py-4 text-right text-stable-text">
                     ${Number(trialBalance?.totalDebits || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </td>
-                  <td className="px-6 py-4 text-right text-emerald-700">
+                  <td className="px-6 py-4 text-right text-stable-text">
                     ${Number(trialBalance?.totalCredits || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </td>
                 </tr>
@@ -521,39 +516,39 @@ export default function GeneralLedgerPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* AR Aging */}
-            <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-4">
+            <div className="bg-surface border border-border rounded-xl shadow-sm p-6 space-y-4">
               <div className="flex justify-between items-center border-b pb-3">
                 <div>
-                  <h3 className="font-bold text-slate-900">Accounts Receivable (AR) Aging</h3>
-                  <p className="text-xs text-slate-500">Uncollected patient & insurance invoices</p>
+                  <h3 className="font-bold text-text">Accounts Receivable (AR) Aging</h3>
+                  <p className="text-xs text-text-muted">Uncollected patient & insurance invoices</p>
                 </div>
-                <span className="font-mono font-bold text-lg text-blue-600">
+                <span className="font-mono font-bold text-lg text-info">
                   ${Number(agingSummary?.totalOutstandingAR || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
               <div className="space-y-3 font-mono text-sm">
-                <div className="flex justify-between p-2 bg-slate-50 rounded">
-                  <span className="font-sans text-slate-600">Current (0 - 30 Days)</span>
-                  <span className="font-semibold text-slate-900">
+                <div className="flex justify-between p-2 bg-surface-subtle rounded">
+                  <span className="font-sans text-text-muted">Current (0 - 30 Days)</span>
+                  <span className="font-semibold text-text">
                     ${Number(agingSummary?.ar?.current || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex justify-between p-2 bg-slate-50 rounded">
-                  <span className="font-sans text-slate-600">31 - 60 Days</span>
-                  <span className="font-semibold text-slate-900">
+                <div className="flex justify-between p-2 bg-surface-subtle rounded">
+                  <span className="font-sans text-text-muted">31 - 60 Days</span>
+                  <span className="font-semibold text-text">
                     ${Number(agingSummary?.ar?.days30to60 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex justify-between p-2 bg-slate-50 rounded">
-                  <span className="font-sans text-slate-600">61 - 90 Days</span>
-                  <span className="font-semibold text-amber-600">
+                <div className="flex justify-between p-2 bg-surface-subtle rounded">
+                  <span className="font-sans text-text-muted">61 - 90 Days</span>
+                  <span className="font-semibold text-warning">
                     ${Number(agingSummary?.ar?.days61to90 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex justify-between p-2 bg-slate-50 rounded">
-                  <span className="font-sans text-slate-600">&gt; 90 Days Past Due</span>
-                  <span className="font-semibold text-rose-600">
+                <div className="flex justify-between p-2 bg-surface-subtle rounded">
+                  <span className="font-sans text-text-muted">&gt; 90 Days Past Due</span>
+                  <span className="font-semibold text-critical">
                     ${Number(agingSummary?.ar?.over90 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -561,39 +556,39 @@ export default function GeneralLedgerPage() {
             </div>
 
             {/* AP Aging */}
-            <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-4">
+            <div className="bg-surface border border-border rounded-xl shadow-sm p-6 space-y-4">
               <div className="flex justify-between items-center border-b pb-3">
                 <div>
-                  <h3 className="font-bold text-slate-900">Accounts Payable (AP) Aging</h3>
-                  <p className="text-xs text-slate-500">Outstanding vendor and supplier purchase liabilities</p>
+                  <h3 className="font-bold text-text">Accounts Payable (AP) Aging</h3>
+                  <p className="text-xs text-text-muted">Outstanding vendor and supplier purchase liabilities</p>
                 </div>
-                <span className="font-mono font-bold text-lg text-amber-600">
+                <span className="font-mono font-bold text-lg text-warning">
                   ${Number(agingSummary?.totalOutstandingAP || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
               <div className="space-y-3 font-mono text-sm">
-                <div className="flex justify-between p-2 bg-slate-50 rounded">
-                  <span className="font-sans text-slate-600">Current (0 - 30 Days)</span>
-                  <span className="font-semibold text-slate-900">
+                <div className="flex justify-between p-2 bg-surface-subtle rounded">
+                  <span className="font-sans text-text-muted">Current (0 - 30 Days)</span>
+                  <span className="font-semibold text-text">
                     ${Number(agingSummary?.ap?.current || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex justify-between p-2 bg-slate-50 rounded">
-                  <span className="font-sans text-slate-600">31 - 60 Days</span>
-                  <span className="font-semibold text-slate-900">
+                <div className="flex justify-between p-2 bg-surface-subtle rounded">
+                  <span className="font-sans text-text-muted">31 - 60 Days</span>
+                  <span className="font-semibold text-text">
                     ${Number(agingSummary?.ap?.days30to60 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex justify-between p-2 bg-slate-50 rounded">
-                  <span className="font-sans text-slate-600">61 - 90 Days</span>
-                  <span className="font-semibold text-amber-600">
+                <div className="flex justify-between p-2 bg-surface-subtle rounded">
+                  <span className="font-sans text-text-muted">61 - 90 Days</span>
+                  <span className="font-semibold text-warning">
                     ${Number(agingSummary?.ap?.days61to90 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex justify-between p-2 bg-slate-50 rounded">
-                  <span className="font-sans text-slate-600">&gt; 90 Days Past Due</span>
-                  <span className="font-semibold text-rose-600">
+                <div className="flex justify-between p-2 bg-surface-subtle rounded">
+                  <span className="font-sans text-text-muted">&gt; 90 Days Past Due</span>
+                  <span className="font-semibold text-critical">
                     ${Number(agingSummary?.ap?.over90 || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -605,15 +600,14 @@ export default function GeneralLedgerPage() {
 
       {/* MODAL 1: POST NEW JOURNAL ENTRY */}
       {isNewJournalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
+          <div className="bg-surface rounded-xl shadow-xl w-full max-w-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b pb-3">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">Post Double-Entry Journal</h2>
-                <p className="text-xs text-slate-500">Every journal entry must strictly satisfy Debits = Credits</p>
+                <h2 className="text-lg font-bold text-text">Post Double-Entry Journal</h2>
+                <p className="text-xs text-text-muted">Every journal entry must strictly satisfy Debits = Credits</p>
               </div>
-              <div className={`px-3 py-1 rounded text-xs font-bold font-mono ${
-                isJournalBalanced ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+              <div className={`px-3 py-1 rounded text-xs font-bold font-mono ${ isJournalBalanced ?'bg-stable-bg text-stable-text' : 'bg-critical-bg text-critical-text'
               }`}>
                 {isJournalBalanced ? 'BALANCED' : `DIFF: $${Math.abs(totalDebits - totalCredits).toFixed(2)}`}
               </div>
@@ -622,47 +616,47 @@ export default function GeneralLedgerPage() {
             <form onSubmit={handlePostJournal} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Entry Date</label>
+                  <label className="text-xs font-semibold text-text">Entry Date</label>
                   <input
                     type="date"
                     required
                     value={journalForm.entryDate}
                     onChange={(e) => setJournalForm({ ...journalForm, entryDate: e.target.value })}
-                    className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-slate-900"
+                    className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-ring"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-700">Reference #</label>
+                  <label className="text-xs font-semibold text-text">Reference #</label>
                   <input
                     type="text"
                     required
                     value={journalForm.referenceNumber}
                     onChange={(e) => setJournalForm({ ...journalForm, referenceNumber: e.target.value })}
-                    className="w-full px-3 py-1.5 text-sm border rounded-lg font-mono focus:ring-2 focus:ring-slate-900"
+                    className="w-full px-3 py-1.5 text-sm border rounded-lg font-mono focus:ring-2 focus:ring-ring"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Memo / Description</label>
+                <label className="text-xs font-semibold text-text">Memo / Description</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Biomedical equipment calibration expenses"
                   value={journalForm.description}
                   onChange={(e) => setJournalForm({ ...journalForm, description: e.target.value })}
-                  className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-ring"
                 />
               </div>
 
               {/* Journal Lines */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-bold text-slate-700 uppercase">Journal Lines</span>
+                  <span className="text-xs font-bold text-text uppercase">Journal Lines</span>
                   <button
                     type="button"
                     onClick={handleAddJournalLine}
-                    className="text-xs font-semibold text-slate-900 hover:underline"
+                    className="text-xs font-semibold text-text hover:underline"
                   >
                     + Add Line
                   </button>
@@ -725,7 +719,7 @@ export default function GeneralLedgerPage() {
                           type="button"
                           disabled={journalForm.lines.length <= 2}
                           onClick={() => handleRemoveJournalLine(idx)}
-                          className="text-xs text-rose-500 hover:text-rose-700 disabled:opacity-30"
+                          className="text-xs text-critical hover:text-critical-text disabled:opacity-30"
                         >
                           x
                         </button>
@@ -734,10 +728,10 @@ export default function GeneralLedgerPage() {
                   ))}
                 </div>
 
-                <div className="grid grid-cols-12 gap-2 pt-2 border-t font-mono text-xs font-bold text-slate-800">
+                <div className="grid grid-cols-12 gap-2 pt-2 border-t font-mono text-xs font-bold text-text">
                   <div className="col-span-5 text-right pr-2">Totals:</div>
-                  <div className="col-span-3 text-emerald-700">${totalDebits.toFixed(2)}</div>
-                  <div className="col-span-3 text-emerald-700">${totalCredits.toFixed(2)}</div>
+                  <div className="col-span-3 text-stable-text">${totalDebits.toFixed(2)}</div>
+                  <div className="col-span-3 text-stable-text">${totalCredits.toFixed(2)}</div>
                   <div className="col-span-1"></div>
                 </div>
               </div>
@@ -746,14 +740,14 @@ export default function GeneralLedgerPage() {
                 <button
                   type="button"
                   onClick={() => setIsNewJournalOpen(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-sm text-text-muted hover:bg-surface-subtle rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!isJournalBalanced}
-                  className="px-4 py-2 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-semibold text-brand-foreground bg-surface hover:bg-surface-raised rounded-lg shadow disabled:opacity-50"
                 >
                   Post to Ledger
                 </button>
@@ -765,36 +759,36 @@ export default function GeneralLedgerPage() {
 
       {/* MODAL 2: ADD GL ACCOUNT */}
       {isNewAccountOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h2 className="text-lg font-bold text-slate-900">Add Chart of Account</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
+          <div className="bg-surface rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-lg font-bold text-text">Add Chart of Account</h2>
             <form onSubmit={handleCreateAccount} className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-slate-700">Account Code</label>
+                <label className="text-xs font-semibold text-text">Account Code</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. 5210"
                   value={accountForm.accountCode}
                   onChange={(e) => setAccountForm({ ...accountForm, accountCode: e.target.value })}
-                  className="w-full px-3 py-1.5 text-sm border rounded-lg font-mono focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-3 py-1.5 text-sm border rounded-lg font-mono focus:ring-2 focus:ring-ring"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Account Name</label>
+                <label className="text-xs font-semibold text-text">Account Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Diagnostic Equipment Maintenance"
                   value={accountForm.accountName}
                   onChange={(e) => setAccountForm({ ...accountForm, accountName: e.target.value })}
-                  className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-ring"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Category / Type</label>
+                <label className="text-xs font-semibold text-text">Category / Type</label>
                 <select
                   value={accountForm.accountType}
                   onChange={(e) => setAccountForm({ ...accountForm, accountType: e.target.value })}
@@ -809,7 +803,7 @@ export default function GeneralLedgerPage() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">Description (Optional)</label>
+                <label className="text-xs font-semibold text-text">Description (Optional)</label>
                 <input
                   type="text"
                   value={accountForm.description}
@@ -822,13 +816,13 @@ export default function GeneralLedgerPage() {
                 <button
                   type="button"
                   onClick={() => setIsNewAccountOpen(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-sm text-text-muted hover:bg-surface-subtle rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow"
+                  className="px-4 py-2 text-sm font-semibold text-brand-foreground bg-surface hover:bg-surface-raised rounded-lg shadow"
                 >
                   Create Account
                 </button>

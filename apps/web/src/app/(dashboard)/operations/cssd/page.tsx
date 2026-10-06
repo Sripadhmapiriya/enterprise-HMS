@@ -94,8 +94,8 @@ export default function CSSDDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">CSSD Central Sterile Services</h1>
-          <p className="text-slate-500 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-text tracking-tight">CSSD Central Sterile Services</h1>
+          <p className="text-text-muted text-sm mt-0.5">
             Surgical instrument decontam, autoclave & ETO sterilization cycles, biological QA indicator validation.
           </p>
         </div>
@@ -104,7 +104,7 @@ export default function CSSDDashboard() {
             setShowNewModal(true);
             setNotice(null);
           }}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 shadow-sm"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-brand-foreground bg-brand hover:bg-brand-hover shadow-sm"
         >
           + Start Sterilization Cycle
         </button>
@@ -112,10 +112,9 @@ export default function CSSDDashboard() {
 
       {notice && (
         <div
-          className={`p-3.5 rounded-lg text-xs font-medium flex justify-between items-center ${
-            notice.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border border-rose-200 text-rose-800'
+          className={`p-3.5 rounded-lg text-xs font-medium flex justify-between items-center ${ notice.type ==='success'
+              ? 'bg-stable-bg border border-stable-border text-stable-text'
+              : 'bg-critical-bg border border-critical-border text-critical-text'
           }`}
         >
           <span>{notice.text}</span>
@@ -125,41 +124,41 @@ export default function CSSDDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Cycles Run Today</p>
-          <p className="text-2xl font-bold text-slate-900 mt-2">{stats?.totalToday ?? cycles.length}</p>
-          <p className="text-xs text-slate-400 mt-1">Processed batches</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Cycles Run Today</p>
+          <p className="text-2xl font-bold text-text mt-2">{stats?.totalToday ?? cycles.length}</p>
+          <p className="text-xs text-text-muted mt-1">Processed batches</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Active In-Chamber</p>
-          <p className="text-2xl font-bold text-blue-600 mt-2">{stats?.activeCycles ?? cycles.filter((c) => c.result === 'PENDING').length}</p>
-          <p className="text-xs text-slate-400 mt-1">Currently undergoing cycle</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Active In-Chamber</p>
+          <p className="text-2xl font-bold text-info mt-2">{stats?.activeCycles ?? cycles.filter((c) => c.result === 'PENDING').length}</p>
+          <p className="text-xs text-text-muted mt-1">Currently undergoing cycle</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Passed / Certified</p>
-          <p className="text-2xl font-bold text-emerald-600 mt-2">{stats?.passedToday ?? cycles.filter((c) => c.result === 'PASSED').length}</p>
-          <p className="text-xs text-slate-400 mt-1">Ready for OT dispatch</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Passed / Certified</p>
+          <p className="text-2xl font-bold text-stable mt-2">{stats?.passedToday ?? cycles.filter((c) => c.result === 'PASSED').length}</p>
+          <p className="text-xs text-text-muted mt-1">Ready for OT dispatch</p>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Failed / Quarantined</p>
-          <p className="text-2xl font-bold text-rose-600 mt-2">{stats?.failedToday ?? cycles.filter((c) => c.result === 'FAILED').length}</p>
-          <p className="text-xs text-slate-400 mt-1">Indicator test failures</p>
+        <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider">Failed / Quarantined</p>
+          <p className="text-2xl font-bold text-critical mt-2">{stats?.failedToday ?? cycles.filter((c) => c.result === 'FAILED').length}</p>
+          <p className="text-xs text-text-muted mt-1">Indicator test failures</p>
         </div>
       </div>
 
       {/* Sterilization Cycles Worklist */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-slate-900">Sterilization Cycles</h2>
-            <span className="text-xs text-slate-500">({filtered.length} cycles)</span>
+            <h2 className="text-base font-semibold text-text">Sterilization Cycles</h2>
+            <span className="text-xs text-text-muted">({filtered.length} cycles)</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <select
               value={methodFilter}
               onChange={(e) => setMethodFilter(e.target.value)}
-              className="px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-3 py-1.5 border border-border rounded-lg text-xs bg-surface focus:outline-none focus:ring-1 focus:ring-brand"
             >
               <option value="ALL">All Methods</option>
               <option value="AUTOCLAVE">Autoclave (Steam)</option>
@@ -170,7 +169,7 @@ export default function CSSDDashboard() {
             <select
               value={resultFilter}
               onChange={(e) => setResultFilter(e.target.value)}
-              className="px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-3 py-1.5 border border-border rounded-lg text-xs bg-surface focus:outline-none focus:ring-1 focus:ring-brand"
             >
               <option value="ALL">All Results</option>
               <option value="PENDING">In Progress (Pending)</option>
@@ -181,8 +180,8 @@ export default function CSSDDashboard() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3">Cycle #</th>
                 <th className="px-5 py-3">Machine & Method</th>
@@ -193,44 +192,43 @@ export default function CSSDDashboard() {
                 <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
+            <tbody className="divide-y divide-border text-xs">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={7} className="px-5 py-8 text-center text-text-muted">
                     Loading sterilization cycles...
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={7} className="px-5 py-8 text-center text-text-muted">
                     No sterilization cycles found. Start a new cycle to initiate processing.
                   </td>
                 </tr>
               ) : (
                 filtered.map((cyc) => (
-                  <tr key={cyc.id} className="hover:bg-slate-50/50">
-                    <td className="px-5 py-4 font-mono font-bold text-slate-900">{cyc.cycleNumber}</td>
+                  <tr key={cyc.id} className="hover:bg-surface-subtle/50">
+                    <td className="px-5 py-4 font-mono font-bold text-text">{cyc.cycleNumber}</td>
                     <td className="px-5 py-4">
-                      <strong className="text-slate-900 block">{cyc.machineId}</strong>
-                      <span className="text-slate-400 text-[11px]">{cyc.method}</span>
+                      <strong className="text-text block">{cyc.machineId}</strong>
+                      <span className="text-text-muted text-[11px]">{cyc.method}</span>
                     </td>
-                    <td className="px-5 py-4 text-slate-600 font-mono">
+                    <td className="px-5 py-4 text-text-muted font-mono">
                       {new Date(cyc.startTime).toLocaleString()}
                     </td>
-                    <td className="px-5 py-4 text-slate-500 font-mono">
+                    <td className="px-5 py-4 text-text-muted font-mono">
                       {cyc.endTime ? new Date(cyc.endTime).toLocaleString() : 'In Progress...'}
                     </td>
-                    <td className="px-5 py-4 text-slate-700 font-medium">
+                    <td className="px-5 py-4 text-text font-medium">
                       {cyc.operator?.name || 'CSSD Technician'}
                     </td>
                     <td className="px-5 py-4">
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                          cyc.result === 'PASSED'
-                            ? 'bg-emerald-100 text-emerald-800'
+                        className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${ cyc.result ==='PASSED'
+                            ? 'bg-stable-bg text-stable-text'
                             : cyc.result === 'FAILED'
-                            ? 'bg-rose-100 text-rose-800'
-                            : 'bg-blue-100 text-blue-800'
+                            ? 'bg-critical-bg text-critical-text'
+                            : 'bg-info-bg text-info-text'
                         }`}
                       >
                         {cyc.result}
@@ -244,12 +242,12 @@ export default function CSSDDashboard() {
                             setChemIndicator(true);
                             setBioIndicator(true);
                           }}
-                          className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold shadow-sm"
+                          className="px-3 py-1 bg-stable hover:bg-stable text-brand-foreground rounded text-xs font-semibold shadow-sm"
                         >
                           Certify QA
                         </button>
                       ) : (
-                        <span className="text-slate-400 font-medium text-[11px]">Certified</span>
+                        <span className="text-text-muted font-medium text-[11px]">Certified</span>
                       )}
                     </td>
                   </tr>
@@ -262,23 +260,23 @@ export default function CSSDDashboard() {
 
       {/* Start Cycle Modal */}
       {showNewModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
+        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div className="border-b border-border pb-3 flex justify-between items-center">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Start Sterilization Cycle</h3>
-                <p className="text-xs text-slate-500">Initiate chamber load sterilization process.</p>
+                <h3 className="text-base font-bold text-text">Start Sterilization Cycle</h3>
+                <p className="text-xs text-text-muted">Initiate chamber load sterilization process.</p>
               </div>
-              <button onClick={() => setShowNewModal(false)} className="text-slate-400 font-bold">x</button>
+              <button onClick={() => setShowNewModal(false)} className="text-text-muted font-bold">x</button>
             </div>
 
             <form onSubmit={handleStartCycle} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Machine / Chamber ID *</label>
+                <label className="block text-xs font-medium text-text mb-1">Machine / Chamber ID *</label>
                 <select
                   value={machineId}
                   onChange={(e) => setMachineId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
                   required
                 >
                   <option value="AUTOCLAVE-01">Autoclave Chamber 01 (Pre-vacuum Steam 134°C)</option>
@@ -289,11 +287,11 @@ export default function CSSDDashboard() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Method *</label>
+                <label className="block text-xs font-medium text-text mb-1">Method *</label>
                 <select
                   value={method}
                   onChange={(e) => setMethod(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white font-semibold"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface font-semibold"
                 >
                   <option value="AUTOCLAVE">Autoclave (High Pressure Steam)</option>
                   <option value="ETO">Ethylene Oxide (ETO)</option>
@@ -302,27 +300,27 @@ export default function CSSDDashboard() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Instrument Trays / Loads</label>
+                <label className="block text-xs font-medium text-text mb-1">Instrument Trays / Loads</label>
                 <textarea
                   rows={2}
                   value={loads}
                   onChange={(e) => setLoads(e.target.value)}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs"
+                  className="w-full px-3 py-1.5 border border-border rounded text-xs"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowNewModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700"
+                  className="px-4 py-2 border border-border rounded-lg text-xs text-text"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold disabled:opacity-50"
+                  className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold disabled:opacity-50"
                 >
                   {submitting ? 'Starting...' : 'Start Cycle'}
                 </button>
@@ -334,57 +332,57 @@ export default function CSSDDashboard() {
 
       {/* Certify Cycle QA Modal */}
       {completeCycleId && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
+        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div className="border-b border-border pb-3 flex justify-between items-center">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Certify Sterilization Quality Check</h3>
-                <p className="text-xs text-slate-500">Verify chemical strip and biological spore indicators.</p>
+                <h3 className="text-base font-bold text-text">Certify Sterilization Quality Check</h3>
+                <p className="text-xs text-text-muted">Verify chemical strip and biological spore indicators.</p>
               </div>
-              <button onClick={() => setCompleteCycleId(null)} className="text-slate-400 font-bold">x</button>
+              <button onClick={() => setCompleteCycleId(null)} className="text-text-muted font-bold">x</button>
             </div>
 
             <form onSubmit={handleCompleteCycle} className="space-y-4 text-xs">
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-3">
-                <label className="flex items-center gap-2.5 font-medium text-slate-800 cursor-pointer">
+              <div className="p-3 bg-surface-subtle border border-border rounded-lg space-y-3">
+                <label className="flex items-center gap-2.5 font-medium text-text cursor-pointer">
                   <input
                     type="checkbox"
                     checked={chemIndicator}
                     onChange={(e) => setChemIndicator(e.target.checked)}
-                    className="rounded text-blue-600"
+                    className="rounded text-info"
                   />
                   <span>Chemical Integrator Strip Passed (Color Shift Confirmed)</span>
                 </label>
 
-                <label className="flex items-center gap-2.5 font-medium text-slate-800 cursor-pointer">
+                <label className="flex items-center gap-2.5 font-medium text-text cursor-pointer">
                   <input
                     type="checkbox"
                     checked={bioIndicator}
                     onChange={(e) => setBioIndicator(e.target.checked)}
-                    className="rounded text-blue-600"
+                    className="rounded text-info"
                   />
                   <span>Biological Spore Indicator Negative (No Bacterial Growth)</span>
                 </label>
               </div>
 
               {!chemIndicator || !bioIndicator ? (
-                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded font-semibold">
+                <div className="p-3 bg-critical-bg border border-critical-border text-critical-text rounded font-semibold">
                   Warning: Failed indicators will cause this cycle to be QUARANTINED and all loads re-processed.
                 </div>
               ) : null}
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setCompleteCycleId(null)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-xs text-slate-700"
+                  className="px-4 py-2 border border-border rounded-lg text-xs text-text"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={completing}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold disabled:opacity-50"
+                  className="px-4 py-2 bg-stable hover:bg-stable text-brand-foreground rounded-lg text-xs font-semibold disabled:opacity-50"
                 >
                   {completing ? 'Certifying...' : 'Commit QA Certification'}
                 </button>

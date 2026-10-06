@@ -97,23 +97,23 @@ export default function AnalyticsDashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <BarChart3 className="w-7 h-7 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-text tracking-tight flex items-center gap-2">
+            <BarChart3 className="w-7 h-7 text-brand" />
             Clinical & Operational Analytics
           </h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <p className="text-text-muted text-sm mt-1">
             Executive KPI scorecards, department utilization, and scheduled MIS reporting pack.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={loadData} disabled={loading}>
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ?'animate-spin' : ''}`} />
             Refresh
           </Button>
           <Button
             size="sm"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white"
+            className="bg-brand hover:bg-brand-hover text-brand-foreground"
             onClick={() => setExportModalOpen(true)}
           >
             <Download className="w-4 h-4 mr-2" />
@@ -123,13 +123,12 @@ export default function AnalyticsDashboardPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-border">
         <button
           onClick={() => setActiveTab('kpis')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px flex items-center gap-2 ${
-            activeTab === 'kpis'
-              ? 'border-indigo-600 text-indigo-600 font-semibold'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px flex items-center gap-2 ${ activeTab ==='kpis'
+              ? 'border-brand text-brand font-semibold'
+              : 'border-transparent text-text-muted hover:text-text'
           }`}
         >
           <TrendingUp className="w-4 h-4" />
@@ -137,10 +136,9 @@ export default function AnalyticsDashboardPage() {
         </button>
         <button
           onClick={() => setActiveTab('mis')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px flex items-center gap-2 ${
-            activeTab === 'mis'
-              ? 'border-indigo-600 text-indigo-600 font-semibold'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px flex items-center gap-2 ${ activeTab ==='mis'
+              ? 'border-brand text-brand font-semibold'
+              : 'border-transparent text-text-muted hover:text-text'
           }`}
         >
           <FileSpreadsheet className="w-4 h-4" />
@@ -148,10 +146,9 @@ export default function AnalyticsDashboardPage() {
         </button>
         <button
           onClick={() => setActiveTab('trends')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px flex items-center gap-2 ${
-            activeTab === 'trends'
-              ? 'border-indigo-600 text-indigo-600 font-semibold'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px flex items-center gap-2 ${ activeTab ==='trends'
+              ? 'border-brand text-brand font-semibold'
+              : 'border-transparent text-text-muted hover:text-text'
           }`}
         >
           <Calendar className="w-4 h-4" />
@@ -177,98 +174,98 @@ export default function AnalyticsDashboardPage() {
             <div className="space-y-6">
               {/* Metric Banner */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
                   <div className="flex justify-between items-start">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">
                       Bed Occupancy Rate
                     </span>
-                    <Bed className="w-5 h-5 text-indigo-600" />
+                    <Bed className="w-5 h-5 text-brand" />
                   </div>
                   <div className="mt-2 flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-slate-900 tabular-nums">
+                    <span className="text-2xl font-bold text-text tabular-nums">
                       {kpiData?.clinical?.occupancyRatePercent}%
                     </span>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-text-muted">
                       ({kpiData?.clinical?.occupiedBeds} / {kpiData?.clinical?.totalBeds} Beds)
                     </span>
                   </div>
-                  <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
+                  <p className="text-xs text-stable mt-2 flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" /> Optimal target range (75-85%)
                   </p>
                 </div>
 
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
                   <div className="flex justify-between items-start">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">
                       Avg Length of Stay (ALOS)
                     </span>
-                    <Clock className="w-5 h-5 text-cyan-600" />
+                    <Clock className="w-5 h-5 text-info" />
                   </div>
                   <div className="mt-2 flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-slate-900 tabular-nums">
+                    <span className="text-2xl font-bold text-text tabular-nums">
                       {kpiData?.clinical?.averageLengthOfStayDays}
                     </span>
-                    <span className="text-xs text-slate-500">Days</span>
+                    <span className="text-xs text-text-muted">Days</span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-2">Active Inpatient Census: {kpiData?.clinical?.activeCensus}</p>
+                  <p className="text-xs text-text-muted mt-2">Active Inpatient Census: {kpiData?.clinical?.activeCensus}</p>
                 </div>
 
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
                   <div className="flex justify-between items-start">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">
                       Today Footfall (OPD / ER)
                     </span>
-                    <Users className="w-5 h-5 text-amber-600" />
+                    <Users className="w-5 h-5 text-warning" />
                   </div>
                   <div className="mt-2 flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-slate-900 tabular-nums">
+                    <span className="text-2xl font-bold text-text tabular-nums">
                       {kpiData?.clinical?.todayEncounters}
                     </span>
-                    <span className="text-xs text-amber-600 font-medium">
+                    <span className="text-xs text-warning font-medium">
                       ({kpiData?.clinical?.todayEmergencyVisits} ER Triage)
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-2">Patient consultations recorded today</p>
+                  <p className="text-xs text-text-muted mt-2">Patient consultations recorded today</p>
                 </div>
 
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <div className="bg-surface p-5 rounded-xl border border-border shadow-sm">
                   <div className="flex justify-between items-start">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">
                       Total Billed & AR
                     </span>
-                    <DollarSign className="w-5 h-5 text-emerald-600" />
+                    <DollarSign className="w-5 h-5 text-stable" />
                   </div>
                   <div className="mt-2 flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-slate-900 tabular-nums">
+                    <span className="text-2xl font-bold text-text tabular-nums">
                       ${kpiData?.financial?.totalBilled?.toLocaleString()}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-2">
+                  <p className="text-xs text-text-muted mt-2">
                     Collected: ${kpiData?.financial?.totalCollected?.toLocaleString()} | AR: ${kpiData?.financial?.outstandingAr?.toLocaleString()}
                   </p>
                 </div>
               </div>
 
               {/* Quality & Safety Scorecard */}
-              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <h3 className="font-semibold text-slate-900 text-base">Clinical Quality & Safety Metrics</h3>
+              <div className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-4">
+                <h3 className="font-semibold text-text text-base">Clinical Quality & Safety Metrics</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 bg-slate-50 rounded-lg border border-slate-100">
-                    <span className="text-xs text-slate-500 uppercase font-semibold">Hospital Mortality Rate</span>
-                    <p className="text-xl font-bold text-slate-900 mt-1 tabular-nums">{kpiData?.clinical?.mortalityRatePercent}%</p>
-                    <p className="text-xs text-emerald-600 mt-1">Zero unreviewed sentinel events</p>
+                  <div className="p-4 bg-surface-subtle rounded-lg border border-border">
+                    <span className="text-xs text-text-muted uppercase font-semibold">Hospital Mortality Rate</span>
+                    <p className="text-xl font-bold text-text mt-1 tabular-nums">{kpiData?.clinical?.mortalityRatePercent}%</p>
+                    <p className="text-xs text-stable mt-1">Zero unreviewed sentinel events</p>
                   </div>
 
-                  <div className="p-4 bg-slate-50 rounded-lg border border-slate-100">
-                    <span className="text-xs text-slate-500 uppercase font-semibold">Hospital Acquired Infection</span>
-                    <p className="text-xl font-bold text-slate-900 mt-1 tabular-nums">{kpiData?.clinical?.infectionRatePercent}%</p>
-                    <p className="text-xs text-slate-500 mt-1">Well below CDC 1.5% threshold</p>
+                  <div className="p-4 bg-surface-subtle rounded-lg border border-border">
+                    <span className="text-xs text-text-muted uppercase font-semibold">Hospital Acquired Infection</span>
+                    <p className="text-xl font-bold text-text mt-1 tabular-nums">{kpiData?.clinical?.infectionRatePercent}%</p>
+                    <p className="text-xs text-text-muted mt-1">Well below CDC 1.5% threshold</p>
                   </div>
 
-                  <div className="p-4 bg-slate-50 rounded-lg border border-slate-100">
-                    <span className="text-xs text-slate-500 uppercase font-semibold">Revenue Collection Ratio</span>
-                    <p className="text-xl font-bold text-slate-900 mt-1 tabular-nums">{kpiData?.financial?.collectionRatioPercent}%</p>
-                    <p className="text-xs text-slate-500 mt-1">Cashier and insurance receipts reconciled</p>
+                  <div className="p-4 bg-surface-subtle rounded-lg border border-border">
+                    <span className="text-xs text-text-muted uppercase font-semibold">Revenue Collection Ratio</span>
+                    <p className="text-xl font-bold text-text mt-1 tabular-nums">{kpiData?.financial?.collectionRatioPercent}%</p>
+                    <p className="text-xs text-text-muted mt-1">Cashier and insurance receipts reconciled</p>
                   </div>
                 </div>
               </div>
@@ -280,25 +277,25 @@ export default function AnalyticsDashboardPage() {
             <div className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Departmental Utilization */}
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                  <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-                    <h3 className="font-semibold text-slate-900 text-sm">Department Volume & Utilization</h3>
+                <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+                  <div className="p-4 border-b border-border flex justify-between items-center bg-surface-subtle">
+                    <h3 className="font-semibold text-text text-sm">Department Volume & Utilization</h3>
                     <Badge variant="neutral">{misData?.departments?.length || 0} Departments</Badge>
                   </div>
-                  <table className="w-full text-left text-sm text-slate-600">
-                    <thead className="bg-slate-50/50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase">
+                  <table className="w-full text-left text-sm text-text-muted">
+                    <thead className="bg-surface-subtle/50 border-b border-border text-xs font-semibold text-text-muted uppercase">
                       <tr>
                         <th className="px-4 py-2.5">Department</th>
                         <th className="px-4 py-2.5 text-right">Patients</th>
                         <th className="px-4 py-2.5 text-right">Revenue ($)</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-border">
                       {misData?.departments?.map((dept: any, idx: number) => (
-                        <tr key={idx} className="hover:bg-slate-50/50">
-                          <td className="px-4 py-2.5 font-medium text-slate-900">{dept.department}</td>
+                        <tr key={idx} className="hover:bg-surface-subtle/50">
+                          <td className="px-4 py-2.5 font-medium text-text">{dept.department}</td>
                           <td className="px-4 py-2.5 text-right tabular-nums">{dept.patientCount}</td>
-                          <td className="px-4 py-2.5 text-right font-medium text-slate-900 tabular-nums">
+                          <td className="px-4 py-2.5 text-right font-medium text-text tabular-nums">
                             ${dept.revenue.toLocaleString()}
                           </td>
                         </tr>
@@ -308,25 +305,25 @@ export default function AnalyticsDashboardPage() {
                 </div>
 
                 {/* Top Prescribed Medications */}
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                  <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-                    <h3 className="font-semibold text-slate-900 text-sm">Top 5 Prescribed Medications</h3>
+                <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+                  <div className="p-4 border-b border-border flex justify-between items-center bg-surface-subtle">
+                    <h3 className="font-semibold text-text text-sm">Top 5 Prescribed Medications</h3>
                     <Badge variant="neutral">Pharmacy FEFO</Badge>
                   </div>
-                  <table className="w-full text-left text-sm text-slate-600">
-                    <thead className="bg-slate-50/50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase">
+                  <table className="w-full text-left text-sm text-text-muted">
+                    <thead className="bg-surface-subtle/50 border-b border-border text-xs font-semibold text-text-muted uppercase">
                       <tr>
                         <th className="px-4 py-2.5">Drug Name</th>
                         <th className="px-4 py-2.5">Category</th>
                         <th className="px-4 py-2.5 text-right">Units Dispensed</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-border">
                       {misData?.topMedications?.map((m: any, idx: number) => (
-                        <tr key={idx} className="hover:bg-slate-50/50">
-                          <td className="px-4 py-2.5 font-medium text-slate-900">{m.name}</td>
-                          <td className="px-4 py-2.5 text-slate-500 text-xs">{m.category}</td>
-                          <td className="px-4 py-2.5 text-right font-semibold text-indigo-600 tabular-nums">{m.count}</td>
+                        <tr key={idx} className="hover:bg-surface-subtle/50">
+                          <td className="px-4 py-2.5 font-medium text-text">{m.name}</td>
+                          <td className="px-4 py-2.5 text-text-muted text-xs">{m.category}</td>
+                          <td className="px-4 py-2.5 text-right font-semibold text-brand tabular-nums">{m.count}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -335,30 +332,30 @@ export default function AnalyticsDashboardPage() {
               </div>
 
               {/* Turnaround Time Benchmarks */}
-              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
-                <h3 className="font-semibold text-slate-900 text-sm">Operational Turnaround Benchmarks (TAT)</h3>
+              <div className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-4">
+                <h3 className="font-semibold text-text text-sm">Operational Turnaround Benchmarks (TAT)</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                    <span className="text-xs text-slate-500">Avg OPD Wait Time</span>
-                    <p className="text-lg font-bold text-slate-900 mt-1 tabular-nums">
+                  <div className="p-3 bg-surface-subtle rounded-lg border border-border">
+                    <span className="text-xs text-text-muted">Avg OPD Wait Time</span>
+                    <p className="text-lg font-bold text-text mt-1 tabular-nums">
                       {misData?.hospitalTurnaround?.averageOpdWaitMinutes} mins
                     </p>
                   </div>
-                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                    <span className="text-xs text-slate-500">ER Triage Assessment</span>
-                    <p className="text-lg font-bold text-slate-900 mt-1 tabular-nums">
+                  <div className="p-3 bg-surface-subtle rounded-lg border border-border">
+                    <span className="text-xs text-text-muted">ER Triage Assessment</span>
+                    <p className="text-lg font-bold text-text mt-1 tabular-nums">
                       {misData?.hospitalTurnaround?.averageErTriageMinutes} mins
                     </p>
                   </div>
-                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                    <span className="text-xs text-slate-500">Bed Turnaround (Clean)</span>
-                    <p className="text-lg font-bold text-slate-900 mt-1 tabular-nums">
+                  <div className="p-3 bg-surface-subtle rounded-lg border border-border">
+                    <span className="text-xs text-text-muted">Bed Turnaround (Clean)</span>
+                    <p className="text-lg font-bold text-text mt-1 tabular-nums">
                       {misData?.hospitalTurnaround?.bedTurnaroundMinutes} mins
                     </p>
                   </div>
-                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                    <span className="text-xs text-slate-500">Pharmacy Dispense TAT</span>
-                    <p className="text-lg font-bold text-slate-900 mt-1 tabular-nums">
+                  <div className="p-3 bg-surface-subtle rounded-lg border border-border">
+                    <span className="text-xs text-text-muted">Pharmacy Dispense TAT</span>
+                    <p className="text-lg font-bold text-text mt-1 tabular-nums">
                       {misData?.hospitalTurnaround?.pharmacyDispenseMinutes} mins
                     </p>
                   </div>
@@ -369,11 +366,11 @@ export default function AnalyticsDashboardPage() {
 
           {/* TAB 3: 7-DAY OPERATIONAL TRENDS */}
           {activeTab === 'trends' && (
-            <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5 space-y-4">
-              <h3 className="font-semibold text-slate-900 text-sm">7-Day Daily Volume & Revenue Breakdown</h3>
+            <div className="bg-surface border border-border rounded-xl shadow-sm p-5 space-y-4">
+              <h3 className="font-semibold text-text text-sm">7-Day Daily Volume & Revenue Breakdown</h3>
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-slate-600">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
+                <table className="w-full text-left text-sm text-text-muted">
+                  <thead className="bg-surface-subtle border-b border-border text-xs font-semibold text-text-muted uppercase">
                     <tr>
                       <th className="px-4 py-3">Date</th>
                       <th className="px-4 py-3 text-right">OPD Visits</th>
@@ -382,14 +379,14 @@ export default function AnalyticsDashboardPage() {
                       <th className="px-4 py-3 text-right">Daily Revenue ($)</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-border">
                     {trends.map((t: any, idx: number) => (
-                      <tr key={idx} className="hover:bg-slate-50/50">
-                        <td className="px-4 py-3 font-medium text-slate-900">{t.date}</td>
+                      <tr key={idx} className="hover:bg-surface-subtle/50">
+                        <td className="px-4 py-3 font-medium text-text">{t.date}</td>
                         <td className="px-4 py-3 text-right tabular-nums">{t.opdVisits}</td>
-                        <td className="px-4 py-3 text-right tabular-nums text-amber-600 font-medium">{t.erAdmissions}</td>
-                        <td className="px-4 py-3 text-right tabular-nums text-cyan-600 font-medium">{t.inpatientAdmissions}</td>
-                        <td className="px-4 py-3 text-right font-bold text-slate-900 tabular-nums">
+                        <td className="px-4 py-3 text-right tabular-nums text-warning font-medium">{t.erAdmissions}</td>
+                        <td className="px-4 py-3 text-right tabular-nums text-info font-medium">{t.inpatientAdmissions}</td>
+                        <td className="px-4 py-3 text-right font-bold text-text tabular-nums">
                           ${t.revenue.toLocaleString()}
                         </td>
                       </tr>
@@ -404,23 +401,23 @@ export default function AnalyticsDashboardPage() {
 
       {/* EXPORT MODAL */}
       {exportModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl border border-slate-200 max-w-md w-full p-6 space-y-5">
+        <div className="fixed inset-0 bg-surface/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-surface rounded-xl shadow-xl border border-border max-w-md w-full p-6 space-y-5">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Download className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-lg font-bold text-text flex items-center gap-2">
+                <Download className="w-5 h-5 text-brand" />
                 Export Hospital MIS Report
               </h3>
               <button
                 onClick={() => setExportModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-text-muted hover:text-text-muted"
               >
                 x
               </button>
             </div>
 
             {exportSuccess && (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-lg flex items-center gap-2">
+              <div className="p-3 bg-stable-bg border border-stable-border text-stable-text text-sm rounded-lg flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 {exportSuccess}
               </div>
@@ -428,11 +425,11 @@ export default function AnalyticsDashboardPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-slate-700 uppercase">Report Scope</label>
+                <label className="text-xs font-semibold text-text uppercase">Report Scope</label>
                 <select
                   value={exportReportType}
                   onChange={(e) => setExportReportType(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full mt-1 px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
                 >
                   <option value="MIS_PACK">Comprehensive Monthly MIS Pack</option>
                   <option value="CENSUS_REPORT">Hospital Inpatient Census & BOR</option>
@@ -442,15 +439,14 @@ export default function AnalyticsDashboardPage() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700 uppercase">File Format</label>
+                <label className="text-xs font-semibold text-text uppercase">File Format</label>
                 <div className="grid grid-cols-2 gap-3 mt-1">
                   <button
                     type="button"
                     onClick={() => setExportFormat('json')}
-                    className={`px-3 py-2 border rounded-lg text-sm font-medium text-center ${
-                      exportFormat === 'json'
-                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                        : 'border-slate-300 text-slate-700'
+                    className={`px-3 py-2 border rounded-lg text-sm font-medium text-center ${ exportFormat ==='json'
+                        ? 'border-brand bg-surface-subtle text-brand'
+                        : 'border-border text-text'
                     }`}
                   >
                     JSON Pack
@@ -458,10 +454,9 @@ export default function AnalyticsDashboardPage() {
                   <button
                     type="button"
                     onClick={() => setExportFormat('csv')}
-                    className={`px-3 py-2 border rounded-lg text-sm font-medium text-center ${
-                      exportFormat === 'csv'
-                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                        : 'border-slate-300 text-slate-700'
+                    className={`px-3 py-2 border rounded-lg text-sm font-medium text-center ${ exportFormat ==='csv'
+                        ? 'border-brand bg-surface-subtle text-brand'
+                        : 'border-border text-text'
                     }`}
                   >
                     CSV Spreadsheet
@@ -475,21 +470,21 @@ export default function AnalyticsDashboardPage() {
                   id="asyncWorker"
                   checked={exportAsync}
                   onChange={(e) => setExportAsync(e.target.checked)}
-                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  className="rounded border-border text-brand focus:ring-brand"
                 />
-                <label htmlFor="asyncWorker" className="text-xs text-slate-600">
+                <label htmlFor="asyncWorker" className="text-xs text-text-muted">
                   Process asynchronously via BullMQ background worker queue
                 </label>
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+            <div className="flex justify-end gap-3 pt-3 border-t border-border">
               <Button variant="outline" size="sm" onClick={() => setExportModalOpen(false)}>
                 Cancel
               </Button>
               <Button
                 size="sm"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                className="bg-brand hover:bg-brand-hover text-brand-foreground"
                 onClick={handleExport}
                 disabled={exporting}
               >

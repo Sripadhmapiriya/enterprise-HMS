@@ -53,10 +53,12 @@ import {
   PinOff,
   Sun,
   Moon,
+  Monitor,
   PanelLeftClose,
   PanelLeftOpen,
   AlertTriangle,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import {
   CommandPalette,
   CommandItem,
@@ -242,7 +244,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const [enabledModules, setEnabledModules] = useState<string[] | null>(null);
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Sidebar Modes & Layout
   const [isCollapsed, setIsCollapsed] = useState(false); // 72px rail on desktop
@@ -306,17 +313,6 @@ export function AppShell({ children }: { children: ReactNode }) {
     if (!token) {
       window.location.href = '/login?redirect=' + encodeURIComponent(pathname);
       return;
-    }
-
-    // Load theme
-    const savedTheme = (localStorage.getItem('hms_theme') as 'light' | 'dark') || 'light';
-    setTheme(savedTheme);
-    if (savedTheme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-      document.documentElement.classList.remove('dark');
     }
 
     // Load cached user if available
@@ -520,19 +516,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     [currentUser]
   );
 
-  // Theme Toggle
-  const toggleTheme = useCallback(() => {
-    const nextTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(nextTheme);
-    localStorage.setItem('hms_theme', nextTheme);
-    if (nextTheme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
+  // Theme Cycle (Light -> Dark -> System -> Light)
+  const cycleTheme = useCallback(() => {
+    if (theme === 'system') setTheme('light');
+    else if (theme === 'light') setTheme('dark');
+    else setTheme('system');
+  }, [theme, setTheme]);
 
   // Sign out
   const handleSignOut = () => {
@@ -667,9 +656,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           variants={clinicalAlertPulseVariants}
           initial="initial"
           animate="pulse"
-          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-950/80 text-red-200 border border-red-700/60 shadow-xs tabular-nums"
+          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-critical-bg text-critical-text border border-critical-border shadow-xs tabular-nums"
         >
-          <AlertTriangle className="w-2.5 h-2.5 text-red-400" aria-hidden="true" />
+          <AlertTriangle className="w-2.5 h-2.5 text-critical" aria-hidden="true" />
           <span>{count}</span>
         </motion.span>
       );
@@ -677,14 +666,14 @@ export function AppShell({ children }: { children: ReactNode }) {
 
     if (item.badgeKey === 'lab') {
       return (
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-cyan-950 text-cyan-200 border border-cyan-800/60 tabular-nums">
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-info-bg text-info-text border border-info-border tabular-nums">
           {count}
         </span>
       );
     }
 
     return (
-      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700 tabular-nums">
+      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-surface-subtle text-text-muted border border-border tabular-nums">
         {count}
       </span>
     );
@@ -711,11 +700,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex transition-colors duration-200">
+    <div className="min-h-screen bg-background text-text flex transition-colors duration-200">
       {/* Mobile / Tablet Backdrop */}
       {isDrawerOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 bg-overlay backdrop-blur-xs lg:hidden"
           onClick={() => setIsDrawerOpen(false)}
           aria-hidden="true"
         />
@@ -724,51 +713,35 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Sidebar Navigation */}
       <aside
         aria-label="Application Sidebar"
-        className={`fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-slate-900 text-slate-100 border-r border-slate-800 transition-all duration-200 ${
+        className={`fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-surface text-text border-r border-border transition-all duration-200 ${
           isDrawerOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0'
         } ${isCollapsed ? 'lg:w-[72px]' : 'lg:w-64'}`}
       >
         {/* Header: Product Logo & Tenant Info & Close Button */}
-        <div className="h-14 flex items-center justify-between px-3.5 border-b border-slate-800 shrink-0">
+        <div className={`h-14 flex items-center border-b border-border shrink-0 justify-between px-3.5 ${isCollapsed ? 'lg:justify-center lg:px-0' : ''}`}>
           <Link
             href="/dashboard"
-            className="flex items-center gap-2.5 overflow-hidden focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-md py-1"
+            className="flex items-center gap-2.5 overflow-hidden focus-visible:ring-2 focus-visible:ring-brand rounded-md py-1"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#0891B2] flex items-center justify-center text-white shrink-0 shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-brand-foreground shrink-0 shadow-xs">
               <Activity className="w-5 h-5" aria-hidden="true" />
             </div>
-            {!isCollapsed && (
-              <div className="overflow-hidden">
-                <span className="font-bold text-sm tracking-tight text-white whitespace-nowrap block leading-tight">
-                  Enterprise <span className="text-[#22D3EE]">HMS</span>
-                </span>
-                <span className="text-[10px] text-slate-400 truncate block leading-tight">
-                  {tenantName}
-                </span>
-              </div>
-            )}
+            <div className={`overflow-hidden ${isCollapsed ? 'lg:hidden' : ''}`}>
+              <span className="font-bold text-sm tracking-tight text-text whitespace-nowrap block leading-tight">
+                Enterprise <span className="text-brand">HMS</span>
+              </span>
+              <span className="text-[10px] text-text-muted truncate block leading-tight">
+                {tenantName}
+              </span>
+            </div>
           </Link>
-
-          {/* Desktop collapse toggle */}
-          <button
-            type="button"
-            onClick={toggleCollapsed}
-            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            className="hidden lg:flex p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
-          >
-            {isCollapsed ? (
-              <PanelLeftOpen className="w-4 h-4" aria-hidden="true" />
-            ) : (
-              <PanelLeftClose className="w-4 h-4" aria-hidden="true" />
-            )}
-          </button>
 
           {/* Mobile drawer close button */}
           <button
             type="button"
             onClick={() => setIsDrawerOpen(false)}
             aria-label="Close mobile navigation"
-            className="lg:hidden text-slate-400 hover:text-white p-1 rounded-md"
+            className="lg:hidden text-text-muted hover:text-text p-1 rounded-md"
           >
             <X className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -776,25 +749,25 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         {/* Hospital Branch Selector directly under header */}
         {!isCollapsed && (
-          <div className="px-3 pt-2 pb-1.5 border-b border-slate-800/80 shrink-0">
+          <div className="px-3 pt-2 pb-1.5 border-b border-border shrink-0">
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setIsHospitalMenuOpen((prev) => !prev)}
                 aria-expanded={isHospitalMenuOpen}
                 aria-label="Select hospital branch"
-                className="w-full flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-md bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-xs text-slate-200 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
+                className="w-full flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-md bg-surface-subtle hover:bg-surface-raised border border-border text-xs text-text transition-colors focus-visible:ring-2 focus-visible:ring-brand"
               >
                 <div className="flex items-center gap-2 truncate">
-                  <Building className="w-3.5 h-3.5 text-[#22D3EE] shrink-0" aria-hidden="true" />
+                  <Building className="w-3.5 h-3.5 text-brand shrink-0" aria-hidden="true" />
                   <span className="truncate text-[11px] font-medium">{selectedHospital}</span>
                 </div>
-                <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" aria-hidden="true" />
+                <ChevronDown className="w-3 h-3 text-text-muted shrink-0" aria-hidden="true" />
               </button>
 
               {isHospitalMenuOpen && (
-                <div className="absolute left-0 right-0 mt-1 rounded-md border border-slate-700 bg-slate-800 p-1 shadow-xl z-50 space-y-0.5">
-                  <div className="px-2 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                <div className="absolute left-0 right-0 mt-1 rounded-md border border-border bg-surface-raised p-1 shadow-xl z-50 space-y-0.5">
+                  <div className="px-2 py-1 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
                     Hospital Branches
                   </div>
                   {hospitals.map((hosp) => (
@@ -806,11 +779,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                         setIsHospitalMenuOpen(false);
                         localStorage.setItem('hms_selected_branch', hosp);
                       }}
-                      className="w-full flex items-center justify-between px-2 py-1.5 rounded text-left text-xs text-slate-200 hover:bg-cyan-950/60 hover:text-[#22D3EE] transition-colors"
+                      className="w-full flex items-center justify-between px-2 py-1.5 rounded text-left text-xs text-text hover:bg-surface-subtle hover:text-brand transition-colors"
                     >
                       <span className="truncate text-[11px]">{hosp}</span>
                       {selectedHospital === hosp && (
-                        <Check className="w-3 h-3 text-[#22D3EE]" aria-hidden="true" />
+                        <Check className="w-3 h-3 text-brand" aria-hidden="true" />
                       )}
                     </button>
                   ))}
@@ -821,22 +794,22 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
 
         {/* Search at top of sidebar */}
-        <div className="p-2 border-b border-slate-800/60 shrink-0">
+        <div className="p-2 border-b border-border shrink-0">
           {!isCollapsed ? (
             <div className="relative flex items-center">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" aria-hidden="true" />
+              <Search className="w-3.5 h-3.5 text-text-muted absolute left-2.5 pointer-events-none" aria-hidden="true" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search menu..."
                 aria-label="Filter menu items"
-                className="w-full pl-8 pr-14 py-1.5 bg-slate-800/80 border border-slate-700/60 rounded-md text-xs text-slate-100 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-cyan-400"
+                className="w-full pl-8 pr-14 py-1.5 bg-surface-subtle border border-border rounded-md text-xs text-text placeholder:text-text-muted focus:outline-hidden focus:ring-1 focus:ring-brand"
               />
               <button
                 type="button"
                 onClick={() => setIsCommandPaletteOpen(true)}
-                className="absolute right-1.5 text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 hover:text-white"
+                className="absolute right-1.5 text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface border border-border text-text-muted hover:text-text"
                 title="Open Command Palette (Ctrl+K)"
               >
                 Ctrl K
@@ -847,7 +820,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => setIsCommandPaletteOpen(true)}
               aria-label="Search navigation (Ctrl+K)"
-              className="w-full p-2 flex items-center justify-center rounded-md hover:bg-slate-800 text-slate-400 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="w-full p-2 flex items-center justify-center rounded-md hover:bg-surface-subtle text-text-muted hover:text-text focus-visible:ring-2 focus-visible:ring-brand"
             >
               <Search className="w-4 h-4" aria-hidden="true" />
             </button>
@@ -857,7 +830,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         {/* Scrollable Navigation Area with scroll fade mask and custom scrollbar */}
         <div className="relative flex-1 min-h-0 overflow-hidden">
           {/* Soft top gradient fade mask */}
-          <div className="pointer-events-none h-3 bg-gradient-to-b from-slate-900 to-transparent absolute top-0 left-0 right-0 z-10" />
+          <div className="pointer-events-none h-3 bg-gradient-to-b from-surface to-transparent absolute top-0 left-0 right-0 z-10" />
 
           <nav
             ref={navListRef}
@@ -868,18 +841,18 @@ export function AppShell({ children }: { children: ReactNode }) {
             {/* 1. Live Filtered Search Results View */}
             {searchFilteredItems !== null ? (
               <div className="space-y-1">
-                <div className="px-2 py-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                <div className="px-2 py-1 text-[11px] font-semibold text-text-muted uppercase tracking-wider flex items-center justify-between">
                   <span>Filtered ({searchFilteredItems.length})</span>
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="text-[10px] text-cyan-400 hover:underline"
+                    className="text-[10px] text-brand hover:underline"
                   >
                     Clear
                   </button>
                 </div>
                 {searchFilteredItems.length === 0 ? (
-                  <div className="px-3 py-4 text-center text-slate-500 text-xs">
+                  <div className="px-3 py-4 text-center text-text-muted text-xs">
                     No matching pages found
                   </div>
                 ) : (
@@ -897,21 +870,21 @@ export function AppShell({ children }: { children: ReactNode }) {
                           setSearchQuery('');
                           setIsDrawerOpen(false);
                         }}
-                        className={`relative group flex items-center justify-between px-3 py-2 rounded-md transition-colors font-medium focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+                        className={`relative group flex items-center justify-between px-3 py-2 rounded-md transition-colors font-medium focus-visible:ring-2 focus-visible:ring-brand ${
                           isActive
-                            ? 'bg-cyan-500/15 text-cyan-300 font-semibold shadow-xs'
-                            : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                            ? 'bg-brand/10 text-brand font-semibold shadow-xs'
+                            : 'text-text-muted hover:bg-surface-subtle hover:text-text'
                         }`}
                       >
                         {isActive && (
                           <motion.div
                             layoutId="activeNavIndicator"
-                            className="absolute inset-0 bg-cyan-500/15 border-l-2 border-[#22D3EE] rounded-md pointer-events-none"
+                            className="absolute inset-0 bg-brand/10 border-l-2 border-brand rounded-md pointer-events-none"
                             transition={MOTION_SPRING}
                           />
                         )}
                         <div className="flex items-center gap-2.5 truncate">
-                          <IconComponent className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-cyan-300" />
+                          <IconComponent className="w-4 h-4 shrink-0 text-text-muted group-hover:text-brand" />
                           <span className="truncate">{item.label}</span>
                         </div>
                         {renderBadge(item)}
@@ -924,10 +897,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               <>
                 {/* 2. Pinned Favorites Section (Max 6) */}
                 {pinnedItems.length > 0 && (
-                  <div className="space-y-0.5 border-b border-slate-800/80 pb-2 mb-2">
+                  <div className="space-y-0.5 border-b border-border pb-2 mb-2">
                     {!isCollapsed && (
-                      <div className="px-2 py-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <Pin className="w-3 h-3 text-[#22D3EE]" aria-hidden="true" />
+                      <div className="px-2 py-1 text-[11px] font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
+                        <Pin className="w-3 h-3 text-brand" aria-hidden="true" />
                         <span>Pinned ({pinnedItems.length}/6)</span>
                       </div>
                     )}
@@ -943,21 +916,21 @@ export function AppShell({ children }: { children: ReactNode }) {
                             aria-current={isActive ? 'page' : undefined}
                             className={`relative flex items-center ${
                               isCollapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2'
-                            } rounded-md transition-colors font-medium focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+                            } rounded-md transition-colors font-medium focus-visible:ring-2 focus-visible:ring-brand ${
                               isActive
-                                ? 'bg-cyan-500/15 text-cyan-300 font-semibold shadow-xs'
-                                : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                                ? 'bg-brand/10 text-brand font-semibold shadow-xs'
+                                : 'text-text-muted hover:bg-surface-subtle hover:text-text'
                             }`}
                           >
                             {isActive && (
                               <motion.div
                                 layoutId="activeNavIndicator"
-                                className="absolute inset-0 bg-cyan-500/15 border-l-2 border-[#22D3EE] rounded-md pointer-events-none"
+                                className="absolute inset-0 bg-brand/10 border-l-2 border-brand rounded-md pointer-events-none"
                                 transition={MOTION_SPRING}
                               />
                             )}
                             <div className="flex items-center gap-2.5 truncate">
-                              <IconComponent className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-cyan-300" />
+                              <IconComponent className="w-4 h-4 shrink-0 text-text-muted group-hover:text-brand" />
                               {!isCollapsed && <span className="truncate">{item.label}</span>}
                             </div>
                             {!isCollapsed && (
@@ -967,7 +940,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                                   type="button"
                                   onClick={(e) => togglePin(item.route, e)}
                                   aria-label={`Unpin ${item.label}`}
-                                  className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-slate-400 hover:text-amber-400 transition-opacity"
+                                  className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-text-muted hover:text-warning transition-opacity"
                                 >
                                   <PinOff className="w-3 h-3" aria-hidden="true" />
                                 </button>
@@ -979,7 +952,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                           {isCollapsed && (
                             <div
                               role="tooltip"
-                              className="absolute left-[76px] top-1/2 -translate-y-1/2 z-50 px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-white text-xs whitespace-nowrap shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-150"
+                              className="absolute left-[76px] top-1/2 -translate-y-1/2 z-50 px-2.5 py-1 rounded-md bg-surface-raised border border-border text-text text-xs whitespace-nowrap shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-150"
                             >
                               {item.label}
                             </div>
@@ -1004,16 +977,16 @@ export function AppShell({ children }: { children: ReactNode }) {
                           onClick={() => toggleGroup(section.title)}
                           aria-expanded={isOpen}
                           aria-controls={`group-${section.title.replace(/\s+/g, '-')}`}
-                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-[11px] font-semibold uppercase tracking-wider text-left transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-[11px] font-semibold uppercase tracking-wider text-left transition-colors focus-visible:ring-2 focus-visible:ring-brand ${
                             hasActiveItem
-                              ? 'text-cyan-300 bg-slate-800/40'
-                              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                              ? 'text-brand bg-surface-subtle'
+                              : 'text-text-muted hover:text-text hover:bg-surface-subtle'
                           }`}
                         >
                           <span className="truncate">{section.title}</span>
                           <ChevronDown
                             className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-                              isOpen ? 'transform rotate-180 text-cyan-400' : 'text-slate-500'
+                              isOpen ? 'transform rotate-180 text-brand' : 'text-text-muted'
                             }`}
                             aria-hidden="true"
                           />
@@ -1033,26 +1006,26 @@ export function AppShell({ children }: { children: ReactNode }) {
                                   href={item.route}
                                   role="link"
                                   aria-current={isActive ? 'page' : undefined}
-                                  className={`relative flex items-center justify-center p-2.5 rounded-md transition-colors font-medium focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+                                  className={`relative flex items-center justify-center p-2.5 rounded-md transition-colors font-medium focus-visible:ring-2 focus-visible:ring-brand ${
                                     isActive
-                                      ? 'bg-cyan-500/15 text-cyan-300 font-semibold shadow-xs'
-                                      : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                      ? 'bg-brand/10 text-brand font-semibold shadow-xs'
+                                      : 'text-text-muted hover:bg-surface-subtle hover:text-text'
                                   }`}
                                 >
                                   {isActive && (
                                     <motion.div
                                       layoutId="activeNavIndicator"
-                                      className="absolute inset-0 bg-cyan-500/15 border-l-2 border-[#22D3EE] rounded-md pointer-events-none"
+                                      className="absolute inset-0 bg-brand/10 border-l-2 border-brand rounded-md pointer-events-none"
                                       transition={MOTION_SPRING}
                                     />
                                   )}
-                                  <IconComponent className="w-5 h-5 shrink-0 group-hover:text-cyan-300" />
+                                  <IconComponent className="w-5 h-5 shrink-0 group-hover:text-brand" />
                                 </Link>
 
                                 {/* Floating tooltip for icon-rail mode */}
                                 <div
                                   role="tooltip"
-                                  className="absolute left-[76px] top-1/2 -translate-y-1/2 z-50 px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-white text-xs whitespace-nowrap shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-150 flex items-center gap-2"
+                                  className="absolute left-[76px] top-1/2 -translate-y-1/2 z-50 px-2.5 py-1 rounded-md bg-surface-raised border border-border text-text text-xs whitespace-nowrap shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-150 flex items-center gap-2"
                                 >
                                   <span>{item.label}</span>
                                   {renderBadge(item)}
@@ -1086,21 +1059,21 @@ export function AppShell({ children }: { children: ReactNode }) {
                                       href={item.route}
                                       role="link"
                                       aria-current={isActive ? 'page' : undefined}
-                                      className={`relative flex items-center justify-between px-3 py-2 rounded-md transition-colors font-medium focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+                                      className={`relative flex items-center justify-between px-3 py-2 rounded-md transition-colors font-medium focus-visible:ring-2 focus-visible:ring-brand ${
                                         isActive
-                                          ? 'bg-cyan-500/15 text-cyan-300 font-semibold shadow-xs'
-                                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                                          ? 'bg-brand/10 text-brand font-semibold shadow-xs'
+                                          : 'text-text-muted hover:bg-surface-subtle hover:text-text'
                                       }`}
                                     >
                                       {isActive && (
                                         <motion.div
                                           layoutId="activeNavIndicator"
-                                          className="absolute inset-0 bg-cyan-500/15 border-l-2 border-[#22D3EE] rounded-md pointer-events-none"
+                                          className="absolute inset-0 bg-brand/10 border-l-2 border-brand rounded-md pointer-events-none"
                                           transition={MOTION_SPRING}
                                         />
                                       )}
                                       <div className="flex items-center gap-2.5 truncate">
-                                        <IconComponent className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-cyan-300" />
+                                        <IconComponent className="w-4 h-4 shrink-0 text-text-muted group-hover:text-brand" />
                                         <span className="truncate">{item.label}</span>
                                       </div>
                                       <div className="flex items-center gap-1.5">
@@ -1111,8 +1084,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                                           aria-label={isPinned ? `Unpin ${item.label}` : `Pin ${item.label}`}
                                           className={`p-0.5 rounded transition-opacity ${
                                             isPinned
-                                              ? 'text-cyan-400'
-                                              : 'opacity-0 group-hover:opacity-100 text-slate-500 hover:text-cyan-300'
+                                              ? 'text-brand'
+                                              : 'opacity-0 group-hover:opacity-100 text-text-muted hover:text-brand'
                                           }`}
                                         >
                                           <Pin className="w-3 h-3" aria-hidden="true" />
@@ -1134,80 +1107,110 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
 
           {/* Soft bottom gradient fade mask */}
-          <div className="pointer-events-none h-4 bg-gradient-to-t from-slate-900 to-transparent absolute bottom-0 left-0 right-0 z-10" />
+          <div className="pointer-events-none h-4 bg-gradient-to-t from-surface to-transparent absolute bottom-0 left-0 right-0 z-10" />
         </div>
 
         {/* Footer: User Card & Dropdown Menu */}
-        <div className="p-2.5 border-t border-slate-800 shrink-0 relative bg-slate-900 z-20">
+        <div className="p-2.5 border-t border-border shrink-0 relative bg-surface z-20">
           <button
             type="button"
             onClick={() => setIsUserMenuOpen((prev) => !prev)}
             aria-expanded={isUserMenuOpen}
             aria-label="User profile and account settings"
-            className="w-full flex items-center justify-between p-1.5 rounded-lg hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400 text-left"
+            className="w-full flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-subtle transition-colors focus-visible:ring-2 focus-visible:ring-brand text-left cursor-pointer"
           >
             <div className="flex items-center gap-2.5 truncate">
-              <div className="w-8 h-8 rounded-full bg-cyan-700 text-white flex items-center justify-center text-xs font-bold shrink-0">
+              <div className="w-8 h-8 rounded-full bg-brand text-brand-foreground flex items-center justify-center text-xs font-bold shrink-0">
                 {initials}
               </div>
               {!isCollapsed && (
                 <div className="overflow-hidden">
-                  <div className="text-xs font-semibold text-slate-200 truncate">{displayName}</div>
-                  <div className="text-[10px] text-slate-400 truncate">
+                  <div className="text-xs font-semibold text-text truncate">{displayName}</div>
+                  <div className="text-[10px] text-text-muted truncate">
                     {displayRole} • Main Campus
                   </div>
                 </div>
               )}
             </div>
             {!isCollapsed && (
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
+              <ChevronDown className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
             )}
           </button>
 
           {/* User popup dropdown */}
           {isUserMenuOpen && (
-            <div className="absolute bottom-16 left-2 right-2 rounded-lg border border-slate-700 bg-slate-800 p-1.5 shadow-2xl z-50 space-y-1 text-xs">
-              <div className="px-2.5 py-2 border-b border-slate-700/80">
-                <div className="font-semibold text-slate-100">{displayName}</div>
-                <div className="text-[11px] text-slate-400 truncate">{displayEmail}</div>
-                <span className="inline-block mt-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-cyan-900/60 text-cyan-200 border border-cyan-700/60">
+            <div className="absolute bottom-16 left-2 right-2 rounded-lg border border-border bg-surface-raised p-1.5 shadow-2xl z-50 space-y-1 text-xs">
+              <div className="px-2.5 py-2 border-b border-border">
+                <div className="font-semibold text-text">{displayName}</div>
+                <div className="text-[11px] text-text-muted truncate">{displayEmail}</div>
+                <span className="inline-block mt-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-brand/10 text-brand border border-brand/20">
                   {displayRole}
                 </span>
               </div>
 
               <Link
                 href="/users"
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded text-slate-200 hover:bg-slate-700 hover:text-white"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded text-text hover:bg-surface-subtle"
                 onClick={() => setIsUserMenuOpen(false)}
               >
-                <Users className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
+                <Users className="w-3.5 h-3.5 text-text-muted" aria-hidden="true" />
                 <span>Profile & Roles</span>
               </Link>
 
-              {/* Theme toggle */}
-              <button
-                type="button"
-                onClick={toggleTheme}
-                className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-slate-200 hover:bg-slate-700 hover:text-white cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  {theme === 'dark' ? (
-                    <Moon className="w-3.5 h-3.5 text-amber-300" aria-hidden="true" />
-                  ) : (
-                    <Sun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
-                  )}
+              {/* Theme selection */}
+              <div className="px-2 py-1.5 space-y-1.5 border-t border-border">
+                <div className="flex items-center justify-between text-[11px] font-medium text-text-muted">
                   <span>Theme</span>
+                  <span className="capitalize text-[10px] font-semibold text-text">{mounted ? theme : 'system'}</span>
                 </div>
-                <span className="text-[10px] uppercase font-semibold text-slate-400">
-                  {theme}
-                </span>
-              </button>
+                <div className="grid grid-cols-3 gap-1 bg-surface-subtle p-1 rounded-md border border-border">
+                  <button
+                    type="button"
+                    onClick={() => setTheme('light')}
+                    className={`flex items-center justify-center gap-1 py-1 px-1 rounded text-[11px] font-medium transition-colors cursor-pointer ${
+                      mounted && theme === 'light'
+                        ? 'bg-surface text-brand font-semibold shadow-xs'
+                        : 'text-text-muted hover:text-text'
+                    }`}
+                    aria-label="Set light theme"
+                  >
+                    <Sun className="w-3 h-3 text-warning" aria-hidden="true" />
+                    <span>Light</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTheme('dark')}
+                    className={`flex items-center justify-center gap-1 py-1 px-1 rounded text-[11px] font-medium transition-colors cursor-pointer ${
+                      mounted && theme === 'dark'
+                        ? 'bg-surface text-brand font-semibold shadow-xs'
+                        : 'text-text-muted hover:text-text'
+                    }`}
+                    aria-label="Set dark theme"
+                  >
+                    <Moon className="w-3 h-3 text-brand" aria-hidden="true" />
+                    <span>Dark</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTheme('system')}
+                    className={`flex items-center justify-center gap-1 py-1 px-1 rounded text-[11px] font-medium transition-colors cursor-pointer ${
+                      mounted && theme === 'system'
+                        ? 'bg-surface text-brand font-semibold shadow-xs'
+                        : 'text-text-muted hover:text-text'
+                    }`}
+                    aria-label="Set system theme"
+                  >
+                    <Monitor className="w-3 h-3 text-brand" aria-hidden="true" />
+                    <span>System</span>
+                  </button>
+                </div>
+              </div>
 
               {/* Sign out */}
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-red-400 hover:bg-red-950/40 hover:text-red-300 text-left cursor-pointer border-t border-slate-700/60 pt-1.5"
+                className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-critical hover:bg-critical-bg text-left cursor-pointer border-t border-border pt-1.5"
               >
                 <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>Sign Out</span>
@@ -1224,14 +1227,14 @@ export function AppShell({ children }: { children: ReactNode }) {
         }`}
       >
         {/* Sticky Topbar Header */}
-        <header className="h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6">
+        <header className="h-14 bg-surface border-b border-border sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
             {/* Mobile / Tablet Drawer Trigger */}
             <button
               type="button"
               onClick={() => setIsDrawerOpen(true)}
               aria-label="Open navigation menu"
-              className="p-1.5 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="p-1.5 rounded-md text-text-muted hover:text-text hover:bg-surface-subtle lg:hidden focus-visible:ring-2 focus-visible:ring-brand"
             >
               <Menu className="w-5 h-5" aria-hidden="true" />
             </button>
@@ -1241,14 +1244,18 @@ export function AppShell({ children }: { children: ReactNode }) {
               type="button"
               onClick={toggleCollapsed}
               aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              className="hidden lg:flex p-1.5 rounded-md text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="hidden lg:flex p-1.5 rounded-md text-text-muted hover:text-text hover:bg-surface-subtle transition-colors focus-visible:ring-2 focus-visible:ring-brand"
             >
-              <Menu className="w-4 h-4" aria-hidden="true" />
+              {isCollapsed ? (
+                <PanelLeftOpen className="w-5 h-5" aria-hidden="true" />
+              ) : (
+                <PanelLeftClose className="w-5 h-5" aria-hidden="true" />
+              )}
             </button>
 
             {/* Topbar Hospital Branch Display */}
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
-              <Building className="w-3.5 h-3.5 text-[#0891B2] dark:text-[#22D3EE]" aria-hidden="true" />
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-text">
+              <Building className="w-3.5 h-3.5 text-brand" aria-hidden="true" />
               <span className="truncate max-w-[200px] sm:max-w-none">{selectedHospital}</span>
             </div>
           </div>
@@ -1260,11 +1267,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => setIsCommandPaletteOpen(true)}
               aria-label="Open command search palette (Ctrl+K)"
-              className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 rounded-md px-2.5 py-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="flex items-center gap-2 text-xs text-text-muted hover:text-text bg-surface-subtle hover:bg-surface-raised border border-border rounded-md px-2.5 py-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
             >
-              <Search className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" aria-hidden="true" />
+              <Search className="w-3.5 h-3.5 text-text-muted" aria-hidden="true" />
               <span className="hidden sm:inline font-medium">Search records & modules...</span>
-              <kbd className="hidden sm:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
+              <kbd className="hidden sm:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface text-text-muted border border-border">
                 Ctrl K
               </kbd>
             </button>
@@ -1276,7 +1283,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 onClick={() => setIsNotificationsOpen((prev) => !prev)}
                 aria-expanded={isNotificationsOpen}
                 aria-label={`View clinical alerts (${badges.criticalAlerts} alerts)`}
-                className="relative p-2 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
+                className="relative p-2 rounded-md text-text-muted hover:text-text hover:bg-surface-subtle transition-colors focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
               >
                 <Bell className="w-4 h-4" aria-hidden="true" />
                 {badges.criticalAlerts > 0 && (
@@ -1284,16 +1291,16 @@ export function AppShell({ children }: { children: ReactNode }) {
                     variants={clinicalAlertPulseVariants}
                     initial="initial"
                     animate="pulse"
-                    className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900"
+                    className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-critical ring-2 ring-surface"
                   />
                 )}
               </button>
 
               {isNotificationsOpen && (
-                <div className="absolute right-0 mt-1.5 w-80 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-xl z-50 space-y-2">
-                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5 text-red-500" aria-hidden="true" />
+                <div className="absolute right-0 mt-1.5 w-80 rounded-lg border border-border bg-surface-raised p-3 shadow-xl z-50 space-y-2">
+                  <div className="flex items-center justify-between border-b border-border pb-2">
+                    <span className="text-xs font-semibold text-text flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 text-critical" aria-hidden="true" />
                       <span>Clinical Alerts</span>
                     </span>
                     <Badge variant="critical" size="sm">
@@ -1301,50 +1308,50 @@ export function AppShell({ children }: { children: ReactNode }) {
                     </Badge>
                   </div>
                   <div className="space-y-2 text-xs">
-                    <div className="p-2 rounded bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 text-red-900 dark:text-red-200">
+                    <div className="p-2 rounded bg-critical-bg border border-critical-border text-critical-text">
                       <div className="font-semibold flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3 text-red-600 dark:text-red-400" />
+                        <AlertTriangle className="w-3 h-3 text-critical" />
                         <span>Critical Lab Value: MRN-2024-0012</span>
                       </div>
-                      <div className="text-[11px] text-red-700 dark:text-red-300">Serum Potassium 6.2 mEq/L (Ref: 3.5 - 5.0)</div>
+                      <div className="text-[11px] opacity-90">Serum Potassium 6.2 mEq/L (Ref: 3.5 - 5.0)</div>
                     </div>
-                    <div className="p-2 rounded bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900 text-amber-900 dark:text-amber-200">
+                    <div className="p-2 rounded bg-warning-bg border border-warning-border text-warning-text">
                       <div className="font-semibold">Bed Turnaround Alert</div>
-                      <div className="text-[11px] text-amber-700 dark:text-amber-300">ICU Bed #4 sanitized and ready for admission</div>
+                      <div className="text-[11px] opacity-90">ICU Bed #4 sanitized and ready for admission</div>
                     </div>
-                    <div className="p-2 rounded bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-100 dark:border-cyan-900 text-cyan-900 dark:text-cyan-200">
+                    <div className="p-2 rounded bg-info-bg border border-info-border text-info-text">
                       <div className="font-semibold">Pharmacy Shift Closing</div>
-                      <div className="text-[11px] text-cyan-700 dark:text-cyan-300">Narcotics reconciliation pending verification</div>
+                      <div className="text-[11px] opacity-90">Narcotics reconciliation pending verification</div>
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Quick Theme Toggle in Topbar */}
+            {/* Theme Toggle in Topbar: Icon + Text label, Keyboard accessible */}
             <button
               type="button"
-              onClick={toggleTheme}
+              onClick={cycleTheme}
               aria-label="Toggle visual theme"
-              className="p-2 rounded-md text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
+              title={`Current theme: ${mounted ? theme : 'system'}. Click to switch theme`}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-text-muted hover:text-text bg-surface-subtle hover:bg-surface-raised border border-border transition-colors focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
             >
-              {theme === 'dark' ? (
-                <Moon className="w-4 h-4 text-amber-300" aria-hidden="true" />
-              ) : (
-                <Sun className="w-4 h-4 text-amber-500" aria-hidden="true" />
-              )}
+              {(!mounted || theme === 'light') && <Sun className="w-3.5 h-3.5 text-warning" aria-hidden="true" />}
+              {mounted && theme === 'dark' && <Moon className="w-3.5 h-3.5 text-brand" aria-hidden="true" />}
+              {mounted && theme === 'system' && <Monitor className="w-3.5 h-3.5 text-brand" aria-hidden="true" />}
+              <span className="capitalize">{mounted ? theme : 'Theme'}</span>
             </button>
           </div>
         </header>
 
         {/* Breadcrumb Trail */}
-        <div className="px-6 py-2 bg-slate-100/70 dark:bg-slate-900/60 border-b border-slate-200/80 dark:border-slate-800">
-          <nav aria-label="Breadcrumb" className="flex items-center text-xs text-slate-500 dark:text-slate-400">
+        <div className="px-6 py-2 bg-surface-subtle border-b border-border">
+          <nav aria-label="Breadcrumb" className="flex items-center text-xs text-text-muted">
             <ol className="flex items-center space-x-1.5 list-none p-0 m-0">
               <li>
                 <Link
                   href="/dashboard"
-                  className="flex items-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
+                  className="flex items-center text-text-muted hover:text-text transition-colors focus-visible:ring-2 focus-visible:ring-brand"
                   aria-label="Home Dashboard"
                 >
                   <Home className="w-3.5 h-3.5" aria-hidden="true" />
@@ -1352,15 +1359,15 @@ export function AppShell({ children }: { children: ReactNode }) {
               </li>
               {breadcrumbs.map((item, idx) => (
                 <li key={idx} className="flex items-center space-x-1.5">
-                  <ChevronRight className="w-3 h-3 text-slate-300 dark:text-slate-600 shrink-0" aria-hidden="true" />
+                  <ChevronRight className="w-3 h-3 text-border-strong shrink-0" aria-hidden="true" />
                   {item.isCurrent ? (
-                    <span className="font-semibold text-slate-800 dark:text-slate-100" aria-current="page">
+                    <span className="font-semibold text-text" aria-current="page">
                       {item.label}
                     </span>
                   ) : (
                     <Link
                       href={item.href}
-                      className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
+                      className="text-text-muted hover:text-text transition-colors focus-visible:ring-2 focus-visible:ring-brand"
                     >
                       {item.label}
                     </Link>

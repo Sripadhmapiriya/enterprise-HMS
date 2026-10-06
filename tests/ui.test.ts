@@ -93,7 +93,7 @@ describe('Workstream C: Design System & Packages/UI Components', () => {
       });
 
       expect(criticalBadge.props.className).toContain('tabular-nums');
-      expect(criticalBadge.props.className).toContain('bg-red-50');
+      expect(criticalBadge.props.className).toContain('bg-critical-bg');
       // Children array contains icon + text element so status is never conveyed by color alone
       expect(criticalBadge.props.children[0]).toBeDefined(); // icon
       expect(criticalBadge.props.children[1].props.children).toBe('Heart Rate High');

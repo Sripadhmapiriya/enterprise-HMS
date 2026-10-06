@@ -65,8 +65,8 @@ export default function UsersPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Users & Role Access</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Manage staff authentication, RBAC role permissions, and access credentials.</p>
+          <h1 className="text-xl font-bold text-text tracking-tight">Users & Role Access</h1>
+          <p className="text-xs text-text-muted mt-0.5">Manage staff authentication, RBAC role permissions, and access credentials.</p>
         </div>
         <Button
           variant="primary"
@@ -78,26 +78,26 @@ export default function UsersPage() {
         </Button>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
-        <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="bg-surface border border-border rounded-xl shadow-xs overflow-hidden">
+        <div className="p-4 border-b border-border bg-surface-subtle/50 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            <Search className="w-4 h-4 text-text-muted absolute left-3 top-2.5" />
             <input
               type="text"
               placeholder="Search users by name, email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+              className="w-full pl-9 pr-3 py-1.5 border border-border rounded-lg text-xs focus:outline-hidden focus:ring-2 focus:ring-brand"
             />
           </div>
-          <span className="text-xs text-slate-500 font-medium">
+          <span className="text-xs text-text-muted font-medium">
             {filteredUsers.length} staff members listed
           </span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
+          <table className="w-full text-left text-xs text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase font-semibold">
               <tr>
                 <th className="px-6 py-3">Personnel</th>
                 <th className="px-6 py-3">Assigned Roles</th>
@@ -106,32 +106,32 @@ export default function UsersPage() {
                 <th className="px-6 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-slate-400">
+                  <td colSpan={5} className="px-6 py-8 text-center text-text-muted">
                     Loading personnel records...
                   </td>
                 </tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-slate-400">
+                  <td colSpan={5} className="px-6 py-8 text-center text-text-muted">
                     No matching users found.
                   </td>
                 </tr>
               ) : (
                 filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={user.id} className="hover:bg-surface-subtle/50 transition-colors">
                     <td className="px-6 py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-cyan-100 text-cyan-800 font-semibold text-xs flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-info-bg text-info-text font-semibold text-xs flex items-center justify-center">
                           {user.firstName?.[0] || 'U'}{user.lastName?.[0] || ''}
                         </div>
                         <div>
-                          <div className="font-semibold text-slate-900">
+                          <div className="font-semibold text-text">
                             {user.firstName} {user.lastName}
                           </div>
-                          <div className="text-[11px] text-slate-400">{user.email}</div>
+                          <div className="text-[11px] text-text-muted">{user.email}</div>
                         </div>
                       </div>
                     </td>
@@ -140,21 +140,21 @@ export default function UsersPage() {
                         {(user.roles || ['STAFF']).map((role: string, idx: number) => (
                           <span
                             key={idx}
-                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200"
+                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-surface-subtle text-text border border-border"
                           >
-                            <Shield className="w-2.5 h-2.5 mr-1 text-slate-400" />
+                            <Shield className="w-2.5 h-2.5 mr-1 text-text-muted" />
                             {role}
                           </span>
                         ))}
                       </div>
                     </td>
                     <td className="px-6 py-3.5">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-stable-bg text-stable-text border border-stable-border">
+                        <CheckCircle2 className="w-3 h-3 text-stable" />
                         {user.isActive ? 'Active' : 'Suspended'}
                       </span>
                     </td>
-                    <td className="px-6 py-3.5 text-slate-500 font-mono text-[11px]">
+                    <td className="px-6 py-3.5 text-text-muted font-mono text-[11px]">
                       {user.lastLoginAt
                         ? new Date(user.lastLoginAt).toLocaleDateString([], {
                             month: 'short',
@@ -167,7 +167,7 @@ export default function UsersPage() {
                     <td className="px-6 py-3.5 text-right">
                       <button
                         onClick={() => alert(`Managing permissions for ${user.email}`)}
-                        className="text-cyan-700 hover:text-cyan-900 font-medium text-xs"
+                        className="text-info-text hover:text-info-text font-medium text-xs"
                       >
                         Edit Access
                       </button>

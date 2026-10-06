@@ -30,17 +30,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants: Record<string, string> = {
       primary:
-        'bg-[#0891B2] text-white hover:bg-[#0E7490] active:bg-[#155E75] focus:ring-[#0891B2] shadow-xs',
+        'bg-brand text-brand-foreground hover:bg-brand-hover focus:ring-ring shadow-xs',
       secondary:
-        'bg-[#059669] text-white hover:bg-[#047857] active:bg-[#065F46] focus:ring-[#059669] shadow-xs',
+        'bg-stable text-brand-foreground hover:opacity-90 focus:ring-ring shadow-xs',
       outline:
-        'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 active:bg-slate-100 focus:ring-[#0891B2]',
+        'border border-border bg-surface text-text hover:bg-surface-subtle focus:ring-ring',
       ghost:
-        'bg-transparent text-slate-700 hover:bg-slate-100 active:bg-slate-200 focus:ring-[#0891B2]',
+        'bg-transparent text-text hover:bg-surface-subtle focus:ring-ring',
       destructive:
-        'bg-[#DC2626] text-white hover:bg-[#B91C1C] active:bg-[#991B1B] focus:ring-[#DC2626] shadow-xs',
+        'bg-critical text-brand-foreground hover:opacity-90 focus:ring-ring shadow-xs',
       link:
-        'bg-transparent text-[#0891B2] underline-offset-4 hover:underline p-0 h-auto focus:ring-0',
+        'bg-transparent text-brand underline-offset-4 hover:underline p-0 h-auto focus:ring-0',
     };
 
     const sizes: Record<string, string> = {

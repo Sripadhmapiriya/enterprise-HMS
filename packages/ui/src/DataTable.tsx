@@ -116,14 +116,14 @@ export function DataTable<TData, TValue>({
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
         {/* Search */}
         <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" aria-hidden="true" />
           <input
             type="search"
             value={globalFilter ?? ''}
             onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder={searchPlaceholder}
             aria-label={searchPlaceholder}
-            className="w-full text-xs rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 pl-9 pr-3 py-1.5 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0891B2]"
+            className="w-full text-xs rounded-md border border-border bg-surface pl-9 pr-3 py-1.5 text-text placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
 
@@ -143,8 +143,8 @@ export function DataTable<TData, TValue>({
               Columns
             </Button>
             {isColumnMenuOpen && (
-              <div className="absolute right-0 mt-1 w-44 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-2 shadow-lg z-20 space-y-1">
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 px-1 mb-1">
+              <div className="absolute right-0 mt-1 w-44 rounded-md border border-border bg-surface-raised p-2 shadow-lg z-20 space-y-1">
+                <p className="text-[11px] font-semibold text-muted px-1 mb-1">
                   Toggle Columns
                 </p>
                 {table
@@ -153,13 +153,13 @@ export function DataTable<TData, TValue>({
                   .map((column) => (
                     <label
                       key={column.id}
-                      className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 px-1 py-1 rounded cursor-pointer select-none"
+                      className="flex items-center gap-2 text-xs text-text hover:bg-surface-subtle px-1 py-1 rounded cursor-pointer select-none"
                     >
                       <input
                         type="checkbox"
                         checked={column.getIsVisible()}
                         onChange={column.getToggleVisibilityHandler()}
-                        className="rounded border-slate-300 text-[#0891B2] focus:ring-[#0891B2]"
+                        className="rounded border-border text-brand focus:ring-ring"
                       />
                       <span className="capitalize">{column.id}</span>
                     </label>
@@ -185,9 +185,9 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Table Container */}
-      <div className="rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-x-auto shadow-xs">
+      <div className="rounded-md border border-border bg-surface overflow-x-auto shadow-xs">
         <table className="w-full text-left text-xs border-collapse">
-          <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider text-[11px]">
+          <thead className="bg-surface-subtle border-b border-border text-muted font-semibold uppercase tracking-wider text-[11px]">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -210,17 +210,17 @@ export function DataTable<TData, TValue>({
                         <div
                           className={cn(
                             'flex items-center gap-1.5',
-                            canSort ? 'cursor-pointer hover:text-slate-900 dark:hover:text-slate-100' : ''
+                            canSort ? 'cursor-pointer hover:text-text' : ''
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
                           {canSort && (
-                            <span className="text-slate-400">
+                            <span className="text-muted">
                               {isSorted === 'asc' ? (
-                                <ArrowUp className="w-3 h-3 text-[#0891B2]" aria-hidden="true" />
+                                <ArrowUp className="w-3 h-3 text-brand" aria-hidden="true" />
                               ) : isSorted === 'desc' ? (
-                                <ArrowDown className="w-3 h-3 text-[#0891B2]" aria-hidden="true" />
+                                <ArrowDown className="w-3 h-3 text-brand" aria-hidden="true" />
                               ) : (
                                 <ArrowUpDown className="w-3 h-3 opacity-40 hover:opacity-100" aria-hidden="true" />
                               )}
@@ -234,7 +234,7 @@ export function DataTable<TData, TValue>({
               </tr>
             ))}
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <tbody className="divide-y divide-border-subtle">
             {isLoading ? (
               <tr>
                 <td colSpan={columns.length} className="p-0">
@@ -256,10 +256,10 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                  className="hover:bg-surface-subtle transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-3.5 py-2.5 text-slate-700 dark:text-slate-300">
+                    <td key={cell.id} className="px-3.5 py-2.5 text-text">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
@@ -272,21 +272,21 @@ export function DataTable<TData, TValue>({
 
       {/* Pagination Footer */}
       {!isLoading && table.getRowModel().rows.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-1 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-1 text-xs text-muted">
           <div className="flex items-center gap-1.5">
             <span>Showing</span>
-            <span className="font-semibold text-slate-700 dark:text-slate-200 tabular-nums">
+            <span className="font-semibold text-text tabular-nums">
               {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}
             </span>
             <span>to</span>
-            <span className="font-semibold text-slate-700 dark:text-slate-200 tabular-nums">
+            <span className="font-semibold text-text tabular-nums">
               {Math.min(
                 (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
                 table.getFilteredRowModel().rows.length
               )}
             </span>
             <span>of</span>
-            <span className="font-semibold text-slate-700 dark:text-slate-200 tabular-nums">
+            <span className="font-semibold text-text tabular-nums">
               {table.getFilteredRowModel().rows.length}
             </span>
             <span>entries</span>
@@ -299,7 +299,7 @@ export function DataTable<TData, TValue>({
                 value={table.getState().pagination.pageSize}
                 onChange={(e) => table.setPageSize(Number(e.target.value))}
                 aria-label="Select rows per page"
-                className="text-xs rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-1 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#0891B2]"
+                className="text-xs rounded border border-border bg-surface px-2 py-1 text-text focus:outline-none focus:ring-1 focus:ring-ring"
               >
                 {[10, 25, 50, 100].map((size) => (
                   <option key={size} value={size}>

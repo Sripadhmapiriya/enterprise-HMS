@@ -90,31 +90,31 @@ export default function InvoicesList() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <FileText className="w-6 h-6 text-sky-600" />
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Patient Invoices & Bills</h1>
+            <FileText className="w-6 h-6 text-info" />
+            <h1 className="text-2xl font-bold text-text tracking-tight">Patient Invoices & Bills</h1>
           </div>
-          <p className="text-slate-500 mt-1">Review finalized bills, outstanding balances, and print official tax invoices</p>
+          <p className="text-text-muted mt-1">Review finalized bills, outstanding balances, and print official tax invoices</p>
         </div>
         <Button variant="secondary" onClick={() => loadBills()} disabled={loading}>
-          <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ?'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
         {/* Filters */}
-        <div className="p-4 border-b border-slate-100 bg-slate-50/60 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="p-4 border-b border-border bg-surface-subtle/60 flex flex-col sm:flex-row items-center justify-between gap-3">
           <Input
             placeholder="Search by Bill #, Patient, or MRN..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full sm:w-80 bg-white"
+            className="w-full sm:w-80 bg-surface"
           />
           <div className="flex space-x-3 w-full sm:w-auto">
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="px-3 py-2 border border-border rounded-lg text-xs bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
             >
               <option value="">All Care Types</option>
               <option value="OPD">OPD Consultation</option>
@@ -125,7 +125,7 @@ export default function InvoicesList() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="px-3 py-2 border border-border rounded-lg text-xs bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
             >
               <option value="">All Statuses</option>
               <option value="DRAFT">Draft</option>
@@ -138,8 +138,8 @@ export default function InvoicesList() {
 
         {/* Invoices Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
+          <table className="w-full text-left text-sm text-text-muted">
+            <thead className="bg-surface-subtle border-b border-border text-text-muted uppercase text-xs font-semibold">
               <tr>
                 <th className="px-5 py-3.5">Bill # / Date</th>
                 <th className="px-5 py-3.5">Patient</th>
@@ -150,21 +150,21 @@ export default function InvoicesList() {
                 <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border">
               {filteredBills.map((b) => (
-                <tr key={b.id} className="hover:bg-slate-50/60 transition-colors">
+                <tr key={b.id} className="hover:bg-surface-subtle/60 transition-colors">
                   <td className="px-5 py-3.5">
-                    <span className="font-bold font-mono text-slate-900">{b.billNumber}</span>
-                    <div className="text-xs text-slate-500">{new Date(b.billDate).toLocaleDateString()}</div>
+                    <span className="font-bold font-mono text-text">{b.billNumber}</span>
+                    <div className="text-xs text-text-muted">{new Date(b.billDate).toLocaleDateString()}</div>
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="font-semibold text-slate-900">
+                    <div className="font-semibold text-text">
                       {b.patient?.firstName} {b.patient?.lastName}
                     </div>
-                    <div className="text-xs text-slate-500 font-mono">MRN: {b.patient?.mrn}</div>
+                    <div className="text-xs text-text-muted font-mono">MRN: {b.patient?.mrn}</div>
                   </td>
                   <td className="px-5 py-3.5">
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded bg-surface-subtle text-text">
                       {b.billType}
                     </span>
                   </td>
@@ -182,11 +182,11 @@ export default function InvoicesList() {
                       {b.status}
                     </Badge>
                   </td>
-                  <td className="px-5 py-3.5 text-right font-bold text-slate-900 tabular-nums">
+                  <td className="px-5 py-3.5 text-right font-bold text-text tabular-nums">
                     ${(b.grossTotal || 0).toFixed(2)}
                   </td>
                   <td className="px-5 py-3.5 text-right font-bold tabular-nums">
-                    <span className={b.outstandingAmount > 0 ? 'text-rose-600' : 'text-slate-500'}>
+                    <span className={b.outstandingAmount > 0 ? 'text-critical' : 'text-text-muted'}>
                       ${(b.outstandingAmount || 0).toFixed(2)}
                     </span>
                   </td>
@@ -206,7 +206,7 @@ export default function InvoicesList() {
                       href={billingApi.getInvoicePdfUrl(b.id)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50"
+                      className="inline-flex items-center text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-border text-text hover:bg-surface-subtle"
                     >
                       <Download className="w-3.5 h-3.5 mr-1" />
                       PDF
@@ -216,7 +216,7 @@ export default function InvoicesList() {
               ))}
               {filteredBills.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-sm text-slate-500">
+                  <td colSpan={7} className="px-5 py-8 text-center text-sm text-text-muted">
                     No matching invoices found.
                   </td>
                 </tr>
@@ -229,25 +229,25 @@ export default function InvoicesList() {
       {/* Collect Payment Modal */}
       <Dialog isOpen={isPayOpen} onClose={() => setIsPayOpen(false)} title={`Collect Payment for ${selectedBill?.billNumber}`}>
         <form onSubmit={handleProcessPayment} className="space-y-4">
-          <div className="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
+          <div className="p-3 bg-surface-subtle rounded-lg text-xs space-y-1">
             <div className="flex justify-between">
-              <span className="text-slate-500">Patient:</span>
-              <span className="font-semibold text-slate-800">
+              <span className="text-text-muted">Patient:</span>
+              <span className="font-semibold text-text">
                 {selectedBill?.patient?.firstName} {selectedBill?.patient?.lastName} ({selectedBill?.patient?.mrn})
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Total Gross:</span>
-              <span className="font-semibold text-slate-800">${(selectedBill?.grossTotal || 0).toFixed(2)}</span>
+              <span className="text-text-muted">Total Gross:</span>
+              <span className="font-semibold text-text">${(selectedBill?.grossTotal || 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Outstanding:</span>
-              <span className="font-bold text-rose-600">${(selectedBill?.outstandingAmount || 0).toFixed(2)}</span>
+              <span className="text-text-muted">Outstanding:</span>
+              <span className="font-bold text-critical">${(selectedBill?.outstandingAmount || 0).toFixed(2)}</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Amount to Pay ($) *</label>
+            <label className="block text-xs font-semibold text-text mb-1">Amount to Pay ($) *</label>
             <Input
               type="number"
               step="0.01"
@@ -258,9 +258,9 @@ export default function InvoicesList() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Payment Method *</label>
+            <label className="block text-xs font-semibold text-text mb-1">Payment Method *</label>
             <select
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
               value={payMethod}
               onChange={(e: any) => setPayMethod(e.target.value)}
             >
@@ -272,7 +272,7 @@ export default function InvoicesList() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Transaction Reference (Optional)</label>
+            <label className="block text-xs font-semibold text-text mb-1">Transaction Reference (Optional)</label>
             <Input
               value={transRef}
               onChange={(e) => setTransRef(e.target.value)}
@@ -280,7 +280,7 @@ export default function InvoicesList() {
             />
           </div>
 
-          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+          <div className="flex justify-end space-x-3 pt-3 border-t border-border">
             <Button variant="secondary" type="button" onClick={() => setIsPayOpen(false)}>
               Cancel
             </Button>

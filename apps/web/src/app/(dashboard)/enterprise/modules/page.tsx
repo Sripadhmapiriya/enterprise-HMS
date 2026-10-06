@@ -119,11 +119,11 @@ export default function ModuleManagerPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <Boxes className="w-6 h-6 text-cyan-600" />
+          <h1 className="text-2xl font-bold tracking-tight text-text flex items-center gap-2">
+            <Boxes className="w-6 h-6 text-info" />
             Tenant Module Manager & Licensing
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-text-muted mt-1">
             Dynamic runtime entitlements with dependency validation and instant cache invalidation.
           </p>
         </div>
@@ -140,14 +140,14 @@ export default function ModuleManagerPage() {
       </div>
 
       {/* Preset Applicator Bar */}
-      <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <div className="p-4 bg-surface border border-border rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Layers className="w-5 h-5 text-cyan-700" />
+          <Layers className="w-5 h-5 text-info-text" />
           <div>
-            <h4 className="font-semibold text-sm text-slate-900">
+            <h4 className="font-semibold text-sm text-text">
               Apply Client Edition Preset
             </h4>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-text-muted">
               Instantly configure the module package according to customer contract tier.
             </p>
           </div>
@@ -185,15 +185,15 @@ export default function ModuleManagerPage() {
           return (
             <div
               key={kind}
-              className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden"
+              className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden"
             >
-              <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">
+              <div className="px-5 py-3.5 bg-surface-subtle border-b border-border flex items-center justify-between">
+                <h3 className="font-bold text-text text-sm uppercase tracking-wider">
                   {kind} Modules ({items.length})
                 </h3>
               </div>
 
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-border">
                 {items.map((mod: any) => {
                   const isFoundation = mod.id === 'foundation';
                   const isBusy = togglingModule === mod.id;
@@ -201,28 +201,28 @@ export default function ModuleManagerPage() {
                   return (
                     <div
                       key={mod.id}
-                      className="p-4 flex items-center justify-between hover:bg-slate-50/50 transition-colors"
+                      className="p-4 flex items-center justify-between hover:bg-surface-subtle/50 transition-colors"
                     >
                       <div className="space-y-1 pr-4">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-900 text-sm">
+                          <span className="font-bold text-text text-sm">
                             {mod.name}
                           </span>
-                          <span className="font-mono text-xs text-slate-400">
+                          <span className="font-mono text-xs text-text-muted">
                             ({mod.id})
                           </span>
                           {isFoundation && (
                             <Badge variant="neutral">Core Platform (Always On)</Badge>
                           )}
                         </div>
-                        <p className="text-xs text-slate-500">{mod.description}</p>
+                        <p className="text-xs text-text-muted">{mod.description}</p>
                         {mod.requires?.length > 0 && (
                           <div className="flex items-center gap-1.5 pt-1">
-                            <span className="text-[11px] text-slate-400">Requires:</span>
+                            <span className="text-[11px] text-text-muted">Requires:</span>
                             {mod.requires.map((req: string) => (
                               <span
                                 key={req}
-                                className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 text-slate-600 rounded text-[10px] font-mono"
+                                className="px-1.5 py-0.5 bg-surface-subtle border border-border text-text-muted rounded text-[10px] font-mono"
                               >
                                 {req}
                               </span>

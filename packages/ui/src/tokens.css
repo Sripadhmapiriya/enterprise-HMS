@@ -5,8 +5,6 @@
  * Clinical Dial: DESIGN_VARIANCE 2, MOTION_INTENSITY 4, VISUAL_DENSITY 8
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 :root {
   /* Motion Tokens (MOTION_INTENSITY: 4, durations 120/200/320ms, two curves) */
   --duration-fast: 120ms;
@@ -101,100 +99,260 @@
   /* -------------------------------------------------------------
    * 2. SEMANTIC TOKENS (LIGHT THEME DEFAULT)
    * ----------------------------------------------------------- */
-  --color-bg-canvas: #F8FAFC;
-  --color-bg-surface: #FFFFFF;
-  --color-bg-subtle: #F1F5F9;
+  color-scheme: light;
+  --background: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-raised: #FFFFFF;
+  --surface-subtle: #F1F5F9;
+  --border: #E2E8F0;
+  --border-subtle: #F1F5F9;
+  --border-strong: #CBD5E1;
+
+  --text: #0F172A;
+  --text-muted: #475569;
+  --text-subtle: #64748B;
+
+  --brand: #0E7490;
+  --brand-hover: #155E75;
+  --brand-foreground: #FFFFFF;
+  --ring: #0891B2;
+  --overlay: rgba(0, 0, 0, 0.5);
+
+  /* Backward Compatibility Aliases */
+  --color-bg-canvas: var(--background);
+  --color-bg-surface: var(--surface);
+  --color-bg-subtle: var(--surface-subtle);
   --color-bg-muted: #E2E8F0;
-
-  --color-fg-primary: #0F172A;
+  --color-fg-primary: var(--text);
   --color-fg-secondary: #334155;
-  --color-fg-muted: #64748B;
-  --color-fg-subtle: #94A3B8;
-
-  --color-border-subtle: #F1F5F9;
-  --color-border-default: #E2E8F0;
-  --color-border-strong: #CBD5E1;
-
-  --color-primary: #0891B2;
-  --color-primary-hover: #0E7490;
-  --color-primary-fg: #FFFFFF;
-
-  --color-accent: #059669;
-  --color-accent-hover: #047857;
-  --color-accent-fg: #FFFFFF;
-
-  --color-focus-ring: #0891B2;
+  --color-fg-muted: var(--text-muted);
+  --color-fg-subtle: var(--text-subtle);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-primary: var(--brand);
+  --color-primary-hover: var(--brand-hover);
+  --color-primary-fg: var(--brand-foreground);
+  --color-focus-ring: var(--ring);
 
   /* -------------------------------------------------------------
    * 3. CLINICAL SEMANTIC STATUS TOKENS
    * (Status is never conveyed by color alone: Pair with icon + text)
    * ----------------------------------------------------------- */
   /* Critical / Emergency */
+  --critical: #DC2626;
+  --critical-bg: #FEF2F2;
+  --critical-border: #FECACA;
+  --critical-text: #991B1B;
+  --clinical-critical-solid: #DC2626;
   --clinical-critical-bg: #FEF2F2;
   --clinical-critical-border: #FECACA;
   --clinical-critical-fg: #991B1B;
-  --clinical-critical-solid: #DC2626;
 
   /* Warning / Caution */
+  --warning: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #FDE68A;
+  --warning-text: #92400E;
+  --clinical-warning-solid: #D97706;
   --clinical-warning-bg: #FFFBEB;
   --clinical-warning-border: #FDE68A;
   --clinical-warning-fg: #92400E;
-  --clinical-warning-solid: #D97706;
 
   /* Stable / Normal */
+  --stable: #059669;
+  --stable-bg: #ECFDF5;
+  --stable-border: #A7F3D0;
+  --stable-text: #065F46;
+  --clinical-stable-solid: #059669;
   --clinical-stable-bg: #ECFDF5;
   --clinical-stable-border: #A7F3D0;
   --clinical-stable-fg: #065F46;
-  --clinical-stable-solid: #059669;
 
   /* Info / Diagnostics */
+  --info: #0891B2;
+  --info-bg: #ECFEFF;
+  --info-border: #A5F3FC;
+  --info-text: #155E75;
+  --clinical-info-solid: #0891B2;
   --clinical-info-bg: #ECFEFF;
   --clinical-info-border: #A5F3FC;
   --clinical-info-fg: #155E75;
-  --clinical-info-solid: #0891B2;
 
   /* Neutral / Pending */
+  --neutral: #64748B;
+  --neutral-bg: #F8FAFC;
+  --neutral-border: #E2E8F0;
+  --neutral-text: #334155;
+  --clinical-neutral-solid: #64748B;
   --clinical-neutral-bg: #F8FAFC;
   --clinical-neutral-border: #E2E8F0;
   --clinical-neutral-fg: #334155;
-  --clinical-neutral-solid: #64748B;
 }
 
-/* Dark Theme Support */
+/* -------------------------------------------------------------
+ * 4. DARK THEME TOKENS
+ * ----------------------------------------------------------- */
+.dark,
 [data-theme='dark'] {
-  --color-bg-canvas: #090D16;
-  --color-bg-surface: #0F172A;
-  --color-bg-subtle: #1E293B;
+  color-scheme: dark;
+  --background: #090D16;
+  --surface: #0F172A;
+  --surface-raised: #1E293B;
+  --surface-subtle: #1E293B;
+  --border: #334155;
+  --border-subtle: #1E293B;
+  --border-strong: #475569;
+
+  --text: #F8FAFC;
+  --text-muted: #94A3B8;
+  --text-subtle: #64748B;
+
+  --brand: #0891B2;
+  --brand-hover: #0E7490;
+  --brand-foreground: #FFFFFF;
+  --ring: #22D3EE;
+  --overlay: rgba(0, 0, 0, 0.7);
+
+  /* Backward Compatibility Aliases */
+  --color-bg-canvas: var(--background);
+  --color-bg-surface: var(--surface);
+  --color-bg-subtle: var(--surface-subtle);
   --color-bg-muted: #334155;
-
-  --color-fg-primary: #F8FAFC;
+  --color-fg-primary: var(--text);
   --color-fg-secondary: #CBD5E1;
-  --color-fg-muted: #94A3B8;
-  --color-fg-subtle: #64748B;
+  --color-fg-muted: var(--text-muted);
+  --color-fg-subtle: var(--text-subtle);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-primary: var(--brand);
+  --color-primary-hover: var(--brand-hover);
+  --color-primary-fg: var(--brand-foreground);
+  --color-focus-ring: var(--ring);
 
-  --color-border-subtle: #1E293B;
-  --color-border-default: #334155;
-  --color-border-strong: #475569;
-
+  /* Clinical Status Tokens (Dark Theme) */
+  --critical: #DC2626;
+  --critical-bg: #450A0A;
+  --critical-border: #7F1D1D;
+  --critical-text: #FCA5A5;
+  --clinical-critical-solid: #DC2626;
   --clinical-critical-bg: #450A0A;
   --clinical-critical-border: #7F1D1D;
   --clinical-critical-fg: #FCA5A5;
 
+  --warning: #D97706;
+  --warning-bg: #451A03;
+  --warning-border: #78350F;
+  --warning-text: #FCD34D;
+  --clinical-warning-solid: #D97706;
   --clinical-warning-bg: #451A03;
   --clinical-warning-border: #78350F;
   --clinical-warning-fg: #FCD34D;
 
+  --stable: #059669;
+  --stable-bg: #022C22;
+  --stable-border: #064E3B;
+  --stable-text: #6EE7B7;
+  --clinical-stable-solid: #059669;
   --clinical-stable-bg: #022C22;
   --clinical-stable-border: #064E3B;
   --clinical-stable-fg: #6EE7B7;
 
+  --info: #0891B2;
+  --info-bg: #083344;
+  --info-border: #164E63;
+  --info-text: #67E8F9;
+  --clinical-info-solid: #0891B2;
   --clinical-info-bg: #083344;
   --clinical-info-border: #164E63;
   --clinical-info-fg: #67E8F9;
 
+  --neutral: #64748B;
+  --neutral-bg: #1E293B;
+  --neutral-border: #334155;
+  --neutral-text: #CBD5E1;
+  --clinical-neutral-solid: #64748B;
   --clinical-neutral-bg: #1E293B;
   --clinical-neutral-border: #334155;
   --clinical-neutral-fg: #CBD5E1;
+}
+
+/* -------------------------------------------------------------
+ * 5. PRINT & PDF ENFORCEMENT (ALWAYS LIGHT THEME)
+ * ----------------------------------------------------------- */
+@media print {
+  html,
+  body,
+  :root,
+  .dark,
+  [data-theme='dark'] {
+    color-scheme: light !important;
+    --background: #FFFFFF !important;
+    --surface: #FFFFFF !important;
+    --surface-raised: #FFFFFF !important;
+    --surface-subtle: #F8FAFC !important;
+    --border: #E2E8F0 !important;
+    --border-subtle: #F1F5F9 !important;
+    --border-strong: #CBD5E1 !important;
+
+    --text: #0F172A !important;
+    --text-muted: #475569 !important;
+    --text-subtle: #64748B !important;
+
+    --brand: #0891B2 !important;
+    --brand-hover: #0E7490 !important;
+    --brand-foreground: #FFFFFF !important;
+    --ring: #0891B2 !important;
+
+    --critical: #DC2626 !important;
+    --critical-bg: #FEF2F2 !important;
+    --critical-border: #FECACA !important;
+    --critical-text: #991B1B !important;
+    --clinical-critical-solid: #DC2626 !important;
+    --clinical-critical-bg: #FEF2F2 !important;
+    --clinical-critical-border: #FECACA !important;
+    --clinical-critical-fg: #991B1B !important;
+
+    --warning: #D97706 !important;
+    --warning-bg: #FFFBEB !important;
+    --warning-border: #FDE68A !important;
+    --warning-text: #92400E !important;
+    --clinical-warning-solid: #D97706 !important;
+    --clinical-warning-bg: #FFFBEB !important;
+    --clinical-warning-border: #FDE68A !important;
+    --clinical-warning-fg: #92400E !important;
+
+    --stable: #059669 !important;
+    --stable-bg: #ECFDF5 !important;
+    --stable-border: #A7F3D0 !important;
+    --stable-text: #065F46 !important;
+    --clinical-stable-solid: #059669 !important;
+    --clinical-stable-bg: #ECFDF5 !important;
+    --clinical-stable-border: #A7F3D0 !important;
+    --clinical-stable-fg: #065F46 !important;
+
+    --info: #0891B2 !important;
+    --info-bg: #ECFEFF !important;
+    --info-border: #A5F3FC !important;
+    --info-text: #155E75 !important;
+    --clinical-info-solid: #0891B2 !important;
+    --clinical-info-bg: #ECFEFF !important;
+    --clinical-info-border: #A5F3FC !important;
+    --clinical-info-fg: #155E75 !important;
+
+    --neutral: #64748B !important;
+    --neutral-bg: #F8FAFC !important;
+    --neutral-border: #E2E8F0 !important;
+    --neutral-text: #334155 !important;
+    --clinical-neutral-solid: #64748B !important;
+    --clinical-neutral-bg: #F8FAFC !important;
+    --clinical-neutral-border: #E2E8F0 !important;
+    --clinical-neutral-fg: #334155 !important;
+
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+  }
 }
 
 /* Number display standard: Always tabular numerals in clinical and financial contexts */
@@ -203,14 +361,14 @@
   font-feature-settings: 'tnum';
 }
 
-/* Custom Thin Dark Scrollbar on hover */
+/* Custom Thin Scrollbar on hover adhering to semantic borders */
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
   transition: scrollbar-color 200ms ease;
 }
 .custom-scrollbar:hover {
-  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+  scrollbar-color: var(--border-strong) transparent;
 }
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;
@@ -224,10 +382,7 @@
   transition: background-color 200ms ease;
 }
 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(148, 163, 184, 0.35);
-}
-.custom-scrollbar:hover::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(148, 163, 184, 0.6);
+  background-color: var(--border-strong);
 }
 
 /* Top and bottom fade masks for scrollable areas */
