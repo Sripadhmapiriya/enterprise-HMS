@@ -126,7 +126,8 @@ router.get('/duplicates', requirePermission('patients.read'), async (req, res, n
         mobile: true,
         createdAt: true,
       },
-      take: 10,
+      orderBy: { createdAt: 'desc' },
+      take: 50,
     });
 
     res.json({
