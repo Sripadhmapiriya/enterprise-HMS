@@ -307,15 +307,27 @@ router.get('/active-patients', requirePermission('icu.flowsheets.read'), async (
       where: {
         tenantId,
         status: 'ADMITTED',
-        OR: [
-          { bed: { bedType: 'ICU' } },
-          { ward: { wardType: 'ICU' } },
-        ],
+        bedAllocations: {
+          some: {
+            status: 'ACTIVE',
+            bed: {
+              OR: [
+                { bedType: 'ICU' },
+                { ward: { wardType: 'ICU' } },
+              ],
+            },
+          },
+        },
       },
       include: {
         patient: true,
-        bed: {
-          include: { ward: true, room: true },
+        bedAllocations: {
+          where: { status: 'ACTIVE' },
+          include: {
+            bed: {
+              include: { ward: true, room: true },
+            },
+          },
         },
         encounter: {
           include: {
@@ -336,13 +348,15 @@ router.get('/active-patients', requirePermission('icu.flowsheets.read'), async (
       const alarms = latestFlowsheet ? evaluateCriticalAlarms(vs, vp) : [];
       const sofa = vs ? calculateSofaScore(vs) : null;
 
+      const activeBed = adm.bedAllocations?.[0]?.bed;
+
       return {
         admissionId: adm.id,
         admissionNumber: adm.admissionNumber,
         admissionDate: adm.admissionDate,
         patient: adm.patient,
-        bed: adm.bed,
-        ward: adm.ward,
+        bed: activeBed,
+        ward: activeBed?.ward,
         encounterId: adm.encounterId,
         latestVitals: vs,
         latestVentilator: vp,

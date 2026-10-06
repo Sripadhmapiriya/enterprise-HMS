@@ -274,12 +274,12 @@ router.get('/appointments', requirePermission('scheduling.appointments.read'), a
     const { doctorId, patientId, branchId, date, status } = req.query as Record<string, string>;
     const where: any = {};
 
-    if (doctorId) where.doctorId = doctorId;
-    if (patientId) where.patientId = patientId;
-    if (branchId) where.branchId = branchId;
-    if (status) where.status = status;
+    if (doctorId && doctorId !== 'undefined') where.doctorId = doctorId;
+    if (patientId && patientId !== 'undefined') where.patientId = patientId;
+    if (branchId && branchId !== 'undefined') where.branchId = branchId;
+    if (status && status !== 'undefined') where.status = status;
 
-    if (date) {
+    if (date && date !== 'undefined') {
       const targetDate = new Date(date);
       const startOfDay = new Date(targetDate);
       startOfDay.setUTCHours(0, 0, 0, 0);

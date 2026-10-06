@@ -62,7 +62,7 @@ test.describe('AppShell Sidebar & Motion Redesign Test Suite', () => {
     await expect(sidebar).toHaveClass(/lg:w-64/);
 
     // Click collapse toggle button
-    const collapseBtn = sidebar.locator('button[aria-label="Collapse sidebar"]');
+    const collapseBtn = page.locator('header button[aria-label="Collapse sidebar"]');
     await collapseBtn.click();
 
     // Verify collapsed to 72px icon rail
@@ -79,7 +79,7 @@ test.describe('AppShell Sidebar & Motion Redesign Test Suite', () => {
     await expect(sidebar).toHaveClass(/lg:w-\[72px\]/);
 
     // Expand back
-    const expandBtn = sidebar.locator('button[aria-label="Expand sidebar"]');
+    const expandBtn = page.locator('header button[aria-label="Expand sidebar"]');
     await expandBtn.click();
     await expect(sidebar).toHaveClass(/lg:w-64/);
   });
@@ -346,7 +346,7 @@ test.describe('AppShell Sidebar & Motion Redesign Test Suite', () => {
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'sidebar-expanded.png'), fullPage: false });
 
     // 2. Collapsed
-    const collapseBtn = page.locator('aside button[aria-label="Collapse sidebar"]');
+    const collapseBtn = page.locator('header button[aria-label="Collapse sidebar"]');
     await collapseBtn.click();
     await page.waitForTimeout(300);
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'sidebar-collapsed.png'), fullPage: false });
@@ -354,7 +354,7 @@ test.describe('AppShell Sidebar & Motion Redesign Test Suite', () => {
     // 3. Dark Theme
     await page.locator('header button[aria-label="Toggle visual theme"]').click();
     await page.waitForTimeout(200);
-    const expandBtn = page.locator('aside button[aria-label="Expand sidebar"]');
+    const expandBtn = page.locator('header button[aria-label="Expand sidebar"]');
     await expandBtn.click();
     await page.waitForTimeout(300);
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'sidebar-dark.png'), fullPage: false });

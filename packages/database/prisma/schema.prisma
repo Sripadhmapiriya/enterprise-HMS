@@ -94,7 +94,7 @@ model Department {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  branch           Branch            @relation(fields: [branchId], references: [id])
+  branch           Branch              @relation(fields: [branchId], references: [id])
   staff            Staff[]
   doctors          Doctor[]
   Appointment      Appointment[]
@@ -294,8 +294,8 @@ model Doctor {
   otProcedureNotes    OTProcedureNote[]
   dietOrders          DietOrder[]
   schedules           DoctorSchedule[]
-  issuedCertificates  MedicalCertificate[]  @relation("IssuedCertificates")
-  incomingReferrals   EncounterReferral[]   @relation("ReferredToDoctor")
+  issuedCertificates  MedicalCertificate[] @relation("IssuedCertificates")
+  incomingReferrals   EncounterReferral[]  @relation("ReferredToDoctor")
 
   @@map("doctors")
 }
@@ -390,15 +390,15 @@ model Patient {
   country        String?
   postalCode     String?
 
-  preferredLanguage  String?
-  registrationDate   DateTime @default(now())
-  registrationSource String?
-  status             String   @default("ACTIVE")
-  photoUrl           String?
-  abhaNumber         String?
-  abhaAddress        String?
+  preferredLanguage   String?
+  registrationDate    DateTime  @default(now())
+  registrationSource  String?
+  status              String    @default("ACTIVE")
+  photoUrl            String?
+  abhaNumber          String?
+  abhaAddress         String?
   mergedIntoPatientId String?
-  mergedAt           DateTime?
+  mergedAt            DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -811,9 +811,9 @@ model DoctorSchedule {
   tenantId       String
   branchId       String
   doctorId       String
-  dayOfWeek      Int      // 0 = Sunday, 1 = Monday, ... 6 = Saturday
-  startTime      String   // "09:00"
-  endTime        String   // "17:00"
+  dayOfWeek      Int // 0 = Sunday, 1 = Monday, ... 6 = Saturday
+  startTime      String // "09:00"
+  endTime        String // "17:00"
   slotDuration   Int      @default(15) // minutes
   maxOverbooking Int      @default(2)
   isActive       Boolean  @default(true)
@@ -831,7 +831,7 @@ model PatientConsent {
   id          String    @id @default(uuid())
   tenantId    String
   patientId   String
-  consentType String    // GENERAL_TREATMENT, DATA_SHARING_ABHA, SURGERY, ANESTHESIA
+  consentType String // GENERAL_TREATMENT, DATA_SHARING_ABHA, SURGERY, ANESTHESIA
   status      String    @default("GRANTED") // GRANTED, REVOKED, EXPIRED
   grantedAt   DateTime  @default(now())
   expiresAt   DateTime?
@@ -850,7 +850,7 @@ model PatientDocument {
   tenantId     String
   patientId    String
   title        String
-  documentType String   // ID_PROOF, INSURANCE_CARD, MEDICAL_RECORD, LAB_REPORT, CONSENT_FORM
+  documentType String // ID_PROOF, INSURANCE_CARD, MEDICAL_RECORD, LAB_REPORT, CONSENT_FORM
   fileUrl      String
   fileSize     Int?
   mimeType     String?
@@ -867,7 +867,7 @@ model PatientDocument {
 model EncounterReferral {
   id                 String   @id @default(uuid())
   encounterId        String
-  referralType       String   // INTERNAL, EXTERNAL
+  referralType       String // INTERNAL, EXTERNAL
   toDepartmentId     String?
   toDoctorId         String?
   toExternalFacility String?
@@ -889,7 +889,7 @@ model MedicalCertificate {
   encounterId         String
   patientId           String
   doctorId            String
-  certificateType     String    // SICKNESS, FITNESS, ATTENDANCE, CUSTOM
+  certificateType     String // SICKNESS, FITNESS, ATTENDANCE, CUSTOM
   diagnosisSummary    String    @db.Text
   restDaysRecommended Int?
   startDate           DateTime?

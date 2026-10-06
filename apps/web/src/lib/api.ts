@@ -263,7 +263,13 @@ export const schedulingApi = {
   },
 
   getAppointments: async (params?: { doctorId?: string; patientId?: string; date?: string; status?: string; branchId?: string }) => {
-    const searchParams = new URLSearchParams(params as any);
+    const cleanParams: Record<string, string> = {};
+    if (params) {
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== '') cleanParams[key] = val as string;
+      });
+    }
+    const searchParams = new URLSearchParams(cleanParams);
     const qs = searchParams.toString();
     return request('/scheduling/appointments' + (qs ? '?' + qs : ''));
   },
