@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { schedulingApi, patientsApi } from '@/lib/api';
+import { PatientPicker, SelectedPatient } from '@/components/PatientPicker';
 
 interface AppointmentRecord {
   id: string;
@@ -79,8 +80,9 @@ function AppointmentsContent() {
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentRecord | null>(null);
 
   // Forms
+  const [selectedPatient, setSelectedPatient] = useState<SelectedPatient | null>(null);
   const [bookForm, setBookForm] = useState({
-    patientMrn: '',
+    patientId: preselectedPatientId || '',
     doctorId: 'doc-default',
     departmentId: 'dept-opd',
     branchId: 'branch-default',
@@ -94,6 +96,19 @@ function AppointmentsContent() {
   const [rescheduleDate, setRescheduleDate] = useState('');
   const [cancelReason, setCancelReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // If preselectedPatientId exists in query, fetch patient info
+  useEffect(() => {
+    if (preselectedPatientId) {
+      patientsApi.get(preselectedPatientId).then((res) => {
+        if (res?.data) {
+          setSelectedPatient(res.data);
+          setBookForm((prev) => ({ ...prev, patientId: res.data.id }));
+          setIsBookOpen(true);
+        }
+      }).catch(() => {});
+    }
+  }, [preselectedPatientId]);
 
   const loadAppointments = useCallback(async () => {
     try {
@@ -119,22 +134,10 @@ function AppointmentsContent() {
     e.preventDefault();
     try {
       setIsSubmitting(true);
-      // Resolve patient by MRN
-      let patientId = preselectedPatientId;
-      if (!patientId && bookForm.patientMrn) {
-        const pRes = await patientsApi.list({ q: bookForm.patientMrn });
-        const match = (pRes.data || []).find(
-          (p: any) => p.mrn.toLowerCase() === bookForm.patientMrn.trim().toLowerCase()
-        );
-        if (!match) {
-          alert(`Patient with MRN "${bookForm.patientMrn}" not found.`);
-          return;
-        }
-        patientId = match.id;
-      }
+      const patientId = selectedPatient?.id || bookForm.patientId;
 
       if (!patientId) {
-        alert('Please provide a valid Patient MRN');
+        alert('Please search and select a patient');
         return;
       }
 
@@ -151,6 +154,7 @@ function AppointmentsContent() {
       });
 
       setIsBookOpen(false);
+      setSelectedPatient(null);
       loadAppointments();
     } catch (err: any) {
       alert(`Booking failed: ${err.message}`);
@@ -420,12 +424,14 @@ function AppointmentsContent() {
         description="Select patient MRN, doctor, and schedule slot with overbooking capacity checks."
       >
         <form onSubmit={handleBook} className="space-y-4">
-          <Input
-            label="Patient MRN"
+          <PatientPicker
+            label="Patient"
             required
-            placeholder="e.g. MRN-20261005-0001"
-            value={bookForm.patientMrn}
-            onChange={(e) => setBookForm({ ...bookForm, patientMrn: e.target.value })}
+            selectedPatient={selectedPatient}
+            onSelect={(p) => {
+              setSelectedPatient(p);
+              setBookForm((prev) => ({ ...prev, patientId: p?.id || '' }));
+            }}
           />
           <div className="grid grid-cols-2 gap-4">
             <Input

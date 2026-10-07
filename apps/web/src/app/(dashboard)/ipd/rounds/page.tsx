@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ipdApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function DoctorRoundsPage() {
   const [loading, setLoading] = useState(true);
@@ -230,7 +231,7 @@ export default function DoctorRoundsPage() {
             <form onSubmit={handleSubmitRound} className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Clinical Status</label>
-                <select
+                <Select
                   value={clinicalStatus}
                   onChange={(e) => setClinicalStatus(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -239,7 +240,7 @@ export default function DoctorRoundsPage() {
                   <option value="STABLE">Stable</option>
                   <option value="DETERIORATING">Deteriorating</option>
                   <option value="CRITICAL">Critical</option>
-                </select>
+                </Select>
               </div>
 
               <div>

@@ -16,6 +16,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { assetsApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function BiomedicalAssetsDashboard() {
   const [activeTab, setActiveTab] = useState<'assets' | 'maintenance'>('assets');
@@ -496,7 +497,7 @@ export default function BiomedicalAssetsDashboard() {
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-text">Category</label>
-                  <select
+                  <Select
                     value={assetForm.category}
                     onChange={(e) => setAssetForm({ ...assetForm, category: e.target.value })}
                     className="w-full px-3 py-1.5 text-sm border rounded-lg"
@@ -505,7 +506,7 @@ export default function BiomedicalAssetsDashboard() {
                     <option value="DIAGNOSTIC">DIAGNOSTIC</option>
                     <option value="SURGICAL">SURGICAL</option>
                     <option value="FACILITY">FACILITY</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 
@@ -597,7 +598,7 @@ export default function BiomedicalAssetsDashboard() {
             <form onSubmit={handleReportBreakdown} className="space-y-3">
               <div>
                 <label className="text-xs font-semibold text-text">Faulty Equipment</label>
-                <select
+                <Select
                   required
                   value={breakdownForm.assetId}
                   onChange={(e) => setBreakdownForm({ ...breakdownForm, assetId: e.target.value })}
@@ -609,12 +610,12 @@ export default function BiomedicalAssetsDashboard() {
                       {a.assetCode} - {a.name} ({a.department})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>
                 <label className="text-xs font-semibold text-text">Priority Level</label>
-                <select
+                <Select
                   value={breakdownForm.priority}
                   onChange={(e) => setBreakdownForm({ ...breakdownForm, priority: e.target.value })}
                   className="w-full px-3 py-1.5 text-sm border rounded-lg"
@@ -622,7 +623,7 @@ export default function BiomedicalAssetsDashboard() {
                   <option value="CRITICAL">CRITICAL (Direct Patient Safety Threat)</option>
                   <option value="HIGH">HIGH (Immediate Ward Disruption)</option>
                   <option value="MEDIUM">MEDIUM (Non-Urgent Diagnostic Fault)</option>
-                </select>
+                </Select>
               </div>
 
               <div>

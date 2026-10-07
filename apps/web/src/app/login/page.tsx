@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Activity,
   ShieldCheck,
@@ -31,6 +31,22 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const [demoAccounts, setDemoAccounts] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+      authApi.getDemoAccounts()
+        .then((res) => {
+          if (res.success && res.data) {
+            setDemoAccounts(res.data);
+          }
+        })
+        .catch(() => {
+          // Silent catch
+        });
+    }
+  }, []);
 
   const applyCredentials = (demoEmail: string, demoPass: string) => {
     setEmail(demoEmail);
@@ -311,98 +327,33 @@ export default function LoginPage() {
           </form>
 
           {/* Quick Demo Credentials */}
-          <div className="mt-5 pt-4 border-t border-border">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">
-                Quick Demo Access
-              </p>
-              <span className="text-[10px] font-mono text-text-muted bg-surface-subtle border border-border px-1.5 py-0.5 rounded">
-                Password: password123
-              </span>
-            </div>
-            <div className="grid grid-cols-1 gap-2">
-              <div className="flex items-center justify-between p-2.5 bg-info-bg/50 border border-info-border rounded-lg transition-colors">
-                <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-xs text-brand flex items-center gap-1.5">
-                    <span>Priya (Admin)</span>
-                    <span className="text-[10px] font-normal text-text-muted font-mono">password123</span>
-                  </div>
-                  <div className="text-[11px] text-text-muted font-mono truncate">priya.s@vedichealth.org</div>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                  <button
-                    type="button"
-                    onClick={() => applyCredentials('priya.s@vedichealth.org', 'password123')}
-                    className="px-2 py-1 text-[11px] text-text hover:text-brand bg-surface border border-border rounded hover:bg-surface-subtle font-medium transition-colors cursor-pointer"
-                  >
-                    Fill
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => handleQuickLogin('priya.s@vedichealth.org', 'password123')}
-                    className="px-2.5 py-1 text-[11px] text-brand-foreground bg-brand hover:bg-brand-hover rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    1-Click Sign In
-                  </button>
-                </div>
+          {demoAccounts.length > 0 && (
+            <div className="mt-5 pt-4 border-t border-border">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">
+                  Quick Demo Access
+                </p>
               </div>
-
-              <div className="flex items-center justify-between p-2.5 bg-surface-subtle border border-border rounded-lg hover:border-border-strong transition-colors">
-                <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-xs text-text flex items-center gap-1.5">
-                    <span>Doctor Role</span>
-                    <span className="text-[10px] font-normal text-text-muted font-mono">password123</span>
-                  </div>
-                  <div className="text-[11px] text-text-muted font-mono truncate">doctor@demo.com</div>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+              <div className="grid grid-cols-1 gap-2">
+                {demoAccounts.map((account) => (
                   <button
-                    type="button"
-                    onClick={() => applyCredentials('doctor@demo.com', 'password123')}
-                    className="px-2 py-1 text-[11px] text-text hover:text-brand bg-surface border border-border rounded hover:bg-surface-subtle font-medium transition-colors cursor-pointer"
-                  >
-                    Fill
-                  </button>
-                  <button
+                    key={account.email}
                     type="button"
                     disabled={isLoading}
-                    onClick={() => handleQuickLogin('doctor@demo.com', 'password123')}
-                    className="px-2.5 py-1 text-[11px] text-text bg-surface-raised hover:bg-surface border border-border rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                    onClick={() => handleQuickLogin(account.email, 'password123')}
+                    className="flex flex-col items-start p-2.5 bg-surface-subtle border border-border rounded-lg hover:border-brand hover:bg-surface-raised transition-all text-left cursor-pointer disabled:opacity-50"
                   >
-                    1-Click Sign In
+                    <div className="font-semibold text-xs text-text mb-0.5">
+                      {account.role}
+                    </div>
+                    <div className="text-[11px] text-text-muted truncate w-full">
+                      {account.description}
+                    </div>
                   </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-2.5 bg-surface-subtle border border-border rounded-lg hover:border-border-strong transition-colors">
-                <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-xs text-text flex items-center gap-1.5">
-                    <span>Super Admin</span>
-                    <span className="text-[10px] font-normal text-text-muted font-mono">password123</span>
-                  </div>
-                  <div className="text-[11px] text-text-muted font-mono truncate">admin@enterprise-hms.com</div>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                  <button
-                    type="button"
-                    onClick={() => applyCredentials('admin@enterprise-hms.com', 'password123')}
-                    className="px-2 py-1 text-[11px] text-text hover:text-brand bg-surface border border-border rounded hover:bg-surface-subtle font-medium transition-colors cursor-pointer"
-                  >
-                    Fill
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => handleQuickLogin('admin@enterprise-hms.com', 'password123')}
-                    className="px-2.5 py-1 text-[11px] text-text bg-surface-raised hover:bg-surface border border-border rounded font-medium shadow-xs transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    1-Click Sign In
-                  </button>
-                </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
 
           {/* Compliance & Security Audit Footnote */}
           <div className="mt-6 pt-5 border-t border-border text-center">

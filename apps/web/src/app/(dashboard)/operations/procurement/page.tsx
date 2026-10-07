@@ -16,6 +16,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { procurementApi, inventoryApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function ProcurementDashboard() {
   const [activeTab, setActiveTab] = useState<'requests' | 'orders' | 'receipts' | 'suppliers'>('requests');
@@ -577,7 +578,7 @@ export default function ProcurementDashboard() {
                 <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Product / Medication
                 </label>
-                <select
+                <Select
                   value={prForm.productId}
                   onChange={(e) => setPrForm({ ...prForm, productId: e.target.value })}
                   className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
@@ -589,7 +590,7 @@ export default function ProcurementDashboard() {
                       {p.name} ({p.code})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -609,7 +610,7 @@ export default function ProcurementDashboard() {
                   <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                     Priority
                   </label>
-                  <select
+                  <Select
                     value={prForm.priority}
                     onChange={(e) => setPrForm({ ...prForm, priority: e.target.value })}
                     className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
@@ -618,7 +619,7 @@ export default function ProcurementDashboard() {
                     <option value="MEDIUM">Medium</option>
                     <option value="HIGH">High</option>
                     <option value="URGENT">Urgent</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
               <div>
@@ -662,7 +663,7 @@ export default function ProcurementDashboard() {
                 <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Select Supplier
                 </label>
-                <select
+                <Select
                   value={poForm.supplierId}
                   onChange={(e) => setPoForm({ ...poForm, supplierId: e.target.value })}
                   className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
@@ -674,13 +675,13 @@ export default function ProcurementDashboard() {
                       {s.name} ({s.code})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Product
                 </label>
-                <select
+                <Select
                   value={poForm.productId}
                   onChange={(e) => setPoForm({ ...poForm, productId: e.target.value })}
                   className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
@@ -692,7 +693,7 @@ export default function ProcurementDashboard() {
                       {p.name}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -753,7 +754,7 @@ export default function ProcurementDashboard() {
                 <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Supplier
                 </label>
-                <select
+                <Select
                   value={grnForm.supplierId}
                   onChange={(e) => setGrnForm({ ...grnForm, supplierId: e.target.value })}
                   className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
@@ -765,13 +766,13 @@ export default function ProcurementDashboard() {
                       {s.name}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
                   Product
                 </label>
-                <select
+                <Select
                   value={grnForm.productId}
                   onChange={(e) => setGrnForm({ ...grnForm, productId: e.target.value })}
                   className="w-full border border-border rounded-lg p-2 text-sm bg-surface"
@@ -783,7 +784,7 @@ export default function ProcurementDashboard() {
                       {p.name}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

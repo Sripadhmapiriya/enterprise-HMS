@@ -11,7 +11,7 @@ router.use(requireModule('hr'));
 
 function generateEmployeeCode(): string {
   const rand = Math.floor(1000 + Math.random() * 9000);
-  return `EMP-${rand}`;
+  return `EMP-${Date.now().toString().slice(-4)}${rand}`;
 }
 
 // =========================================================================

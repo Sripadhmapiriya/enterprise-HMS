@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { otApi, patientsApi, encountersApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function OTDashboard() {
   const [loading, setLoading] = useState(true);
@@ -446,7 +447,7 @@ export default function OTDashboard() {
             <form onSubmit={handleScheduleSurgery} className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Select Surgery Request *</label>
-                <select
+                <Select
                   value={selectedRequestId}
                   onChange={(e) => setSelectedRequestId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -460,7 +461,7 @@ export default function OTDashboard() {
                         {r.procedureName} - {r.patient?.firstName} {r.patient?.lastName} ({r.priority})
                       </option>
                     ))}
-                </select>
+                </Select>
                 {requests.filter((r) => r.status === 'REQUESTED').length === 0 && (
                   <p className="text-[11px] text-warning mt-1">No unbooked requests. Create a Surgery Request first.</p>
                 )}
@@ -468,7 +469,7 @@ export default function OTDashboard() {
 
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Operating Theatre *</label>
-                <select
+                <Select
                   value={selectedOtId}
                   onChange={(e) => setSelectedOtId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -480,7 +481,7 @@ export default function OTDashboard() {
                       {th.name} ({th.type})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -748,7 +749,7 @@ export default function OTDashboard() {
             <form onSubmit={handleCreateRequest} className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Select Patient *</label>
-                <select
+                <Select
                   value={selectedPatientId}
                   onChange={(e) => setSelectedPatientId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -760,7 +761,7 @@ export default function OTDashboard() {
                       {p.firstName} {p.lastName} (MRN: {p.mrn})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>
@@ -788,7 +789,7 @@ export default function OTDashboard() {
 
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Priority</label>
-                <select
+                <Select
                   value={priority}
                   onChange={(e) => setPriority(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -796,7 +797,7 @@ export default function OTDashboard() {
                   <option value="ROUTINE">Routine</option>
                   <option value="URGENT">Urgent</option>
                   <option value="EMERGENCY">Emergency</option>
-                </select>
+                </Select>
               </div>
 
               <div className="flex justify-end gap-3 pt-3 border-t border-border">

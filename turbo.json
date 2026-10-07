@@ -9,6 +9,12 @@
       "cache": false,
       "persistent": true
     },
+    "lint": {
+      "cache": true
+    },
+    "typecheck": {
+      "cache": true
+    },
     "db:push": {
       "cache": false
     },

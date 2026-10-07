@@ -18,6 +18,7 @@ import {
   ArrowDownLeft,
 } from 'lucide-react';
 import { financeApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function GeneralLedgerPage() {
   const [activeTab, setActiveTab] = useState<'journals' | 'accounts' | 'trialBalance' | 'aging'>('journals');
@@ -666,7 +667,7 @@ export default function GeneralLedgerPage() {
                   {journalForm.lines.map((line, idx) => (
                     <div key={idx} className="grid grid-cols-12 gap-2 items-center">
                       <div className="col-span-5">
-                        <select
+                        <Select
                           required
                           value={line.accountId}
                           onChange={(e) => {
@@ -682,7 +683,7 @@ export default function GeneralLedgerPage() {
                               {a.accountCode} - {a.accountName} ({a.accountType})
                             </option>
                           ))}
-                        </select>
+                        </Select>
                       </div>
                       <div className="col-span-3">
                         <input
@@ -789,7 +790,7 @@ export default function GeneralLedgerPage() {
 
               <div>
                 <label className="text-xs font-semibold text-text">Category / Type</label>
-                <select
+                <Select
                   value={accountForm.accountType}
                   onChange={(e) => setAccountForm({ ...accountForm, accountType: e.target.value })}
                   className="w-full px-3 py-1.5 text-sm border rounded-lg"
@@ -799,7 +800,7 @@ export default function GeneralLedgerPage() {
                   <option value="EQUITY">EQUITY</option>
                   <option value="REVENUE">REVENUE</option>
                   <option value="EXPENSE">EXPENSE</option>
-                </select>
+                </Select>
               </div>
 
               <div>

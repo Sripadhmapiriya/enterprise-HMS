@@ -2,12 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import {
-  Button,
+import { Button,
   Badge,
   Skeleton,
-  ErrorState,
-} from '@enterprise-hms/ui';
+  ErrorState, Select } from '@enterprise-hms/ui';
 import {
   Building2,
   ShieldCheck,
@@ -347,7 +345,7 @@ export default function EnterpriseAdminPage() {
 
               <div>
                 <label className="text-xs font-semibold text-text">Currency</label>
-                <select
+                <Select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
                   className="w-full mt-1 px-3 py-2 border border-border rounded-lg text-sm bg-surface"
@@ -356,7 +354,7 @@ export default function EnterpriseAdminPage() {
                   <option value="EUR">EUR (€)</option>
                   <option value="GBP">GBP (£)</option>
                   <option value="INR">INR (₹)</option>
-                </select>
+                </Select>
               </div>
             </div>
 

@@ -68,7 +68,7 @@ import {
   MOTION_EASINGS,
   MOTION_SPRING,
 } from '@enterprise-hms/ui';
-import { authApi, platformServiceApi } from '@/lib/api';
+import { authApi, platformServiceApi, branchesApi } from '@/lib/api';
 
 // SVG Icon dictionary mapping module manifest icon strings to Lucide components
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -276,12 +276,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   });
 
   // Active hospital branch state
-  const [selectedHospital, setSelectedHospital] = useState('City General Hospital - Main Campus');
-  const hospitals = [
-    'City General Hospital - Main Campus',
-    'Metro Care Clinic - North Wing',
-    'St. Jude Trauma Center - East',
-  ];
+  const [allowedBranches, setAllowedBranches] = useState<Array<{ id: string; name: string; displayName: string }>>([
+    { id: '', name: 'Main Branch', displayName: 'City General Hospital - Main Branch' },
+  ]);
+  const [selectedBranch, setSelectedBranch] = useState<{ id: string; displayName: string }>({
+    id: '',
+    displayName: 'City General Hospital - Main Branch',
+  });
 
   // Group Open/Closed states (per user)
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -316,25 +317,53 @@ export function AppShell({ children }: { children: ReactNode }) {
     }
 
     // Load cached user if available
+    let cachedUserId = 'default';
     try {
       const rawUser = localStorage.getItem('hms_user');
       if (rawUser) {
         const u = JSON.parse(rawUser);
         setCurrentUser(u);
+        if (u.id) cachedUserId = u.id;
         if (u.permissions) setUserPermissions(u.permissions);
       }
     } catch {}
 
-    // Load active branch
-    const savedBranch = localStorage.getItem('hms_selected_branch');
-    if (savedBranch) setSelectedHospital(savedBranch);
+    // Synchronously restore sidebar preferences for cached user to avoid reload race conditions
+    try {
+      const savedCollapsed = localStorage.getItem(`hms_sidebar_collapsed_${cachedUserId}`);
+      if (savedCollapsed !== null) {
+        setIsCollapsed(savedCollapsed === 'true');
+      }
 
-    // Fetch user details & capabilities from server
+      const savedPinned = localStorage.getItem(`hms_sidebar_pinned_${cachedUserId}`);
+      if (savedPinned) {
+        try {
+          setPinnedRoutes(JSON.parse(savedPinned));
+        } catch {}
+      }
+
+      const savedGroups = localStorage.getItem(`hms_sidebar_groups_${cachedUserId}`);
+      if (savedGroups) {
+        try {
+          setOpenGroups(JSON.parse(savedGroups));
+        } catch {}
+      }
+    } catch {}
+
+    // Load active branch from storage
+    const savedBranchName = localStorage.getItem('hms_selected_branch');
+    const savedBranchId = localStorage.getItem('hms_selected_branch_id') || '';
+    if (savedBranchName) {
+      setSelectedBranch({ id: savedBranchId, displayName: savedBranchName });
+    }
+
+    // Fetch user details & capabilities & branches from server
     async function initUserSession() {
       try {
-        const [meRes, capRes] = await Promise.all([
+        const [meRes, capRes, branchesRes] = await Promise.all([
           authApi.getMe().catch(() => null),
           authApi.getCapabilities().catch(() => null),
+          branchesApi.getAllowedBranches().catch(() => null),
         ]);
 
         const userId = meRes?.data?.id || 'default';
@@ -346,6 +375,21 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         if (capRes?.data?.enabledModules) {
           setEnabledModules(capRes.data.enabledModules);
+        }
+
+        if (branchesRes?.data && Array.isArray(branchesRes.data) && branchesRes.data.length > 0) {
+          setAllowedBranches(branchesRes.data);
+          // If no saved branch or saved branch not in allowed, default to user's assigned branch or first branch
+          const currentSavedId = localStorage.getItem('hms_selected_branch_id');
+          const matched = branchesRes.data.find((b: any) => b.id === currentSavedId);
+          if (matched) {
+            setSelectedBranch(matched);
+          } else {
+            const defaultBranch = branchesRes.data.find((b: any) => b.id === meRes?.data?.branchId) || branchesRes.data[0];
+            setSelectedBranch(defaultBranch);
+            localStorage.setItem('hms_selected_branch_id', defaultBranch.id);
+            localStorage.setItem('hms_selected_branch', defaultBranch.displayName);
+          }
         }
 
         // Restore collapsed preference
@@ -488,8 +532,16 @@ export function AppShell({ children }: { children: ReactNode }) {
   const toggleCollapsed = useCallback(() => {
     setIsCollapsed((prev) => {
       const next = !prev;
-      const userId = currentUser?.id || 'default';
-      localStorage.setItem(`hms_sidebar_collapsed_${userId}`, String(next));
+      let uid = currentUser?.id;
+      if (!uid && typeof window !== 'undefined') {
+        try {
+          const u = JSON.parse(localStorage.getItem('hms_user') || '{}');
+          if (u.id) uid = u.id;
+        } catch {}
+      }
+      uid = uid || 'default';
+      localStorage.setItem(`hms_sidebar_collapsed_${uid}`, String(next));
+      localStorage.setItem('hms_sidebar_collapsed', String(next));
       return next;
     });
   }, [currentUser]);
@@ -648,7 +700,16 @@ export function AppShell({ children }: { children: ReactNode }) {
   const renderBadge = (item: NavItemDef) => {
     if (!item.badgeKey) return null;
     const count = badges[item.badgeKey];
-    if (count <= 0) return null;
+    if (count === null || count === undefined || count <= 0) return null;
+
+    let tooltip = `${count} items`;
+    if (item.badgeKey === 'queue') {
+      tooltip = `${count} patient${count === 1 ? '' : 's'} waiting today`;
+    } else if (item.badgeKey === 'emergency') {
+      tooltip = `${count} active patient${count === 1 ? '' : 's'} in ER`;
+    } else if (item.badgeKey === 'lab') {
+      tooltip = `${count} pending lab test${count === 1 ? '' : 's'}`;
+    }
 
     if (item.badgeKey === 'emergency') {
       return (
@@ -656,7 +717,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           variants={clinicalAlertPulseVariants}
           initial="initial"
           animate="pulse"
-          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-critical-bg text-critical-text border border-critical-border shadow-xs tabular-nums"
+          title={tooltip}
+          aria-label={tooltip}
+          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-critical-bg text-critical-text border border-critical-border shadow-xs tabular-nums cursor-help"
         >
           <AlertTriangle className="w-2.5 h-2.5 text-critical" aria-hidden="true" />
           <span>{count}</span>
@@ -666,14 +729,22 @@ export function AppShell({ children }: { children: ReactNode }) {
 
     if (item.badgeKey === 'lab') {
       return (
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-info-bg text-info-text border border-info-border tabular-nums">
+        <span
+          title={tooltip}
+          aria-label={tooltip}
+          className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-info-bg text-info-text border border-info-border tabular-nums cursor-help"
+        >
           {count}
         </span>
       );
     }
 
     return (
-      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-surface-subtle text-text-muted border border-border tabular-nums">
+      <span
+        title={tooltip}
+        aria-label={tooltip}
+        className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-surface-subtle text-text-muted border border-border tabular-nums cursor-help"
+      >
         {count}
       </span>
     );
@@ -760,7 +831,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               >
                 <div className="flex items-center gap-2 truncate">
                   <Building className="w-3.5 h-3.5 text-brand shrink-0" aria-hidden="true" />
-                  <span className="truncate text-[11px] font-medium">{selectedHospital}</span>
+                  <span className="truncate text-[11px] font-medium">{selectedBranch.displayName}</span>
                 </div>
                 <ChevronDown className="w-3 h-3 text-text-muted shrink-0" aria-hidden="true" />
               </button>
@@ -770,19 +841,22 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <div className="px-2 py-1 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
                     Hospital Branches
                   </div>
-                  {hospitals.map((hosp) => (
+                  {allowedBranches.map((branch) => (
                     <button
-                      key={hosp}
+                      key={branch.id}
                       type="button"
                       onClick={() => {
-                        setSelectedHospital(hosp);
+                        setSelectedBranch(branch);
                         setIsHospitalMenuOpen(false);
-                        localStorage.setItem('hms_selected_branch', hosp);
+                        localStorage.setItem('hms_selected_branch', branch.displayName);
+                        localStorage.setItem('hms_selected_branch_id', branch.id);
+                        // Trigger immediate badges update and page refresh
+                        window.location.reload();
                       }}
                       className="w-full flex items-center justify-between px-2 py-1.5 rounded text-left text-xs text-text hover:bg-surface-subtle hover:text-brand transition-colors"
                     >
-                      <span className="truncate text-[11px]">{hosp}</span>
-                      {selectedHospital === hosp && (
+                      <span className="truncate text-[11px]">{branch.displayName}</span>
+                      {selectedBranch.id === branch.id && (
                         <Check className="w-3 h-3 text-brand" aria-hidden="true" />
                       )}
                     </button>
@@ -1256,7 +1330,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {/* Topbar Hospital Branch Display */}
             <div className="flex items-center gap-1.5 text-xs font-semibold text-text">
               <Building className="w-3.5 h-3.5 text-brand" aria-hidden="true" />
-              <span className="truncate max-w-[200px] sm:max-w-none">{selectedHospital}</span>
+              <span className="truncate max-w-[200px] sm:max-w-none">{selectedBranch.displayName}</span>
             </div>
           </div>
 

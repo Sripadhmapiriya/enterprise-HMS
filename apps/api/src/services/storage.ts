@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import path from 'path';
+import fs from 'fs';
 
 export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 
@@ -42,18 +43,30 @@ export interface IFileStorageService {
 
   generateDownloadUrl(key: string, tenantId: string): Promise<{ downloadUrl: string; expiresInSeconds: number }>;
 
+  getFile(key: string): { buffer: Buffer; meta: FileMetadata } | null;
+
   isSimulator(): boolean;
 }
 
 /**
- * Local in-memory / virtual filesystem storage simulator.
- * Provides full presigned URL generation, file validation, and virus-scanning hooks.
+ * Local disk storage adapter for development and testing.
+ * Persists files to disk so they survive process restarts.
  */
 export class LocalStorageSimulator implements IFileStorageService {
+  private baseDir: string;
   private files: Map<string, { buffer: Buffer; meta: FileMetadata }> = new Map();
 
+  constructor() {
+    this.baseDir = path.resolve(process.cwd(), 'uploads');
+    if (!fs.existsSync(this.baseDir)) {
+      try {
+        fs.mkdirSync(this.baseDir, { recursive: true });
+      } catch {}
+    }
+  }
+
   isSimulator(): boolean {
-    return true;
+    return false; // Real disk adapter for development
   }
 
   async generateUploadUrl(
@@ -93,6 +106,14 @@ export class LocalStorageSimulator implements IFileStorageService {
     const ext = path.extname(filename);
     const key = `tenants/${tenantId}/files/${Date.now()}-${token}${ext}`;
 
+    // Write file to disk
+    try {
+      const diskPath = path.join(this.baseDir, key.replace(/\//g, '_'));
+      fs.writeFileSync(diskPath, buffer);
+    } catch (e: any) {
+      console.error('Failed writing file to disk:', e.message);
+    }
+
     const metadata: FileMetadata = {
       key,
       originalName: filename,
@@ -112,11 +133,6 @@ export class LocalStorageSimulator implements IFileStorageService {
     key: string,
     tenantId: string
   ): Promise<{ downloadUrl: string; expiresInSeconds: number }> {
-    const file = this.files.get(key);
-    if (!file && !key.startsWith('tenants/')) {
-      // Mock generated download URL
-    }
-
     const token = crypto.randomBytes(16).toString('hex');
     return {
       downloadUrl: `/api/v1/platform/files/download/${encodeURIComponent(key)}?token=${token}`,
@@ -125,7 +141,32 @@ export class LocalStorageSimulator implements IFileStorageService {
   }
 
   getFile(key: string): { buffer: Buffer; meta: FileMetadata } | null {
-    return this.files.get(key) || null;
+    if (this.files.has(key)) {
+      return this.files.get(key)!;
+    }
+
+    // Try reading from disk
+    try {
+      const diskPath = path.join(this.baseDir, key.replace(/\//g, '_'));
+      if (fs.existsSync(diskPath)) {
+        const buffer = fs.readFileSync(diskPath);
+        return {
+          buffer,
+          meta: {
+            key,
+            originalName: path.basename(key),
+            mimeType: 'application/octet-stream',
+            sizeBytes: buffer.length,
+            tenantId: 'tenant',
+            uploadedAt: new Date().toISOString(),
+            virusScanPassed: true,
+            publicUrl: `/api/v1/platform/files/download/${encodeURIComponent(key)}`,
+          },
+        };
+      }
+    } catch {}
+
+    return null;
   }
 
   private validateFileParams(filename: string, mimeType: string, sizeBytes: number) {

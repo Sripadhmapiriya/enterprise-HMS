@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ambulanceApi, patientsApi, encountersApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function AmbulanceDashboard() {
   const [loading, setLoading] = useState(true);
@@ -427,7 +428,7 @@ export default function AmbulanceDashboard() {
 
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Vehicle Type / Capability *</label>
-                <select
+                <Select
                   value={vehicleType}
                   onChange={(e) => setVehicleType(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface font-semibold"
@@ -435,7 +436,7 @@ export default function AmbulanceDashboard() {
                   <option value="BLS">Basic Life Support (BLS - EMT, Oxygen, AED)</option>
                   <option value="ALS">Advanced Life Support (ALS - Paramedic, Defib, Ventilator)</option>
                   <option value="PTS">Patient Transport Service (PTS - Non-emergency Wheelchair/Stretcher)</option>
-                </select>
+                </Select>
               </div>
 
               <div className="flex justify-end gap-3 pt-3 border-t border-border">
@@ -474,7 +475,7 @@ export default function AmbulanceDashboard() {
             <form onSubmit={handleDispatchTrip} className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Select Available Vehicle *</label>
-                <select
+                <Select
                   value={selectedAmbulanceId}
                   onChange={(e) => setSelectedAmbulanceId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface font-mono"
@@ -488,12 +489,12 @@ export default function AmbulanceDashboard() {
                         {a.vehicleNumber} ({a.vehicleType})
                       </option>
                     ))}
-                </select>
+                </Select>
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Patient (Optional)</label>
-                <select
+                <Select
                   value={selectedPatientId}
                   onChange={(e) => setSelectedPatientId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -504,7 +505,7 @@ export default function AmbulanceDashboard() {
                       {p.firstName} {p.lastName} (MRN: {p.mrn})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>

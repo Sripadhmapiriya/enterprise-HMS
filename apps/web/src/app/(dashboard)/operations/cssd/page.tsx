@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { cssdApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function CSSDDashboard() {
   const [loading, setLoading] = useState(true);
@@ -155,7 +156,7 @@ export default function CSSDDashboard() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <select
+            <Select
               value={methodFilter}
               onChange={(e) => setMethodFilter(e.target.value)}
               className="px-3 py-1.5 border border-border rounded-lg text-xs bg-surface focus:outline-none focus:ring-1 focus:ring-brand"
@@ -164,9 +165,9 @@ export default function CSSDDashboard() {
               <option value="AUTOCLAVE">Autoclave (Steam)</option>
               <option value="ETO">ETO (Gas)</option>
               <option value="PLASMA">Plasma (H2O2)</option>
-            </select>
+            </Select>
 
-            <select
+            <Select
               value={resultFilter}
               onChange={(e) => setResultFilter(e.target.value)}
               className="px-3 py-1.5 border border-border rounded-lg text-xs bg-surface focus:outline-none focus:ring-1 focus:ring-brand"
@@ -175,7 +176,7 @@ export default function CSSDDashboard() {
               <option value="PENDING">In Progress (Pending)</option>
               <option value="PASSED">Passed (Certified)</option>
               <option value="FAILED">Failed (Quarantined)</option>
-            </select>
+            </Select>
           </div>
         </div>
 
@@ -273,7 +274,7 @@ export default function CSSDDashboard() {
             <form onSubmit={handleStartCycle} className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Machine / Chamber ID *</label>
-                <select
+                <Select
                   value={machineId}
                   onChange={(e) => setMachineId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -283,12 +284,12 @@ export default function CSSDDashboard() {
                   <option value="AUTOCLAVE-02">Autoclave Chamber 02 (Gravity Steam 121°C)</option>
                   <option value="ETO-CHAMBER-1">ETO Gas Chamber 01 (Low Temp 55°C)</option>
                   <option value="PLASMA-UNIT-01">Hydrogen Peroxide Plasma Sterilizer</option>
-                </select>
+                </Select>
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Method *</label>
-                <select
+                <Select
                   value={method}
                   onChange={(e) => setMethod(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface font-semibold"
@@ -296,7 +297,7 @@ export default function CSSDDashboard() {
                   <option value="AUTOCLAVE">Autoclave (High Pressure Steam)</option>
                   <option value="ETO">Ethylene Oxide (ETO)</option>
                   <option value="PLASMA">Hydrogen Peroxide Plasma</option>
-                </select>
+                </Select>
               </div>
 
               <div>

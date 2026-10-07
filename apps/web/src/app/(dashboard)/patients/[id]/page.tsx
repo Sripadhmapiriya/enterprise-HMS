@@ -15,7 +15,9 @@ import {
   ErrorState,
   Skeleton,
   EmptyState,
+  ToastContainer,
 } from '@enterprise-hms/ui';
+import type { ToastMessage, ToastVariant } from '@enterprise-hms/ui';
 import {
   Calendar,
   Stethoscope,
@@ -29,6 +31,12 @@ import {
   FilePlus,
   ArrowRight,
   User,
+  Trash2,
+  Download,
+  ExternalLink,
+  UploadCloud,
+  File,
+  X,
 } from 'lucide-react';
 import { patientsApi, opdApi } from '@/lib/api';
 
@@ -55,6 +63,17 @@ export default function PatientDetailPage({
   const [isAddDocOpen, setIsAddDocOpen] = useState(false);
   const [isMergeOpen, setIsMergeOpen] = useState(false);
   const [isStartingEncounter, setIsStartingEncounter] = useState(false);
+  const [isDoctorSelectOpen, setIsDoctorSelectOpen] = useState(false);
+  const [selectedDoctorId, setSelectedDoctorId] = useState('');
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const showToast = (title: string, description?: string, variant: ToastVariant = 'info') => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id, title, description, variant }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 5000);
+  };
 
   // Form states
   const [allergyForm, setAllergyForm] = useState({
@@ -70,10 +89,18 @@ export default function PatientDetailPage({
     alertType: 'CLINICAL',
   });
 
+  // Document upload state
+  const [docFile, setDocFile] = useState<File | null>(null);
+  const [docFilePreview, setDocFilePreview] = useState<string | null>(null);
+  const [docUploading, setDocUploading] = useState(false);
+  const [docUploadProgress, setDocUploadProgress] = useState<number>(0);
+  const [docUploadError, setDocUploadError] = useState<string | null>(null);
+  const [docDeleteTarget, setDocDeleteTarget] = useState<any | null>(null);
+  const [docDeleting, setDocDeleting] = useState(false);
+
   const [docForm, setDocForm] = useState({
     title: '',
     documentType: 'ID_PROOF',
-    fileUrl: 'https://storage.hospital.org/docs/sample.pdf',
   });
 
   const [mergeForm, setMergeForm] = useState({
@@ -109,8 +136,9 @@ export default function PatientDetailPage({
       setIsAddAllergyOpen(false);
       setAllergyForm({ allergen: '', severity: 'MODERATE', reaction: '', notes: '' });
       loadPatientData();
+      showToast('Allergy Recorded', 'Allergy has been documented successfully.', 'success');
     } catch (err: any) {
-      alert(err.message);
+      showToast('Error', err.message, 'error');
     }
   };
 
@@ -121,24 +149,108 @@ export default function PatientDetailPage({
       setIsAddAlertOpen(false);
       setAlertForm({ description: '', severity: 'HIGH', alertType: 'CLINICAL' });
       loadPatientData();
+      showToast('Alert Added', 'Clinical alert has been logged successfully.', 'success');
     } catch (err: any) {
-      alert(err.message);
+      showToast('Error', err.message, 'error');
+    }
+  };
+
+  const handleFileSelect = (file: File | null) => {
+    setDocUploadError(null);
+    if (!file) {
+      setDocFile(null);
+      setDocFilePreview(null);
+      return;
+    }
+
+    const allowedMimes = ['application/pdf', 'image/jpeg', 'image/png'];
+    const maxSizeBytes = 10 * 1024 * 1024; // 10 MB
+
+    if (!allowedMimes.includes(file.type.toLowerCase()) && !file.name.match(/\.(pdf|jpe?g|png)$/i)) {
+      setDocUploadError('Invalid file type. Only PDF, JPG, and PNG files up to 10 MB are permitted.');
+      return;
+    }
+
+    if (file.size > maxSizeBytes) {
+      setDocUploadError(`File exceeds maximum permitted size of 10 MB (selected: ${(file.size / (1024 * 1024)).toFixed(1)} MB).`);
+      return;
+    }
+
+    setDocFile(file);
+    if (!docForm.title) {
+      const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
+      setDocForm((prev) => ({ ...prev, title: nameWithoutExt }));
+    }
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => setDocFilePreview(e.target?.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      setDocFilePreview(null);
     }
   };
 
   const handleAddDoc = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!docFile) {
+      setDocUploadError('Please choose or drop a file to upload.');
+      return;
+    }
+
     try {
-      await patientsApi.addDocument(patientId, docForm);
+      setDocUploading(true);
+      setDocUploadProgress(20);
+      setDocUploadError(null);
+
+      // Step 1: Upload multipart file to server
+      setDocUploadProgress(50);
+      const uploadRes = await patientsApi.uploadDocumentMultipart(docFile);
+      setDocUploadProgress(85);
+
+      const uploadedData = uploadRes.data;
+      const fileUrl = uploadedData.fileUrl || `/api/v1/platform/files/download/${encodeURIComponent(uploadedData.key)}`;
+
+      // Step 2: Register patient document
+      await patientsApi.addDocument(patientId, {
+        title: docForm.title.trim(),
+        documentType: docForm.documentType,
+        fileUrl,
+        fileSize: uploadedData.sizeBytes || docFile.size,
+        mimeType: uploadedData.mimeType || docFile.type,
+      });
+
+      setDocUploadProgress(100);
       setIsAddDocOpen(false);
+      setDocFile(null);
+      setDocFilePreview(null);
       setDocForm({
         title: '',
         documentType: 'ID_PROOF',
-        fileUrl: 'https://storage.hospital.org/docs/sample.pdf',
       });
       loadPatientData();
+      showToast('Document Uploaded', 'Document was securely uploaded and attached.', 'success');
     } catch (err: any) {
-      alert(err.message);
+      setDocUploadError(err.message || 'File upload failed');
+      showToast('Upload Failed', err.message || 'Could not upload document', 'error');
+    } finally {
+      setDocUploading(false);
+      setDocUploadProgress(0);
+    }
+  };
+
+  const handleConfirmRemoveDoc = async () => {
+    if (!docDeleteTarget) return;
+    try {
+      setDocDeleting(true);
+      await patientsApi.removeDocument(patientId, docDeleteTarget.id);
+      showToast('Document Removed', `"${docDeleteTarget.title}" was soft-deleted and logged to the audit log.`, 'success');
+      setDocDeleteTarget(null);
+      loadPatientData();
+    } catch (err: any) {
+      showToast('Deletion Failed', err.message || 'Could not remove document', 'error');
+    } finally {
+      setDocDeleting(false);
     }
   };
 
@@ -170,25 +282,38 @@ export default function PatientDetailPage({
   };
 
   const handleStartConsultation = async () => {
+    if (!selectedDoctorId) {
+      showToast('Validation Error', 'Please select a doctor to start the consultation.', 'error');
+      return;
+    }
+
     try {
       setIsStartingEncounter(true);
       const res = await opdApi.startEncounter({
         patientId: patient.id,
-        doctorId: patient.encounters?.[0]?.doctorId || 'doc-default',
+        doctorId: selectedDoctorId,
         branchId: patient.branchId || 'branch-default',
         departmentId: patient.departmentId || 'dept-opd',
         type: 'OPD',
       });
 
       if (res.data?.id) {
+        setIsDoctorSelectOpen(false);
+        showToast('Success', 'Consultation started', 'success');
         router.push(`/opd/consultation/${res.data.id}`);
       }
     } catch (err: any) {
-      alert(`Failed to start consultation: ${err.message}`);
+      showToast('Failed to start consultation', err.message, 'error');
     } finally {
       setIsStartingEncounter(false);
     }
   };
+
+  const MOCK_DOCTORS = [
+    { value: 'doc-123', label: 'Dr. Sarah Jenkins (Cardiology)' },
+    { value: 'doc-456', label: 'Dr. Michael Chen (General Medicine)' },
+    { value: 'doc-789', label: 'Dr. Emily Patel (Pediatrics)' },
+  ];
 
   if (loading) {
     return (
@@ -227,6 +352,7 @@ export default function PatientDetailPage({
     ageYears: age,
     bloodGroup: patient.bloodGroup || undefined,
     mobile: patient.mobile,
+    allergyStatus: patient.allergyStatus,
     allergies: (patient.allergies || [])
       .filter((a: any) => a.status === 'ACTIVE')
       .map((a: any) => ({
@@ -271,6 +397,13 @@ export default function PatientDetailPage({
       <PatientBanner
         patient={bannerData}
         className="shadow-sm"
+        onConfirmNKDA={() => {
+          if (confirm('Are you sure you want to confirm No Known Drug Allergies (NKDA) for this patient?')) {
+            patientsApi.confirmNKDA(patientId).then(() => {
+              loadPatientData();
+            });
+          }
+        }}
       />
 
       {/* Quick Action Bar */}
@@ -278,7 +411,7 @@ export default function PatientDetailPage({
         <div className="flex items-center gap-2">
           <Button
             variant="primary"
-            onClick={handleStartConsultation}
+            onClick={() => setIsDoctorSelectOpen(true)}
             isLoading={isStartingEncounter}
           >
             <Stethoscope className="w-4 h-4 mr-2" />
@@ -294,28 +427,37 @@ export default function PatientDetailPage({
 
         <div className="flex items-center gap-2">
           <Button
-            variant="secondary"
+            variant="ghost"
             size="sm"
             onClick={() => setIsAddAllergyOpen(true)}
+            aria-label="Add Patient Allergy"
+            title="Document a new allergy for this patient"
+            className="bg-warning/15 text-warning-text hover:bg-warning/25 hover:text-warning-text border border-transparent hover:border-warning/30 font-medium"
           >
-            <ShieldAlert className="w-3.5 h-3.5 mr-1 text-warning" />
-            + Allergy
+            <ShieldAlert className="w-4 h-4 mr-1 text-warning" aria-hidden="true" />
+            Allergy
           </Button>
           <Button
-            variant="secondary"
+            variant="ghost"
             size="sm"
             onClick={() => setIsAddAlertOpen(true)}
+            aria-label="Add Clinical Alert"
+            title="Add a critical clinical alert"
+            className="bg-critical/15 text-critical-text hover:bg-critical/25 hover:text-critical-text border border-transparent hover:border-critical/30 font-medium"
           >
-            <AlertTriangle className="w-3.5 h-3.5 mr-1 text-critical" />
-            + Alert
+            <AlertTriangle className="w-4 h-4 mr-1 text-critical" aria-hidden="true" />
+            Alert
           </Button>
           <Button
-            variant="secondary"
+            variant="ghost"
             size="sm"
             onClick={() => setIsAddDocOpen(true)}
+            aria-label="Upload Document"
+            title="Upload a new patient document"
+            className="bg-info/15 text-info-text hover:bg-info/25 hover:text-info-text border border-transparent hover:border-info/30 font-medium"
           >
-            <FilePlus className="w-3.5 h-3.5 mr-1 text-info" />
-            + Document
+            <FilePlus className="w-4 h-4 mr-1 text-info" aria-hidden="true" />
+            Document
           </Button>
           <Button
             variant="ghost"
@@ -535,27 +677,106 @@ export default function PatientDetailPage({
         {activeTab === 'documents' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h4 className="font-semibold text-sm text-text">Patient Documents & Consent Records</h4>
-              <Button variant="outline" size="sm" onClick={() => setIsAddDocOpen(true)}>
-                + Upload Document
+              <div>
+                <h4 className="font-semibold text-sm text-text">Patient Documents & Consent Records</h4>
+                <p className="text-xs text-text-muted">Attached records, identification proofs, and clinical files with verifiable audit trail.</p>
+              </div>
+              <Button variant="primary" size="sm" onClick={() => setIsAddDocOpen(true)}>
+                <FilePlus className="w-4 h-4 mr-1.5" />
+                Upload Document
               </Button>
             </div>
-            {patient.documents?.length === 0 ? (
-              <p className="text-xs text-text-muted py-4">No documents uploaded yet.</p>
+
+            {(!patient.documents || patient.documents.length === 0) ? (
+              <EmptyState
+                icon={<FileText className="w-6 h-6" />}
+                title="No Documents Uploaded"
+                description="Securely upload identification proofs, prior diagnostic reports, lab sheets, or consent forms."
+                actionLabel="Upload First Document"
+                onAction={() => setIsAddDocOpen(true)}
+              />
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {patient.documents.map((doc: any) => (
-                  <div key={doc.id} className="p-3 border border-border rounded-lg bg-surface-subtle flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-info-text" />
-                      <div>
-                        <p className="text-xs font-semibold text-text">{doc.title}</p>
-                        <p className="text-[11px] text-text-muted">{doc.documentType}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {patient.documents.map((doc: any) => {
+                  const formatBytes = (bytes?: number) => {
+                    if (!bytes) return 'Unknown size';
+                    if (bytes < 1024) return `${bytes} B`;
+                    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+                    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+                  };
+
+                  const isImage = doc.mimeType?.startsWith('image/') || doc.fileUrl?.match(/\.(jpe?g|png)$/i);
+                  const isPdf = doc.mimeType === 'application/pdf' || doc.fileUrl?.match(/\.pdf$/i);
+
+                  return (
+                    <div
+                      key={doc.id}
+                      className="p-4 border border-border rounded-xl bg-surface hover:border-border-strong transition-all flex flex-col justify-between space-y-3 shadow-xs"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-lg bg-primary-bg/20 text-primary flex items-center justify-center shrink-0">
+                            {isPdf ? (
+                              <FileText className="w-5 h-5 text-critical" />
+                            ) : isImage ? (
+                              <File className="w-5 h-5 text-accent" />
+                            ) : (
+                              <FileText className="w-5 h-5 text-info-text" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <h5 className="font-semibold text-sm text-text truncate" title={doc.title}>
+                              {doc.title}
+                            </h5>
+                            <div className="flex items-center gap-2 mt-0.5 text-xs text-text-muted">
+                              <Badge variant="neutral" size="sm">
+                                {doc.documentType?.replace(/_/g, ' ') || 'DOCUMENT'}
+                              </Badge>
+                              <span>•</span>
+                              <span>{formatBytes(doc.fileSize)}</span>
+                            </div>
+                            <p className="text-[11px] text-text-muted mt-1">
+                              Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}
+                              {doc.uploadedBy && ` by ${doc.uploadedBy.firstName || ''} ${doc.uploadedBy.lastName || ''}`.trim()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-border/60 flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={doc.fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            View
+                          </a>
+                          <span className="text-text-muted">•</span>
+                          <a
+                            href={doc.fileUrl}
+                            download
+                            className="inline-flex items-center gap-1 text-text-muted hover:text-text font-medium"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            Download
+                          </a>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-critical hover:bg-critical/10 hover:text-critical h-7 px-2"
+                          onClick={() => setDocDeleteTarget(doc)}
+                        >
+                          <Trash2 className="w-3.5 h-3.5 mr-1" />
+                          Remove
+                        </Button>
                       </div>
                     </div>
-                    <Badge variant="neutral">Verified</Badge>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -643,38 +864,212 @@ export default function PatientDetailPage({
       {/* Add Document Modal */}
       <Dialog
         isOpen={isAddDocOpen}
-        onClose={() => setIsAddDocOpen(false)}
+        onClose={() => {
+          if (!docUploading) {
+            setIsAddDocOpen(false);
+            setDocFile(null);
+            setDocFilePreview(null);
+            setDocUploadError(null);
+          }
+        }}
         title="Upload Patient Document"
-        description="Attach medical reports, ID proofs, or signed consent documents."
+        description="Attach medical diagnostic records, identification proofs, or signed consent agreements."
       >
         <form onSubmit={handleAddDoc} className="space-y-4">
           <Input
             label="Document Title"
             required
-            placeholder="e.g. National ID Card Copy"
+            placeholder="e.g. Brain MRI Report, National ID Copy"
             value={docForm.title}
             onChange={(e) => setDocForm({ ...docForm, title: e.target.value })}
+            disabled={docUploading}
           />
           <Select
             label="Document Type"
             value={docForm.documentType}
             onChange={(e) => setDocForm({ ...docForm, documentType: e.target.value })}
+            disabled={docUploading}
             options={[
-              { value: 'ID_PROOF', label: 'National ID / Passport' },
-              { value: 'INSURANCE_CARD', label: 'Insurance Card' },
-              { value: 'MEDICAL_RECORD', label: 'Previous Medical Record' },
+              { value: 'ID_PROOF', label: 'National ID / Passport / Driver License' },
+              { value: 'INSURANCE_CARD', label: 'Insurance Card / Policy Document' },
+              { value: 'MEDICAL_RECORD', label: 'External Diagnostic / Clinical Record' },
               { value: 'CONSENT_FORM', label: 'Signed Consent Form' },
             ]}
           />
+
+          {/* Drag & Drop File Zone */}
+          <div className="space-y-2">
+            <label className="block text-xs font-medium text-text">
+              File Attachment <span className="text-critical">*</span>
+            </label>
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                  handleFileSelect(e.dataTransfer.files[0]);
+                }
+              }}
+              className={`border-2 border-dashed rounded-xl p-5 text-center transition-all ${
+                docFile
+                  ? 'border-primary/50 bg-primary-bg/10'
+                  : 'border-border hover:border-primary/40 bg-surface-subtle'
+              }`}
+            >
+              {!docFile ? (
+                <div className="space-y-2 flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-muted">
+                    <UploadCloud className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="patient-doc-file-input"
+                      className="cursor-pointer text-sm font-semibold text-primary hover:underline"
+                    >
+                      Choose a file
+                    </label>
+                    <span className="text-sm text-text-muted"> or drag & drop here</span>
+                  </div>
+                  <p className="text-[11px] text-text-muted">
+                    Supported formats: PDF, JPG, PNG (Max 10 MB). Scanned for integrity.
+                  </p>
+                  <input
+                    id="patient-doc-file-input"
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleFileSelect(e.target.files[0]);
+                      }
+                    }}
+                    disabled={docUploading}
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center justify-between gap-3 text-left">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {docFilePreview ? (
+                      <img
+                        src={docFilePreview}
+                        alt="Preview"
+                        className="w-12 h-12 object-cover rounded-lg border border-border"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-lg bg-surface border border-border flex items-center justify-center text-text-muted shrink-0">
+                        <FileText className="w-6 h-6 text-critical" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-text truncate">{docFile.name}</p>
+                      <p className="text-[11px] text-text-muted">
+                        {(docFile.size / 1024).toFixed(1)} KB • {docFile.type || 'Document'}
+                      </p>
+                    </div>
+                  </div>
+                  {!docUploading && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleFileSelect(null)}
+                      className="text-text-muted hover:text-critical h-8 w-8 p-0"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          {docUploading && (
+            <div className="space-y-1.5 pt-1">
+              <div className="flex justify-between text-xs text-text-muted">
+                <span>Uploading & verifying file...</span>
+                <span>{docUploadProgress}%</span>
+              </div>
+              <div className="w-full bg-border rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="bg-primary h-1.5 rounded-full transition-all duration-300"
+                  style={{ width: `${docUploadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Error Banner */}
+          {docUploadError && (
+            <div className="p-3 bg-critical-bg border border-critical-border rounded-lg text-xs text-critical-text flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-critical shrink-0 mt-0.5" />
+              <span>{docUploadError}</span>
+            </div>
+          )}
+
           <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => setIsAddDocOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={docUploading}
+              onClick={() => {
+                setIsAddDocOpen(false);
+                setDocFile(null);
+                setDocFilePreview(null);
+                setDocUploadError(null);
+              }}
+            >
               Cancel
             </Button>
-            <Button type="submit" variant="primary">
-              Save Document
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={!docFile || docUploading || !docForm.title.trim()}
+              isLoading={docUploading}
+            >
+              Upload & Attach
             </Button>
           </div>
         </form>
+      </Dialog>
+
+      {/* Remove Document Confirmation Modal */}
+      <Dialog
+        isOpen={Boolean(docDeleteTarget)}
+        onClose={() => !docDeleting && setDocDeleteTarget(null)}
+        title="Remove Patient Document"
+        description="Soft-deletes this document record and creates a permanent entry in the compliance audit log."
+      >
+        <div className="space-y-4">
+          <div className="p-3 bg-critical-bg border border-critical-border rounded-lg text-xs text-critical-text">
+            <p className="font-semibold">Confirm Document Soft-Deletion:</p>
+            <p className="mt-1">
+              Are you sure you want to remove &quot;{docDeleteTarget?.title}&quot;? The file will be archived and hidden from clinical views.
+            </p>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={docDeleting}
+              onClick={() => setDocDeleteTarget(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              isLoading={docDeleting}
+              onClick={handleConfirmRemoveDoc}
+            >
+              Remove Document
+            </Button>
+          </div>
+        </div>
       </Dialog>
 
       {/* Patient Merge Modal */}
@@ -714,6 +1109,43 @@ export default function PatientDetailPage({
           </div>
         </form>
       </Dialog>
+
+      {/* Select Doctor Modal */}
+      <Dialog
+        isOpen={isDoctorSelectOpen}
+        onClose={() => setIsDoctorSelectOpen(false)}
+        title="Start OPD Consultation"
+        description="Select the attending physician for this encounter."
+      >
+        <div className="space-y-4">
+          <Select
+            label="Attending Doctor"
+            options={MOCK_DOCTORS}
+            value={selectedDoctorId}
+            onChange={(e) => setSelectedDoctorId(e.target.value)}
+          />
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={() => setIsDoctorSelectOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleStartConsultation}
+              isLoading={isStartingEncounter}
+              disabled={!selectedDoctorId}
+            >
+              Start Encounter
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+
+      {toasts.length > 0 && (
+        <ToastContainer
+          toasts={toasts}
+          onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
+        />
+      )}
     </div>
   );
 }

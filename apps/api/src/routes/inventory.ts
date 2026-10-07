@@ -79,7 +79,7 @@ router.post('/locations', requirePermission('inventory.adjust'), async (req, res
     const branchId = req.branchId || (req.user as any)?.branchId;
 
     if (!hospitalId || !branchId) {
-      throw AppError.badRequest('Hospital context required to create inventory location');
+      throw AppError.badRequest('Hospital context is required. You do not have a hospital assigned. Please contact the system administrator to assign a hospital to your account.');
     }
 
     const { name, type, departmentId } = CreateLocationSchema.parse(req.body);

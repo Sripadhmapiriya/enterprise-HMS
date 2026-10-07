@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { dietaryApi, patientsApi, encountersApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function DietaryDashboard() {
   const [loading, setLoading] = useState(true);
@@ -382,7 +383,7 @@ export default function DietaryDashboard() {
             <form onSubmit={handleCreateOrder} className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Select Patient *</label>
-                <select
+                <Select
                   value={selectedPatientId}
                   onChange={(e) => setSelectedPatientId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -394,12 +395,12 @@ export default function DietaryDashboard() {
                       {p.firstName} {p.lastName} (MRN: {p.mrn})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Diet Type *</label>
-                <select
+                <Select
                   value={selectedDietTypeId}
                   onChange={(e) => setSelectedDietTypeId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface font-semibold"
@@ -410,7 +411,7 @@ export default function DietaryDashboard() {
                       {dt.name} ({dt.code})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>

@@ -74,6 +74,16 @@ export default function QueueBoardPage() {
           <p className="text-sm text-text-muted mt-1">
             Real-time outpatient consultation token calling and waiting room display monitor.
           </p>
+          <div className="mt-2 inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-surface-subtle border border-border text-xs text-text-muted">
+            <span className="font-semibold text-text">Workflow:</span>
+            <span>Check-in creates a token</span>
+            <span>&rarr;</span>
+            <span className="text-info font-medium">Call</span>
+            <span>&rarr;</span>
+            <span className="text-brand font-medium">Start Consultation</span>
+            <span>&rarr;</span>
+            <span className="text-stable font-medium">Complete</span>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" size="sm" onClick={loadQueue}>

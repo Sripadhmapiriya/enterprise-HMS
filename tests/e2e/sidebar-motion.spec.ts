@@ -18,7 +18,7 @@ test.beforeAll(async () => {
   const apiContext = await playwrightRequest.newContext();
   const res = await apiContext.post('http://localhost:4000/api/v1/auth/login', {
     data: {
-      email: 'priya.s@vedichealth.org',
+      email: 'admin@demo.com',
       password: 'password123',
     },
   });

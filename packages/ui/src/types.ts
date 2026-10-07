@@ -14,6 +14,7 @@ export interface PatientBannerData {
   bedNumber?: string;
   roomNumber?: string;
   wardName?: string;
+  allergyStatus?: 'NOT_ASSESSED' | 'NKDA_CONFIRMED' | 'HAS_ALLERGIES';
   allergies?: Array<{
     id?: string;
     substance: string;

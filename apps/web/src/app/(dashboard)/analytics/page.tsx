@@ -426,7 +426,7 @@ export default function AnalyticsDashboardPage() {
             <div className="space-y-4">
               <div>
                 <label className="text-xs font-semibold text-text uppercase">Report Scope</label>
-                <select
+                <Select
                   value={exportReportType}
                   onChange={(e) => setExportReportType(e.target.value)}
                   className="w-full mt-1 px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
@@ -435,7 +435,7 @@ export default function AnalyticsDashboardPage() {
                   <option value="CENSUS_REPORT">Hospital Inpatient Census & BOR</option>
                   <option value="FINANCIAL_SUMMARY">Revenue & Accounts Receivable</option>
                   <option value="CLINICAL_QUALITY">Clinical Quality & Safety Metrics</option>
-                </select>
+                </Select>
               </div>
 
               <div>

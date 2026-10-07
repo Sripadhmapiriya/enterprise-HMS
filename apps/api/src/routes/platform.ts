@@ -62,6 +62,56 @@ router.post('/files/upload', async (req, res, next) => {
   }
 });
 
+import multer from 'multer';
+
+const upload = multer({
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'application/dicom', 'text/csv'];
+    if (allowed.includes(file.mimetype.toLowerCase())) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Invalid file type: ${file.mimetype}. Allowed types: PDF, JPG, PNG`));
+    }
+  },
+});
+
+router.post('/files/upload-multipart', upload.single('file'), async (req: any, res, next) => {
+  try {
+    const tenantId = req.tenantId!;
+    if (!req.file) {
+      throw AppError.badRequest('No file provided in multipart upload');
+    }
+
+    // Verify buffer magic bytes / signature for PDF, JPG, PNG
+    const buffer = req.file.buffer;
+    let verifiedMime = req.file.mimetype;
+
+    const isPdf = buffer.slice(0, 4).toString('hex') === '25504446'; // %PDF
+    const isJpg = buffer.slice(0, 3).toString('hex') === 'ffd8ff';
+    const isPng = buffer.slice(0, 8).toString('hex') === '89504e470d0a1a0a';
+
+    if (isPdf) verifiedMime = 'application/pdf';
+    else if (isJpg) verifiedMime = 'image/jpeg';
+    else if (isPng) verifiedMime = 'image/png';
+    else if (!['application/dicom', 'text/csv'].includes(req.file.mimetype)) {
+      throw AppError.badRequest('File signature verification failed: File content does not match allowed types (PDF, JPG, PNG)');
+    }
+
+    const meta = await storageService.uploadFile(tenantId, req.file.originalname, verifiedMime, buffer);
+
+    res.status(201).json({
+      success: true,
+      data: {
+        ...meta,
+        fileUrl: `/api/v1/platform/files/download/${encodeURIComponent(meta.key)}`,
+      },
+    });
+  } catch (err: any) {
+    next(err);
+  }
+});
+
 router.get('/files/download-url', async (req, res, next) => {
   try {
     const key = req.query.key as string;
@@ -70,6 +120,31 @@ router.get('/files/download-url', async (req, res, next) => {
     const tenantId = req.tenantId!;
     const result = await storageService.generateDownloadUrl(key, tenantId);
     res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/v1/platform/files/download/:key(*) - Secure view/download endpoint
+router.get('/files/download/:key(*)', async (req, res, next) => {
+  try {
+    const key = decodeURIComponent(req.params.key);
+    const tenantId = req.tenantId!;
+
+    // Security check: Must belong to tenant
+    if (key.startsWith('tenants/') && !key.startsWith(`tenants/${tenantId}/`)) {
+      throw AppError.forbidden('Access denied: File does not belong to your organization');
+    }
+
+    const file = storageService.getFile(key);
+    if (!file) {
+      throw AppError.notFound('File not found or has been removed');
+    }
+
+    res.setHeader('Content-Type', file.meta.mimeType || 'application/octet-stream');
+    res.setHeader('Content-Length', file.buffer.length);
+    res.setHeader('Content-Disposition', `inline; filename="${file.meta.originalName}"`);
+    res.send(file.buffer);
   } catch (err) {
     next(err);
   }
@@ -337,32 +412,73 @@ router.get('/jobs', async (req, res, next) => {
 router.get('/sidebar-badges', async (req, res, next) => {
   try {
     const tenantId = req.tenantId!;
+    const branchId = req.branchId || (req.user as any)?.branchId;
 
-    let queueCount = 0;
+    // 1. OPD queue badge: count only today's WAITING (and CALLED) entries for current branch using queueDate
+    let queueCount: number | null = null;
     try {
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+
+      const whereClause: any = {
+        status: { in: ['WAITING', 'CALLED'] },
+        queueDate: today,
+      };
+      if (branchId) {
+        whereClause.branchId = branchId;
+      }
+
       queueCount = await req.prismaTenant.queue.count({
-        where: { status: 'WAITING' },
+        where: whereClause,
       });
-    } catch {}
+    } catch (err: any) {
+      console.error('Failed to count queue badge:', err.message);
+      queueCount = null;
+    }
 
-    let labCount = 0;
+    // 2. Lab badge: only pending items (ORDERED) for the current branch
+    let labCount: number | null = null;
     try {
-      labCount = await req.prismaTenant.investigationOrderItem.count({
-        where: {
-          category: 'LABORATORY',
-          order: { status: 'ORDERED' },
+      const whereClause: any = {
+        category: 'LABORATORY',
+        order: {
+          tenantId,
+          status: 'ORDERED',
+          ...(branchId ? { encounter: { branchId } } : {}),
         },
-      });
-    } catch {}
+      };
 
-    let emergencyCount = 0;
+      labCount = await req.prismaTenant.investigationOrderItem.count({
+        where: whereClause,
+      });
+    } catch (err: any) {
+      console.error('Failed to count lab badge:', err.message);
+      labCount = null;
+    }
+
+    // 3. Emergency badge: count only patients currently in ER (not discharged, admitted or transferred)
+    // status in ['OPEN', 'IN_PROGRESS'], for the current branch
+    let emergencyCount: number | null = null;
     try {
-      emergencyCount = await req.prismaTenant.emergencyTriage.count({
-        where: { priority: { in: ['RED', 'ORANGE'] } },
-      });
-    } catch {}
+      const whereClause: any = {
+        tenantId,
+        type: 'EMERGENCY',
+        status: { in: ['OPEN', 'IN_PROGRESS'] },
+      };
+      if (branchId) {
+        whereClause.branchId = branchId;
+      }
 
-    let criticalAlertsCount = 0;
+      emergencyCount = await req.prismaTenant.encounter.count({
+        where: whereClause,
+      });
+    } catch (err: any) {
+      console.error('Failed to count emergency badge:', err.message);
+      emergencyCount = null;
+    }
+
+    // 4. Critical alerts badge
+    let criticalAlertsCount: number | null = null;
     try {
       criticalAlertsCount = await req.prismaTenant.notification.count({
         where: {
@@ -371,7 +487,10 @@ router.get('/sidebar-badges', async (req, res, next) => {
           isRead: false,
         },
       });
-    } catch {}
+    } catch (err: any) {
+      console.error('Failed to count critical alerts badge:', err.message);
+      criticalAlertsCount = null;
+    }
 
     res.json({
       success: true,

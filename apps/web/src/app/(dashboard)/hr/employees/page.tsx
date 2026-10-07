@@ -20,6 +20,7 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { hrApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function HumanResourcesDashboard() {
   const [activeTab, setActiveTab] = useState<'employees' | 'credentials' | 'attendance' | 'leave' | 'payroll'>('employees');
@@ -939,7 +940,7 @@ export default function HumanResourcesDashboard() {
             <form onSubmit={handleAddCredential} className="space-y-3">
               <div>
                 <label className="text-xs font-semibold text-text">Staff Member</label>
-                <select
+                <Select
                   required
                   value={credentialForm.employeeId}
                   onChange={(e) => setCredentialForm({ ...credentialForm, employeeId: e.target.value })}
@@ -951,12 +952,12 @@ export default function HumanResourcesDashboard() {
                       {emp.user?.firstName} {emp.user?.lastName} ({emp.employeeCode})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>
                 <label className="text-xs font-semibold text-text">Credential Type</label>
-                <select
+                <Select
                   value={credentialForm.credentialType}
                   onChange={(e) => setCredentialForm({ ...credentialForm, credentialType: e.target.value })}
                   className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-brand"
@@ -966,7 +967,7 @@ export default function HumanResourcesDashboard() {
                   <option value="DEA_REGISTRATION">DEA Controlled Substances Reg</option>
                   <option value="BOARD_CERTIFICATION">Specialty Board Certification</option>
                   <option value="ACLS_CERTIFICATE">ACLS / BLS Certificate</option>
-                </select>
+                </Select>
               </div>
 
               <div>
@@ -1043,7 +1044,7 @@ export default function HumanResourcesDashboard() {
             <form onSubmit={handleLogAttendance} className="space-y-3">
               <div>
                 <label className="text-xs font-semibold text-text">Staff Member</label>
-                <select
+                <Select
                   required
                   value={attendanceForm.employeeId}
                   onChange={(e) => setAttendanceForm({ ...attendanceForm, employeeId: e.target.value })}
@@ -1055,7 +1056,7 @@ export default function HumanResourcesDashboard() {
                       {emp.user?.firstName} {emp.user?.lastName} ({emp.employeeCode})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>
@@ -1093,7 +1094,7 @@ export default function HumanResourcesDashboard() {
 
               <div>
                 <label className="text-xs font-semibold text-text">Status</label>
-                <select
+                <Select
                   value={attendanceForm.status}
                   onChange={(e) => setAttendanceForm({ ...attendanceForm, status: e.target.value })}
                   className="w-full px-3 py-1.5 text-sm border rounded-lg"
@@ -1102,7 +1103,7 @@ export default function HumanResourcesDashboard() {
                   <option value="LATE">LATE</option>
                   <option value="HALF_DAY">HALF_DAY</option>
                   <option value="ABSENT">ABSENT</option>
-                </select>
+                </Select>
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
@@ -1133,7 +1134,7 @@ export default function HumanResourcesDashboard() {
             <form onSubmit={handleSubmitLeave} className="space-y-3">
               <div>
                 <label className="text-xs font-semibold text-text">Staff Member</label>
-                <select
+                <Select
                   required
                   value={leaveForm.employeeId}
                   onChange={(e) => setLeaveForm({ ...leaveForm, employeeId: e.target.value })}
@@ -1145,12 +1146,12 @@ export default function HumanResourcesDashboard() {
                       {emp.user?.firstName} {emp.user?.lastName} ({emp.employeeCode})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>
                 <label className="text-xs font-semibold text-text">Leave Type</label>
-                <select
+                <Select
                   value={leaveForm.leaveType}
                   onChange={(e) => setLeaveForm({ ...leaveForm, leaveType: e.target.value })}
                   className="w-full px-3 py-1.5 text-sm border rounded-lg"
@@ -1159,7 +1160,7 @@ export default function HumanResourcesDashboard() {
                   <option value="SICK">Medical / Sick Leave</option>
                   <option value="EARNED">Earned / Privilege Leave</option>
                   <option value="UNPAID">Loss of Pay (Unpaid)</option>
-                </select>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

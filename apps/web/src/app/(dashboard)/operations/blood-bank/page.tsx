@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { bloodBankApi, patientsApi, encountersApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function BloodBankDashboard() {
   const [loading, setLoading] = useState(true);
@@ -359,7 +360,7 @@ export default function BloodBankDashboard() {
           <form onSubmit={handleRunCrossmatch} className="space-y-4">
             <div>
               <label className="block text-xs font-medium text-text mb-1">Patient Blood Group</label>
-              <select
+              <Select
                 value={checkPatientGroup}
                 onChange={(e) => setCheckPatientGroup(e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface font-bold"
@@ -367,12 +368,12 @@ export default function BloodBankDashboard() {
                 {bloodGroups.map((bg) => (
                   <option key={bg} value={bg}>{bg}</option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             <div>
               <label className="block text-xs font-medium text-text mb-1">Select Blood Component Unit</label>
-              <select
+              <Select
                 value={checkComponentId}
                 onChange={(e) => setCheckComponentId(e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -384,7 +385,7 @@ export default function BloodBankDashboard() {
                     {c.unitId} ({c.bloodGroup} • {c.componentType} • Exp: {new Date(c.expiryDate).toLocaleDateString()})
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             <button
@@ -608,7 +609,7 @@ export default function BloodBankDashboard() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Blood Group *</label>
-                  <select
+                  <Select
                     value={donorForm.bloodGroup}
                     onChange={(e) => setDonorForm({ ...donorForm, bloodGroup: e.target.value })}
                     className="w-full px-3 py-1.5 border border-border rounded text-xs bg-surface font-bold"
@@ -616,11 +617,11 @@ export default function BloodBankDashboard() {
                     {bloodGroups.map((bg) => (
                       <option key={bg} value={bg}>{bg}</option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Gender</label>
-                  <select
+                  <Select
                     value={donorForm.gender}
                     onChange={(e) => setDonorForm({ ...donorForm, gender: e.target.value })}
                     className="w-full px-3 py-1.5 border border-border rounded text-xs bg-surface"
@@ -628,7 +629,7 @@ export default function BloodBankDashboard() {
                     <option value="MALE">Male</option>
                     <option value="FEMALE">Female</option>
                     <option value="OTHER">Other</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 
@@ -686,7 +687,7 @@ export default function BloodBankDashboard() {
             <form onSubmit={handleRecordDonation} className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Select Donor *</label>
-                <select
+                <Select
                   value={selectedDonorId}
                   onChange={(e) => setSelectedDonorId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -700,7 +701,7 @@ export default function BloodBankDashboard() {
                         {d.firstName} {d.lastName} ({d.bloodGroup} • ID: {d.donorId})
                       </option>
                     ))}
-                </select>
+                </Select>
               </div>
 
               <div>
@@ -750,7 +751,7 @@ export default function BloodBankDashboard() {
             <form onSubmit={handleIssueBlood} className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Select Recipient Patient *</label>
-                <select
+                <Select
                   value={issuePatientId}
                   onChange={(e) => setIssuePatientId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -762,7 +763,7 @@ export default function BloodBankDashboard() {
                       {p.firstName} {p.lastName} (MRN: {p.mrn} • Blood: {p.bloodGroup || 'Unspecified'})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="flex justify-end gap-3 pt-3 border-t border-border">

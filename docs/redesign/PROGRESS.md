@@ -2304,3 +2304,163 @@ Running 11 tests using 1 worker
    - `npm run build`: **45 of 45 Next.js routes compiled cleanly with Turbopack**.
 
 
+
+---
+
+## Workstream K: Five Core Issues Root Cause Resolution & Hardening
+
+### Status: COMPLETED
+**Started:** 2026-10-07T12:30:00+05:30  
+**Completed:** 2026-10-07T14:24:00+05:30  
+
+### Five Core Issues Addressed
+
+1. **Patient Documents: Real Upload, Verification, and Soft Delete**
+   - **Root Cause:** The patient upload dialog in apps/web/src/app/(dashboard)/patients/[id]/page.tsx was a stub with only title and type, saving a hardcoded dummy URL ('https://storage.hospital.org/docs/sample.pdf'). Furthermore, files were not validated on server by binary magic bytes and deletions were not supported or audited.
+   - **Solution:**
+     - Removed the dummy URL.
+     - Added real multipart drag-and-drop file dropzone with native file input fallback, visual file name and formatted size preview, image/PDF thumbnail support, upload progress indicator, and explicit validation errors.
+     - Enforced client and server validation: allowed types limited to PDF, JPG, PNG with 10 MB maximum size.
+     - Implemented POST /api/v1/platform/files/upload-multipart using multer with binary magic bytes / signature checking (%PDF, JPEG, PNG) to prevent extension spoofing.
+     - Configured local disk storage persistence adapter saving files into uploads/ directory to survive dev restarts.
+     - Implemented secure view/download endpoint GET /api/v1/platform/files/download/:key(*) with tenant isolation check and proper content headers.
+     - Added soft delete endpoint DELETE /api/v1/patients/:id/documents/:documentId setting deletedAt and deletedById, logging to AuditLog, and filtering deleted records out of GET /api/v1/patients/:id.
+     - Integrated deletion confirmation modal and toast notification system replacing alert().
+
+2. **Appointment Booking: Searchable Patient Picker**
+   - **Root Cause:** In apps/web/src/app/(dashboard)/appointments/page.tsx, patient selection required manual entry of an exact MRN without autocomplete, debouncing, or inline fallback for unregistered patients.
+   - **Solution:**
+     - Created apps/web/src/components/PatientPicker.tsx implementing search-as-you-type with 300ms debounce against GET /api/v1/patients?q=.
+     - Displays comprehensive patient details in dropdown: Full Name, MRN badge, Gender, Age, and Mobile number.
+     - Added inline Register New Patient modal fallback allowing quick walk-in registration and automatic selection of the newly registered patient.
+     - Handled preselectedPatientId URL search parameter for seamless handoffs from patient detail pages.
+     - Integrated PatientPicker into appointment scheduling flow.
+
+3. **Sidebar Badges: Live & Accurate Operational Counts**
+   - **Root Cause:** GET /api/v1/platform/sidebar-badges returned static or non-branch-filtered aggregate queries without handling errors gracefully.
+   - **Solution:**
+     - Updated endpoint in apps/api/src/routes/platform.ts to filter by current branchId.
+     - Filtered OPD queue count to today's active tokens (WAITING, CALLED, with queueDate = today).
+     - Filtered ER count to active encounters (OPEN, IN_PROGRESS) in the current branch.
+     - Wrapped each metric query in individual error catchers returning null on failure, causing badge elements to cleanly disappear rather than displaying stale or zeroed data.
+     - Updated AppShell.tsx to render informative, clinical tooltips (e.g., 3 patients waiting today, 1 active patient in ER).
+     - Added an OPD Queue workflow explainer card in the header of apps/web/src/app/(dashboard)/queue/page.tsx.
+
+4. **Hospital & Branch Context: Comprehensive Routing & Header Enforcement**
+   - **Root Cause:** Requests encountered "Hospital or branch context required" because x-branch-id was not uniformly forwarded from client local storage, token payloads lacked staff branch associations, and users lacked an explicit branch switcher in the shell.
+   - **Solution:**
+     - Updated apps/api/src/middleware/auth.ts to inspect incoming x-branch-id headers, validating against user assigned branches or admin roles, and binding req.branchId.
+     - Updated authService.ts and routes/auth.ts to inject user branch association and staff records into JWT payloads and /auth/me.
+     - Added GET /api/v1/branches/allowed endpoint for allowed branch enumeration.
+     - Updated apps/web/src/lib/api.ts to attach X-Branch-Id header to every outbound HTTP request from localStorage.getItem('hms_selected_branch_id').
+     - Seeded secondary branch (East Wing Campus) in database and assigned staff branch profiles to demo users.
+     - Built live branch switcher into AppShell.tsx topbar with persistent local storage sync and state updates.
+
+5. **IPD Overview & Dynamic Routes: Next.js 16 / React 19 Params Promise**
+   - **Root Cause:** In Next.js 16 / React 19 App Router client components, params is passed as a Promise. Direct destructuring of params.id caused runtime unhandled rejection warnings.
+   - **Solution:**
+     - Updated apps/web/src/app/(dashboard)/ipd/chart/[id]/page.tsx to use const params = useParams() from next/navigation and resolved id = (params?.id as string) || ''.
+     - Replaced all legacy params.id occurrences across async fetchers and action handlers with id.
+     - Created scripts/check-params.mjs AST/regex scanner to enforce useParams() or use(params) across all Next.js App Router client components.
+     - Added check:params script to package.json and wired it into npm run verify.
+
+---
+
+### Verification Results
+
+#### 1. Params Validation Check (npm run check:params)
+```
+> enterprise-hms@1.0.0 check:params
+> node scripts/check-params.mjs
+
+No direct params destructuring found.
+```
+
+#### 2. Monorepo Typecheck (npm run typecheck)
+```
+> enterprise-hms@1.0.0 typecheck
+> turbo run typecheck
+
+ Tasks:    8 successful, 8 total
+ Cached:    8 cached, 8 total
+   Time:    31ms >>> FULL TURBO
+```
+
+#### 3. Semantic Token Audit (npm run check:no-hardcoded-colors)
+```
+> enterprise-hms@1.0.0 check:no-hardcoded-colors
+> tsx scripts/check-no-hardcoded-colors.ts
+
+🔍 Checking for hardcoded colors in app and component code...
+
+✅ ZERO hardcoded colors found! All styles use semantic tokens.
+```
+
+#### 4. Monorepo Integrity Checks (npm run check:integrity)
+```
+> enterprise-hms@1.0.0 check:integrity
+> tsx scripts/verify-integrity.ts
+
+========================================
+Running Monorepo Integrity Checks
+========================================
+
+✓ [PASS] check:no-phase: Zero prohibited "Phase" references detected across all active source, schemas, seeds, and documentation.
+✓ [PASS] check:no-direct-prisma-in-web: Zero direct Prisma imports detected in apps/web. All pages use API client.
+✓ [PASS] check:placeholders: Zero prohibited placeholders detected in shipped API and web source.
+✓ [PASS] check:no-committed-secrets: No committed secrets or environment variable files in git tracking.
+
+========================================
+```
+
+#### 5. Patient & Scheduling Tests (npx vitest run tests/patients.test.ts tests/scheduling.test.ts)
+```
+ RUN  v5.0.3 C:/Atriowings/enterprise-HMS
+
+ ✓ tests/scheduling.test.ts (7 tests) 44045ms
+ ✓ tests/patients.test.ts (10 tests) 50978ms
+   ✓ Workstream D: Master Patient Index (MPI), Allergies, Alerts, Merge & 360 (10)
+     ✓ 1. Quick registration: registers walk-in patient with auto-generated MRN
+     ✓ 2. Full registration: registers comprehensive patient record with emergency contact
+     ✓ 3. Duplicate detection: flags potential duplicate based on phone or name
+     ✓ 4. Allergy documentation: records Penicillin allergy with severity
+     ✓ 5. Clinical Alert: records Fall Risk alert visible to all clinicians
+     ✓ 6. Patient 360 detail: returns persistent banner data, allergies, and alerts
+     ✓ 7. Patient merge: merges duplicate record B into primary record A with audit trail
+     ✓ 8. Document upload: attaches identity document to patient record and supports soft-delete with audit
+     ✓ 9. Patient search: searches patients by name or MRN query for patient picker
+     ✓ 10. Timeline: retrieves clinical timeline of all encounters and events
+
+ Test Files  2 passed (2)
+      Tests  17 passed (17)
+```
+
+#### 6. Playwright E2E Test Suite (npx playwright test tests/e2e/sidebar-motion.spec.ts)
+```
+Running 11 tests using 1 worker
+
+  ok  1 [chromium] › tests/e2e/sidebar-motion.spec.ts:53:7 › 1. collapse/expand toggles icon rail (72px) and remembers choice (1.5s)
+  ok  2 [chromium] › tests/e2e/sidebar-motion.spec.ts:87:7 › 2. group state is remembered after reload and current group opens automatically (1.6s)
+  ok  3 [chromium] › tests/e2e/sidebar-motion.spec.ts:117:7 › 3. search filters menu items as user types (862ms)
+  ok  4 [chromium] › tests/e2e/sidebar-motion.spec.ts:137:7 › 4. favorites / pinned items persist per user (max 6) (1.9s)
+  ok  5 [chromium] › tests/e2e/sidebar-motion.spec.ts:164:7 › 5. live badges come from API and critical alert uses token and icon (1.3s)
+  ok  6 [chromium] › tests/e2e/sidebar-motion.spec.ts:202:7 › 6. full keyboard-only navigation works with arrow keys, Enter, and Escape (2.7s)
+  ok  7 [chromium] › tests/e2e/sidebar-motion.spec.ts:223:7 › 7. drawer works on tablet width (<1024px) and closes on route change (4.6s)
+  ok  8 [chromium] › tests/e2e/sidebar-motion.spec.ts:253:7 › 8. module pruning for patients-only and pharmacy-er presets (6.0s)
+  ok  9 [chromium] › tests/e2e/sidebar-motion.spec.ts:309:7 › 9. axe accessibility scan on shell: zero serious/critical issues (1.3s)
+  ok 10 [chromium] › tests/e2e/sidebar-motion.spec.ts:326:7 › 10. prefers-reduced-motion replaces animations with instant settle (556ms)
+  ok 11 [chromium] › tests/e2e/sidebar-motion.spec.ts:337:7 › 11. captures screenshots across states (expanded, collapsed, tablet drawer, light and dark) (13.8s)
+
+  11 passed (42.4s)
+```
+
+#### 7. Monorepo Production Build (npm run build)
+```
+> enterprise-hms@1.0.0 build
+> turbo run build
+
+ Tasks:    8 successful, 8 total
+ Cached:    0 cached, 8 total
+   Time:    54.634s 
+ 45/45 Next.js App Router routes compiled cleanly with Turbopack.
+```

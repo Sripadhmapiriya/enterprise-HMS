@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FlaskConical, AlertTriangle, CheckCircle2, Clock, RefreshCw, Download, ArrowUpRight } from 'lucide-react';
 import { laboratoryApi } from '@/lib/api';
-import { Button, Badge, Dialog, Input } from '@enterprise-hms/ui';
+import { Button, Badge, Dialog, Input, Select } from '@enterprise-hms/ui';
 
 export default function LaboratoryDashboard() {
   const [samples, setSamples] = useState<any[]>([]);
@@ -230,7 +230,7 @@ export default function LaboratoryDashboard() {
 
           <div>
             <label className="block text-xs font-semibold text-text mb-1">Notification Method *</label>
-            <select
+            <Select
               className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
               value={ackMethod}
               onChange={(e: any) => setAckMethod(e.target.value)}
@@ -239,7 +239,7 @@ export default function LaboratoryDashboard() {
               <option value="VERBAL">Verbal Readback at Bedside</option>
               <option value="IN_PERSON">In-Person Handover to Charge Nurse</option>
               <option value="EMR_ALERT">Electronic Clinical Alert System</option>
-            </select>
+            </Select>
           </div>
 
           <div>

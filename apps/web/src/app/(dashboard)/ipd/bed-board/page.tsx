@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ipdApi, housekeepingApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function BedBoardPage() {
   const [loading, setLoading] = useState(true);
@@ -124,7 +125,7 @@ export default function BedBoardPage() {
       <div className="flex flex-wrap items-center gap-3 bg-surface p-3 rounded-xl border border-border shadow-sm">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">Ward:</span>
-          <select
+          <Select
             value={selectedWardId}
             onChange={(e) => setSelectedWardId(e.target.value)}
             className="px-3 py-1.5 border border-border rounded-lg text-xs font-medium focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -135,12 +136,12 @@ export default function BedBoardPage() {
                 {w.wardName} ({w.totalBeds} beds)
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">Status:</span>
-          <select
+          <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-1.5 border border-border rounded-lg text-xs font-medium focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -150,7 +151,7 @@ export default function BedBoardPage() {
             <option value="OCCUPIED">Occupied</option>
             <option value="CLEANING">Cleaning</option>
             <option value="MAINTENANCE">Maintenance</option>
-          </select>
+          </Select>
         </div>
       </div>
 

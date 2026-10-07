@@ -24,12 +24,18 @@ function getStoredTenantId(): string | null {
   return localStorage.getItem('hms_tenant_id');
 }
 
+function getStoredBranchId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('hms_selected_branch_id');
+}
+
 async function request<T = any>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<{ success: boolean; data: T; meta?: any; message?: string }> {
   const token = getStoredToken();
   const tenantId = getStoredTenantId();
+  const branchId = getStoredBranchId();
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -41,6 +47,9 @@ async function request<T = any>(
   }
   if (tenantId) {
     headers['X-Tenant-Id'] = tenantId;
+  }
+  if (branchId) {
+    headers['X-Branch-Id'] = branchId;
   }
 
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : '/' + endpoint;
@@ -114,6 +123,7 @@ async function request<T = any>(
 // ==========================================
 
 export const authApi = {
+  getDemoAccounts: async () => request('/auth/demo-accounts', { method: 'GET' }),
   login: async (credentials: { email: string; password: string }) => {
     return request('/auth/login', {
       method: 'POST',
@@ -192,6 +202,12 @@ export const patientsApi = {
     });
   },
 
+  confirmNKDA: async (patientId: string) => {
+    return request('/patients/' + patientId + '/nkda', {
+      method: 'POST',
+    });
+  },
+
   addAllergy: async (patientId: string, data: { allergen: string; reaction?: string; severity?: string; notes?: string }) => {
     return request('/patients/' + patientId + '/allergies', {
       method: 'POST',
@@ -211,6 +227,37 @@ export const patientsApi = {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  },
+
+  removeDocument: async (patientId: string, documentId: string) => {
+    return request('/patients/' + patientId + '/documents/' + documentId, {
+      method: 'DELETE',
+    });
+  },
+
+  uploadDocumentMultipart: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = typeof window !== 'undefined' ? localStorage.getItem('hms_access_token') : null;
+    const tenantId = typeof window !== 'undefined' ? localStorage.getItem('hms_tenant_id') : null;
+    const branchId = typeof window !== 'undefined' ? localStorage.getItem('hms_selected_branch_id') : null;
+
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    if (tenantId) headers['X-Tenant-Id'] = tenantId;
+    if (branchId) headers['X-Branch-Id'] = branchId;
+
+    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1') + '/platform/files/upload-multipart', {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(json?.error?.message || json?.message || 'File upload failed');
+    }
+    return json;
   },
 
   addConsent: async (patientId: string, data: { consentType: string; notes?: string; witnessName?: string; expiresAt?: string }) => {
@@ -1281,6 +1328,11 @@ export const userApi = {
 
 export const hospitalsApi = {
   getHospitals: async () => request('/hospitals'),
+};
+
+export const branchesApi = {
+  getBranches: async () => request('/branches'),
+  getAllowedBranches: async () => request('/branches/allowed'),
 };
 
 

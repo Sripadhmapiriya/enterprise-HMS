@@ -212,7 +212,7 @@ export default function BillingDashboard() {
         <form onSubmit={handleCreateBill} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-text mb-1">Select Patient *</label>
-            <select
+            <Select
               className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
               value={form.patientId}
               onChange={(e) => setForm({ ...form, patientId: e.target.value })}
@@ -224,13 +224,13 @@ export default function BillingDashboard() {
                   {p.firstName} {p.lastName} (MRN: {p.mrn})
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-text mb-1">Bill Type</label>
-              <select
+              <Select
                 className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
                 value={form.billType}
                 onChange={(e) => setForm({ ...form, billType: e.target.value })}
@@ -239,7 +239,7 @@ export default function BillingDashboard() {
                 <option value="IPD">Inpatient Stay</option>
                 <option value="EMERGENCY">Emergency Care</option>
                 <option value="PHARMACY">Pharmacy Medication</option>
-              </select>
+              </Select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-text mb-1">Quantity</label>

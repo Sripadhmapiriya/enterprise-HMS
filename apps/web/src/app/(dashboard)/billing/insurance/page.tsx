@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Plus, CheckCircle2, Clock, RefreshCw, DollarSign } from 'lucide-react';
 import { insuranceApi, billingApi } from '@/lib/api';
-import { Button, Badge, Dialog, Input } from '@enterprise-hms/ui';
+import { Button, Badge, Dialog, Input, Select } from '@enterprise-hms/ui';
 
 export default function InsuranceDashboard() {
   const [providers, setProviders] = useState<any[]>([]);
@@ -219,7 +219,7 @@ export default function InsuranceDashboard() {
         <form onSubmit={handleSubmitClaim} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-text mb-1">Select Bill Invoice *</label>
-            <select
+            <Select
               className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
               value={selectedBillId}
               onChange={(e) => {
@@ -235,12 +235,12 @@ export default function InsuranceDashboard() {
                   {b.billNumber} - {b.patient?.firstName} {b.patient?.lastName} (${b.grossTotal.toFixed(2)})
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-text mb-1">Insurance Provider *</label>
-            <select
+            <Select
               className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
               value={selectedProviderId}
               onChange={(e) => setSelectedProviderId(e.target.value)}
@@ -252,7 +252,7 @@ export default function InsuranceDashboard() {
                   {p.name} ({p.code})
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>

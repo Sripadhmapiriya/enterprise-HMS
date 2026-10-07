@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ipdApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function NursingStationPage() {
   const [loading, setLoading] = useState(true);
@@ -94,7 +95,7 @@ export default function NursingStationPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full sm:w-80 px-3 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand"
           />
-          <select
+          <Select
             value={wardFilter}
             onChange={(e) => setWardFilter(e.target.value)}
             className="px-3 py-1.5 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-1 focus:ring-brand"
@@ -103,7 +104,7 @@ export default function NursingStationPage() {
             {wards.map((w: any) => (
               <option key={w} value={w}>{w}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="overflow-x-auto">

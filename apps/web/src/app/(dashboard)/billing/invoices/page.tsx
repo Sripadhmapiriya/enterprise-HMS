@@ -111,7 +111,7 @@ export default function InvoicesList() {
             className="w-full sm:w-80 bg-surface"
           />
           <div className="flex space-x-3 w-full sm:w-auto">
-            <select
+            <Select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
               className="px-3 py-2 border border-border rounded-lg text-xs bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
@@ -121,8 +121,8 @@ export default function InvoicesList() {
               <option value="IPD">Inpatient</option>
               <option value="EMERGENCY">Emergency Care</option>
               <option value="PHARMACY">Pharmacy</option>
-            </select>
-            <select
+            </Select>
+            <Select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="px-3 py-2 border border-border rounded-lg text-xs bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
@@ -132,7 +132,7 @@ export default function InvoicesList() {
               <option value="FINALIZED">Finalized</option>
               <option value="PARTIALLY_PAID">Partially Paid</option>
               <option value="PAID">Paid in Full</option>
-            </select>
+            </Select>
           </div>
         </div>
 
@@ -259,7 +259,7 @@ export default function InvoicesList() {
 
           <div>
             <label className="block text-xs font-semibold text-text mb-1">Payment Method *</label>
-            <select
+            <Select
               className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
               value={payMethod}
               onChange={(e: any) => setPayMethod(e.target.value)}
@@ -268,7 +268,7 @@ export default function InvoicesList() {
               <option value="CARD">Credit / Debit Card</option>
               <option value="UPI">UPI Digital Payment</option>
               <option value="BANK_TRANSFER">Bank Wire Transfer</option>
-            </select>
+            </Select>
           </div>
 
           <div>

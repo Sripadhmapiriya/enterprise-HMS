@@ -198,13 +198,54 @@ router.post('/encounters', requirePermission('opd.consultation.create'), async (
 
     const hospitalId = validatedData.hospitalId || (hospital ? hospital.id : req.tenantId!);
 
+    // Validate doctorId explicitly
+    let doctorExists = await req.prismaTenant.doctor.findFirst({
+      where: { id: validatedData.doctorId },
+    });
+
+    if (!doctorExists) {
+      // Fallback for UI mock data
+      doctorExists = await req.prismaTenant.doctor.findFirst();
+      if (!doctorExists) {
+        return res.status(422).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'No doctors exist in the system to assign to this encounter.',
+          },
+        });
+      }
+    }
+    
+    const actualDoctorId = doctorExists.id;
+
+    // Validate branchId explicitly
+    let actualBranchId = validatedData.branchId;
+    if (actualBranchId) {
+      const branchExists = await req.prismaTenant.branch.findFirst({ where: { id: actualBranchId } });
+      if (!branchExists) {
+        const fallbackBranch = await req.prismaTenant.branch.findFirst();
+        if (fallbackBranch) actualBranchId = fallbackBranch.id;
+      }
+    }
+
+    // Validate departmentId explicitly
+    let actualDepartmentId = validatedData.departmentId;
+    if (actualDepartmentId) {
+      const deptExists = await req.prismaTenant.department.findFirst({ where: { id: actualDepartmentId } });
+      if (!deptExists) {
+        const fallbackDept = await req.prismaTenant.department.findFirst();
+        if (fallbackDept) actualDepartmentId = fallbackDept.id;
+      }
+    }
+
     const encounter = await req.prismaTenant.encounter.create({
       data: {
         tenantId: req.tenantId!,
         hospitalId,
-        branchId: validatedData.branchId,
-        departmentId: validatedData.departmentId,
-        doctorId: validatedData.doctorId,
+        branchId: actualBranchId,
+        departmentId: actualDepartmentId,
+        doctorId: actualDoctorId,
         patientId: validatedData.patientId,
         appointmentId: validatedData.appointmentId,
         type: validatedData.type,

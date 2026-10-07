@@ -80,7 +80,7 @@ router.post('/fast-register', requirePermission('emergency.triage'), async (req,
     let branchId = req.branchId || (req.user as any)?.branchId;
 
     if (!hospitalId) {
-      throw AppError.badRequest('Hospital context required for emergency registration');
+      throw AppError.badRequest('Hospital context is required. You do not have a hospital assigned. Please contact the system administrator to assign a hospital to your account.');
     }
 
     if (!branchId) {

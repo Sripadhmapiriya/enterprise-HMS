@@ -175,6 +175,7 @@ model User {
   assignedMaintenance       MaintenanceTask[]              @relation("MaintenanceAssignedTo")
   securityEvents            SecurityEvent[]
   uploadedPatientDocs       PatientDocument[]              @relation("PatientDocUploadedBy")
+  deletedPatientDocs        PatientDocument[]              @relation("PatientDocDeletedBy")
 
   @@map("users")
 }
@@ -368,6 +369,12 @@ model TenantEntitlement {
 // CLINICAL & PATIENT MANAGEMENT
 // ==========================================
 
+enum AllergyStatus {
+  NOT_ASSESSED
+  NKDA_CONFIRMED
+  HAS_ALLERGIES
+}
+
 model Patient {
   id            String   @id @default(uuid())
   tenantId      String
@@ -380,6 +387,7 @@ model Patient {
   gender        String
   bloodGroup    String?
   maritalStatus String?
+  allergyStatus AllergyStatus @default(NOT_ASSESSED)
 
   mobile         String
   alternatePhone String?
@@ -846,7 +854,7 @@ model PatientConsent {
 }
 
 model PatientDocument {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   tenantId     String
   patientId    String
   title        String
@@ -855,10 +863,13 @@ model PatientDocument {
   fileSize     Int?
   mimeType     String?
   uploadedById String
-  uploadedAt   DateTime @default(now())
+  uploadedAt   DateTime  @default(now())
+  deletedAt    DateTime?
+  deletedById  String?
 
   patient    Patient @relation(fields: [patientId], references: [id])
   uploadedBy User    @relation("PatientDocUploadedBy", fields: [uploadedById], references: [id])
+  deletedBy  User?   @relation("PatientDocDeletedBy", fields: [deletedById], references: [id])
 
   @@index([tenantId, patientId])
   @@map("patient_documents")

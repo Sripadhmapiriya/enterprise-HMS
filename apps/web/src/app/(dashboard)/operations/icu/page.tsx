@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { icuApi, encountersApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function ICUDashboard() {
   const [loading, setLoading] = useState(true);
@@ -351,7 +352,7 @@ export default function ICUDashboard() {
             <form onSubmit={handleSaveFlowsheet} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Select Patient Encounter *</label>
-                <select
+                <Select
                   value={selectedEncounterId}
                   onChange={(e) => setSelectedEncounterId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -363,7 +364,7 @@ export default function ICUDashboard() {
                       {adm.patient?.firstName} {adm.patient?.lastName} (MRN: {adm.patient?.mrn} • Bed: {adm.bed?.bedNumber})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               {/* Vitals Section */}
@@ -438,7 +439,7 @@ export default function ICUDashboard() {
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-[11px] text-text-muted">Mode</label>
-                    <select
+                    <Select
                       value={ventilator.mode}
                       onChange={(e) => setVentilator({ ...ventilator, mode: e.target.value })}
                       className="w-full px-2 py-1.5 border border-border rounded text-xs bg-surface"
@@ -447,7 +448,7 @@ export default function ICUDashboard() {
                       <option value="SIMV">SIMV</option>
                       <option value="PSV">Pressure Support (PSV)</option>
                       <option value="CPAP">CPAP / BIPAP</option>
-                    </select>
+                    </Select>
                   </div>
                   <div>
                     <label className="block text-[11px] text-text-muted">FiO2 (0.21 - 1.0)</label>

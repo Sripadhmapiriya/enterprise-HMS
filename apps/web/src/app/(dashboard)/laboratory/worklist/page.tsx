@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { FlaskConical, CheckCircle2, Download, AlertCircle, RefreshCw, Plus } from 'lucide-react';
 import { laboratoryApi } from '@/lib/api';
-import { Button, Badge, Dialog, Input } from '@enterprise-hms/ui';
+import { Button, Badge, Dialog, Input, Select } from '@enterprise-hms/ui';
 
 export default function LaboratoryWorklist() {
   const [items, setItems] = useState<any[]>([]);
@@ -256,7 +256,7 @@ export default function LaboratoryWorklist() {
 
           <div>
             <label className="block text-xs font-semibold text-text mb-1">Specimen Tube / Type *</label>
-            <select
+            <Select
               className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
               value={specimenType}
               onChange={(e) => setSpecimenType(e.target.value)}
@@ -266,7 +266,7 @@ export default function LaboratoryWorklist() {
               <option value="Plasma (Sodium Citrate)">Plasma (Sodium Citrate - Blue Top)</option>
               <option value="Midstream Urine">Midstream Urine (Sterile Cup)</option>
               <option value="Swab Specimen">Viral / Bacterial Swab</option>
-            </select>
+            </Select>
           </div>
 
           <div className="flex justify-end space-x-3 pt-3 border-t border-border">
@@ -306,7 +306,7 @@ export default function LaboratoryWorklist() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-text mb-1">Flag</label>
-              <select
+              <Select
                 className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-brand"
                 value={paramFlag}
                 onChange={(e: any) => setParamFlag(e.target.value)}
@@ -315,7 +315,7 @@ export default function LaboratoryWorklist() {
                 <option value="LOW">Low</option>
                 <option value="HIGH">High</option>
                 <option value="CRITICAL">Critical / Panic Value</option>
-              </select>
+              </Select>
             </div>
           </div>
 

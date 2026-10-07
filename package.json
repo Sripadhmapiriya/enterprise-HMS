@@ -7,12 +7,13 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
-    "dev": "npm run dev --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "check:params": "node scripts/check-params.mjs",
     "test": "vitest run",
-    "verify": "npm run typecheck && npm run test && tsx scripts/verify-integrity.ts && npm run check:no-hardcoded-colors",
+    "verify": "npm run check:params && npm run typecheck && npm run test && tsx scripts/verify-integrity.ts && npm run check:no-hardcoded-colors",
     "check:integrity": "tsx scripts/verify-integrity.ts",
     "check:no-phase": "tsx scripts/verify-integrity.ts",
     "check:no-hardcoded-colors": "tsx scripts/check-no-hardcoded-colors.ts",

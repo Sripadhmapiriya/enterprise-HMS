@@ -1,10 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ipdApi, housekeepingApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
-export default function IpdChartPage({ params }: { params: { id: string } }) {
+export default function IpdChartPage() {
+  const params = useParams();
+  const id = (params?.id as string) || '';
   const [loading, setLoading] = useState(true);
   const [admission, setAdmission] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'mar' | 'nursing' | 'intakeOutput' | 'rounds' | 'discharge'>('mar');
@@ -89,14 +93,14 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
     try {
       setLoading(true);
       const [admRes, assessRes, ioRes, roundsRes, medsRes, marRes, summaryRes, clearRes] = await Promise.all([
-        ipdApi.getAdmission(params.id),
-        ipdApi.getNursingAssessments(params.id),
-        ipdApi.getIntakeOutput(params.id),
-        ipdApi.getRounds(params.id),
-        ipdApi.getMedicationOrders(params.id),
-        ipdApi.getMar(params.id),
-        ipdApi.getDischargeSummary(params.id),
-        ipdApi.getBillingClearance(params.id),
+        ipdApi.getAdmission(id),
+        ipdApi.getNursingAssessments(id),
+        ipdApi.getIntakeOutput(id),
+        ipdApi.getRounds(id),
+        ipdApi.getMedicationOrders(id),
+        ipdApi.getMar(id),
+        ipdApi.getDischargeSummary(id),
+        ipdApi.getBillingClearance(id),
       ]);
 
       setAdmission(admRes.data);
@@ -168,7 +172,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
   const handleSaveAssessment = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await ipdApi.createNursingAssessment(params.id, assessmentForm);
+      await ipdApi.createNursingAssessment(id, assessmentForm);
       setMsg({ type: 'success', text: 'Nursing assessment recorded' });
       setShowAssessmentModal(false);
       await loadAllData();
@@ -181,7 +185,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
   const handleSaveIo = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await ipdApi.createIntakeOutput(params.id, {
+      await ipdApi.createIntakeOutput(id, {
         ...ioForm,
         amount: Number(ioForm.amount),
       });
@@ -201,7 +205,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
       return;
     }
     try {
-      await ipdApi.createRound(params.id, roundForm);
+      await ipdApi.createRound(id, roundForm);
       setMsg({ type: 'success', text: 'Doctor round progress note recorded' });
       setShowRoundModal(false);
       setRoundForm({ clinicalStatus: 'IMPROVING', progressNote: '', assessment: '', plan: '' });
@@ -219,7 +223,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
       return;
     }
     try {
-      await ipdApi.createMedicationOrder(params.id, medForm);
+      await ipdApi.createMedicationOrder(id, medForm);
       setMsg({ type: 'success', text: 'Medication order placed on MAR' });
       setShowMedModal(false);
       setMedForm({ medicationName: '', dose: '500 mg', route: 'ORAL', frequency: 'TID', instructions: 'Post meals' });
@@ -233,7 +237,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
   const handleSaveSummary = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await ipdApi.saveDischargeSummary(params.id, summaryForm);
+      await ipdApi.saveDischargeSummary(id, summaryForm);
       setMsg({ type: 'success', text: 'Discharge summary saved successfully' });
       await loadAllData();
     } catch (err: any) {
@@ -248,7 +252,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
     }
     try {
       setDischarging(true);
-      const res = await ipdApi.dischargePatient(params.id);
+      const res = await ipdApi.dischargePatient(id);
       setMsg({ type: 'success', text: res.message || 'Patient discharged successfully' });
       await loadAllData();
     } catch (err: any) {
@@ -722,7 +726,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-text mb-1">Condition on Discharge</label>
-                    <select
+                    <Select
                       value={summaryForm.dischargeCondition}
                       onChange={(e) => setSummaryForm({ ...summaryForm, dischargeCondition: e.target.value })}
                       className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -731,7 +735,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
                       <option value="RECOVERED">Fully Recovered</option>
                       <option value="AGAINST_MEDICAL_ADVICE">Against Medical Advice (LAMA)</option>
                       <option value="TRANSFERRED">Transferred to Higher Center</option>
-                    </select>
+                    </Select>
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-text mb-1">Follow-up Plan</label>
@@ -958,7 +962,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Route</label>
-                  <select
+                  <Select
                     value={medForm.route}
                     onChange={(e) => setMedForm({ ...medForm, route: e.target.value })}
                     className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -968,12 +972,12 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
                     <option value="IM">Intramuscular</option>
                     <option value="SUBCUTANEOUS">Subcutaneous</option>
                     <option value="TOPICAL">Topical</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Frequency</label>
-                <select
+                <Select
                   value={medForm.frequency}
                   onChange={(e) => setMedForm({ ...medForm, frequency: e.target.value })}
                   className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -984,7 +988,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
                   <option value="TID">Three Times Daily (TID)</option>
                   <option value="QID">Four Times Daily (QID)</option>
                   <option value="PRN">As Needed (PRN)</option>
-                </select>
+                </Select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Instructions</label>
@@ -1027,7 +1031,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">General Condition</label>
-                  <select
+                  <Select
                     value={assessmentForm.generalCondition}
                     onChange={(e) => setAssessmentForm({ ...assessmentForm, generalCondition: e.target.value })}
                     className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -1035,7 +1039,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
                     <option value="STABLE">Stable</option>
                     <option value="GUARDED">Guarded</option>
                     <option value="CRITICAL">Critical</option>
-                  </select>
+                  </Select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Pain Score (0-10)</label>
@@ -1061,7 +1065,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Fall Risk</label>
-                  <select
+                  <Select
                     value={assessmentForm.fallRisk}
                     onChange={(e) => setAssessmentForm({ ...assessmentForm, fallRisk: e.target.value })}
                     className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
@@ -1069,7 +1073,7 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
                     <option value="Low">Low Risk</option>
                     <option value="Moderate">Moderate Risk</option>
                     <option value="High">High Risk</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
               <div>
@@ -1113,14 +1117,14 @@ export default function IpdChartPage({ params }: { params: { id: string } }) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Type</label>
-                  <select
+                  <Select
                     value={ioForm.type}
                     onChange={(e) => setIoForm({ ...ioForm, type: e.target.value })}
                     className="w-full px-3 py-2 border border-border rounded-lg text-xs bg-surface"
                   >
                     <option value="INTAKE">Intake</option>
                     <option value="OUTPUT">Output</option>
-                  </select>
+                  </Select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Category</label>

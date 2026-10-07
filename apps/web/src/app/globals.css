@@ -74,3 +74,13 @@ body {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
+
+/* Hide native select arrows to prevent double arrows with custom Select component */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+select::-ms-expand {
+  display: none;
+}

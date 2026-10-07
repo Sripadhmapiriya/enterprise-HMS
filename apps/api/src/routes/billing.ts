@@ -110,7 +110,7 @@ router.post('/tariffs', requirePermission('billing.tariffs.manage'), async (req,
       if (h) hospitalId = h.id;
     }
     if (!hospitalId) {
-      throw AppError.badRequest('Hospital context required to create tariff');
+      throw AppError.badRequest('Hospital context is required. You do not have a hospital assigned. Please contact the system administrator to assign a hospital to your account.');
     }
 
     const { name, code, category = 'CONSULTATION', rate = 100, taxPercent = 0, tariffType = 'GENERAL' } = req.body;

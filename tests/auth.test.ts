@@ -157,4 +157,30 @@ describe('Workstream B: API Authentication & Security Hardening', () => {
     expect(fifthRes.status).toBe(423);
     expect(fifthRes.body.error.code).toBe('ACCOUNT_LOCKED');
   });
+
+  it('GET /api/v1/auth/demo-accounts returns 404 in production environment or when DEMO_MODE is false', async () => {
+    // 1. Temporarily override process.env to simulate production
+    const originalEnv = process.env.NODE_ENV;
+    const originalDemoMode = process.env.DEMO_MODE;
+    
+    process.env.NODE_ENV = 'production';
+    const prodRes = await request(app).get('/api/v1/auth/demo-accounts');
+    expect(prodRes.status).toBe(404);
+
+    // 2. Simulate DEMO_MODE = false in development
+    process.env.NODE_ENV = 'development';
+    process.env.DEMO_MODE = 'false';
+    const devNoDemoRes = await request(app).get('/api/v1/auth/demo-accounts');
+    expect(devNoDemoRes.status).toBe(404);
+
+    // 3. Simulate DEMO_MODE = true in development
+    process.env.DEMO_MODE = 'true';
+    const devDemoRes = await request(app).get('/api/v1/auth/demo-accounts');
+    expect(devDemoRes.status).toBe(200);
+    expect(devDemoRes.body.data.length).toBeGreaterThan(0);
+
+    // Restore original env
+    process.env.NODE_ENV = originalEnv;
+    process.env.DEMO_MODE = originalDemoMode;
+  });
 });

@@ -187,7 +187,7 @@ router.post('/requests', requirePermission('procurement.create_po'), async (req,
       const b = await req.prismaTenant.branch.findFirst();
       branchId = b?.id;
     }
-    if (!branchId) throw AppError.badRequest('Branch context required for purchase request');
+    if (!branchId) throw AppError.badRequest('Branch context is required. You do not have a branch assigned. Please contact the system administrator to assign a branch to your account.');
 
     const prNumber = generatePrNumber();
 

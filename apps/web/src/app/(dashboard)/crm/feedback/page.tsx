@@ -17,6 +17,7 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { crmApi, patientsApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function PatientCrmDashboard() {
   const [activeTab, setActiveTab] = useState<'feed' | 'escalations' | 'analytics'>('feed');
@@ -294,7 +295,7 @@ export default function PatientCrmDashboard() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-text-muted uppercase">Category:</span>
-              <select
+              <Select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="px-3 py-1.5 text-xs border rounded-lg bg-surface"
@@ -306,7 +307,7 @@ export default function PatientCrmDashboard() {
                 <option value="DIETARY_FOOD">Dietary & Food Quality</option>
                 <option value="CLEANLINESS_FACILITIES">Cleanliness & Hygiene</option>
                 <option value="WAIT_TIMES">Wait Times & Queue</option>
-              </select>
+              </Select>
             </div>
           </div>
 
@@ -525,7 +526,7 @@ export default function PatientCrmDashboard() {
             <form onSubmit={handleSubmitFeedback} className="space-y-3">
               <div>
                 <label className="text-xs font-semibold text-text">Patient (Optional for anonymous)</label>
-                <select
+                <Select
                   value={feedbackForm.patientId}
                   onChange={(e) => setFeedbackForm({ ...feedbackForm, patientId: e.target.value })}
                   className="w-full px-3 py-1.5 text-sm border rounded-lg"
@@ -536,7 +537,7 @@ export default function PatientCrmDashboard() {
                       {p.firstName} {p.lastName} ({p.mrn})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>
@@ -560,7 +561,7 @@ export default function PatientCrmDashboard() {
 
               <div>
                 <label className="text-xs font-semibold text-text">Category</label>
-                <select
+                <Select
                   value={feedbackForm.category}
                   onChange={(e) => setFeedbackForm({ ...feedbackForm, category: e.target.value })}
                   className="w-full px-3 py-1.5 text-sm border rounded-lg"
@@ -571,7 +572,7 @@ export default function PatientCrmDashboard() {
                   <option value="DIETARY_FOOD">Dietary & Food Quality</option>
                   <option value="CLEANLINESS_FACILITIES">Cleanliness & Facilities</option>
                   <option value="WAIT_TIMES">Wait Times & Flow</option>
-                </select>
+                </Select>
               </div>
 
               <div>
@@ -618,7 +619,7 @@ export default function PatientCrmDashboard() {
             <form onSubmit={handleResolveFeedback} className="space-y-3">
               <div>
                 <label className="text-xs font-semibold text-text">Resolution Status</label>
-                <select
+                <Select
                   value={resolveForm.status}
                   onChange={(e) => setResolveForm({ ...resolveForm, status: e.target.value })}
                   className="w-full px-3 py-1.5 text-sm border rounded-lg"
@@ -626,7 +627,7 @@ export default function PatientCrmDashboard() {
                   <option value="RESOLVED">RESOLVED</option>
                   <option value="CLOSED">CLOSED</option>
                   <option value="IN_PROGRESS">IN_PROGRESS</option>
-                </select>
+                </Select>
               </div>
 
               <div>

@@ -375,7 +375,15 @@ router.get('/:id', requirePermission('patients.read'), async (req, res, next) =>
         alerts: true,
         emergencyContacts: true,
         identifiers: true,
-        documents: true,
+        documents: {
+          where: { deletedAt: null },
+          include: {
+            uploadedBy: {
+              select: { id: true, firstName: true, lastName: true },
+            },
+          },
+          orderBy: { uploadedAt: 'desc' },
+        },
         consents: true,
       },
     });
@@ -427,16 +435,25 @@ router.post('/:id/allergies', requirePermission('patients.update'), async (req, 
   try {
     const { allergen, reaction, severity, notes } = CreateAllergySchema.parse(req.body);
 
-    const allergy = await req.prismaTenant.patientAllergy.create({
-      data: {
-        patientId: req.params.id,
-        allergen,
-        reaction,
-        severity,
-        notes,
-        status: 'ACTIVE',
-        recordedById: req.user!.userId,
-      },
+    const allergy = await req.prismaTenant.$transaction(async (prisma: any) => {
+      const newAllergy = await prisma.patientAllergy.create({
+        data: {
+          patientId: req.params.id,
+          allergen,
+          reaction,
+          severity,
+          notes,
+          status: 'ACTIVE',
+          recordedById: req.user!.userId,
+        },
+      });
+
+      await prisma.patient.update({
+        where: { id: req.params.id },
+        data: { allergyStatus: 'HAS_ALLERGIES' },
+      });
+
+      return newAllergy;
     });
 
     res.status(201).json({
@@ -494,6 +511,65 @@ router.post('/:id/documents', requirePermission('patients.update'), async (req, 
     res.status(201).json({
       success: true,
       data: doc,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// DELETE /api/v1/patients/:id/documents/:documentId
+router.delete('/:id/documents/:documentId', requirePermission('patients.update'), async (req, res, next) => {
+  try {
+    const { id: patientId, documentId } = req.params;
+    const userId = req.user!.userId;
+    const tenantId = req.tenantId!;
+
+    const document = await req.prismaTenant.patientDocument.findFirst({
+      where: {
+        id: documentId,
+        patientId,
+        deletedAt: null,
+      },
+    });
+
+    if (!document) {
+      throw AppError.notFound('Document not found or already deleted');
+    }
+
+    // Soft delete
+    const updated = await req.prismaTenant.patientDocument.update({
+      where: { id: documentId },
+      data: {
+        deletedAt: new Date(),
+        deletedById: userId,
+      },
+    });
+
+    // Write audit entry
+    await req.prismaTenant.auditLog.create({
+      data: {
+        tenantId,
+        userId,
+        action: 'PATIENT_DOCUMENT_DELETE',
+        entity: 'PatientDocument',
+        entityId: documentId,
+        before: {
+          title: document.title,
+          fileUrl: document.fileUrl,
+          documentType: document.documentType,
+          patientId,
+        },
+        after: {
+          deletedAt: updated.deletedAt,
+          deletedById: userId,
+        },
+      },
+    });
+
+    res.json({
+      success: true,
+      message: 'Document removed successfully',
+      data: { id: documentId },
     });
   } catch (error) {
     next(error);
@@ -582,6 +658,31 @@ router.get('/:id/timeline', requirePermission('patients.read'), async (req, res,
       success: true,
       data: events,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Confirm NKDA
+router.post('/:id/nkda', requirePermission('patients.update'), async (req, res, next) => {
+  try {
+    const patient = await req.prismaTenant.patient.update({
+      where: { id: req.params.id },
+      data: { allergyStatus: 'NKDA_CONFIRMED' },
+    });
+
+    // Optionally add to PatientAlert or Audit log if required
+    await req.prismaTenant.patientAlert.create({
+      data: {
+        patientId: req.params.id,
+        alertType: 'CLINICAL',
+        description: 'Clinician confirmed No Known Drug Allergies (NKDA).',
+        severity: 'LOW',
+        recordedById: req.user!.userId,
+      }
+    });
+
+    res.json({ success: true, data: patient });
   } catch (error) {
     next(error);
   }

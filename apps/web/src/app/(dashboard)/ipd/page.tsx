@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ipdApi, patientsApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function IpdDashboard() {
   const [loading, setLoading] = useState(true);
@@ -183,7 +184,7 @@ export default function IpdDashboard() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-3 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand w-full sm:w-64"
             />
-            <select
+            <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-3 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -192,7 +193,7 @@ export default function IpdDashboard() {
               <option value="ADMITTED">Admitted</option>
               <option value="DISCHARGED">Discharged</option>
               <option value="CANCELLED">Cancelled</option>
-            </select>
+            </Select>
           </div>
         </div>
 
@@ -311,7 +312,7 @@ export default function IpdDashboard() {
             <form onSubmit={handleCreateAdmission} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Select Patient *</label>
-                <select
+                <Select
                   value={selectedPatientId}
                   onChange={(e) => setSelectedPatientId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -323,12 +324,12 @@ export default function IpdDashboard() {
                       {p.firstName} {p.lastName} (MRN: {p.mrn} • {p.gender})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Allocate Bed (Optional)</label>
-                <select
+                <Select
                   value={selectedBedId}
                   onChange={(e) => setSelectedBedId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -339,13 +340,13 @@ export default function IpdDashboard() {
                       {b.bedNumber} ({b.ward?.name || 'Ward'} • {b.bedType})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Admission Type</label>
-                  <select
+                  <Select
                     value={admissionType}
                     onChange={(e) => setAdmissionType(e.target.value)}
                     className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -354,11 +355,11 @@ export default function IpdDashboard() {
                     <option value="EMERGENCY">Emergency</option>
                     <option value="TRANSFER">Transfer</option>
                     <option value="DAY_CARE">Day Care</option>
-                  </select>
+                  </Select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Admission Source</label>
-                  <select
+                  <Select
                     value={admissionSource}
                     onChange={(e) => setAdmissionSource(e.target.value)}
                     className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -367,7 +368,7 @@ export default function IpdDashboard() {
                     <option value="OPD">OPD Clinic</option>
                     <option value="EMERGENCY">Emergency Dept</option>
                     <option value="TRANSFER">External Transfer</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 

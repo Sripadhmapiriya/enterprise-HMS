@@ -31,23 +31,86 @@ async function main() {
     data: { hospitalId: hospital.id, name: 'Main Branch', code: 'MAIN-01' }
   });
 
+  const eastBranch = await prisma.branch.findFirst({ where: { hospitalId: hospital.id, code: 'EAST-02' } }) || await prisma.branch.create({
+    data: { hospitalId: hospital.id, name: 'East Wing Campus', code: 'EAST-02' }
+  });
+
   const cardiology = await prisma.department.findFirst({ where: { branchId: branch.id } }) || await prisma.department.create({
     data: { branchId: branch.id, name: 'Cardiology', code: 'CARD' }
   });
 
+  const erDept = await prisma.department.findFirst({ where: { branchId: branch.id, code: 'ER' } }) || await prisma.department.create({
+    data: { branchId: branch.id, name: 'Emergency Department', code: 'ER', type: 'EMERGENCY' }
+  });
+
   const passwordHash = await hashPassword('password123');
   
-  const doctorUser = await prisma.user.upsert({
-    where: { email: 'doctor@demo.com' },
-    update: {},
-    create: {
-      tenantId: tenant.id,
-      email: 'doctor@demo.com',
-      passwordHash,
-      firstName: 'Sarah',
-      lastName: 'Connor'
-    }
-  });
+  // 1. Define Demo Roles
+  const roles = [
+    { name: 'Hospital Admin', desc: 'Full access to hospital settings and modules' },
+    { name: 'Doctor', desc: 'Clinical access, consultations, and prescriptions' },
+    { name: 'Nurse', desc: 'Inpatient care, vitals, and MAR' },
+    { name: 'Receptionist', desc: 'Patient registration and appointments' },
+    { name: 'Pharmacist', desc: 'Dispensary and inventory management' },
+    { name: 'Billing Clerk', desc: 'Invoicing, receipts, and claims' }
+  ];
+
+  const roleMap: Record<string, any> = {};
+  for (const r of roles) {
+    const roleRecord = await prisma.role.upsert({
+      where: { tenantId_name: { tenantId: tenant.id, name: r.name } },
+      update: {},
+      create: { tenantId: tenant.id, name: r.name, description: r.desc, isSystem: true }
+    });
+    roleMap[r.name] = roleRecord;
+  }
+
+  // 2. Define Users
+  const users = [
+    { email: 'admin@demo.com', first: 'Priya', last: 'Admin', role: 'Hospital Admin' },
+    { email: 'doctor@demo.com', first: 'Sarah', last: 'Connor', role: 'Doctor' },
+    { email: 'nurse@demo.com', first: 'Nancy', last: 'Nightingale', role: 'Nurse' },
+    { email: 'reception@demo.com', first: 'Rita', last: 'Reception', role: 'Receptionist' },
+    { email: 'pharmacy@demo.com', first: 'Phil', last: 'Pharma', role: 'Pharmacist' },
+    { email: 'billing@demo.com', first: 'Bill', last: 'Clerk', role: 'Billing Clerk' }
+  ];
+
+  const userMap: Record<string, any> = {};
+  for (const u of users) {
+    const userRecord = await prisma.user.upsert({
+      where: { email: u.email },
+      update: {},
+      create: {
+        tenantId: tenant.id,
+        email: u.email,
+        passwordHash,
+        firstName: u.first,
+        lastName: u.last
+      }
+    });
+    userMap[u.role] = userRecord;
+
+    // Assign Role
+    await prisma.userRole.upsert({
+      where: { userId_roleId: { userId: userRecord.id, roleId: roleMap[u.role].id } },
+      update: {},
+      create: { userId: userRecord.id, roleId: roleMap[u.role].id }
+    });
+
+    // Create Staff Record for hospital and branch context
+    await prisma.staff.upsert({
+      where: { userId: userRecord.id },
+      update: {},
+      create: {
+        userId: userRecord.id,
+        branchId: branch.id,
+        departmentId: cardiology.id, // Just giving them a default department
+        designation: u.role,
+      }
+    });
+  }
+
+  const doctorUser = userMap['Doctor'];
 
   const doctor = await prisma.doctor.findFirst({ where: { userId: doctorUser.id } }) || await prisma.doctor.create({
     data: {
@@ -58,17 +121,8 @@ async function main() {
     }
   });
 
-  const nurseUser = await prisma.user.upsert({
-    where: { email: 'nurse@demo.com' },
-    update: {},
-    create: {
-      tenantId: tenant.id,
-      email: 'nurse@demo.com',
-      passwordHash,
-      firstName: 'Nancy',
-      lastName: 'Nightingale'
-    }
-  });
+  console.log('✓ Created 6 demo role accounts (password: password123)');
+  console.log('  * Password policy: Argon2id hash with 16-byte salt, auto-upgrade enabled.');
 
   // Patient Seeding
   const patient = await prisma.patient.upsert({

@@ -152,7 +152,7 @@ app.use((req, res) => {
   res.status(404).json({
     error: {
       code: 'ROUTE_NOT_FOUND',
-      message: `Cannot \${req.method} \${req.path}`,
+      message: `Cannot ${req.method} ${req.path}`,
       requestId: req.id,
     },
   });
@@ -165,6 +165,7 @@ const PORT = env.PORT || 4000;
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
-    console.log(`Enterprise HMS API running on port \${PORT}`);
+    console.log('\n🚀 Enterprise HMS API is running!');
+    console.log(`👉 API Server: http://localhost:${PORT}`);
   });
 }

@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-export function authenticateToken(req: Request, res: Response, next: NextFunction) {
+export async function authenticateToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
@@ -34,6 +34,47 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
 
     // Attach tenant-scoped Prisma client
     req.prismaTenant = createTenantClient(payload.tenantId, prisma);
+
+    // Support dynamic branch switcher via x-branch-id or x-hospital-id header
+    const requestedBranchId = (req.headers['x-branch-id'] as string)?.trim();
+    if (requestedBranchId) {
+      // Security check: Validate that the requested branch belongs to the user's tenant
+      // And verify user is allowed to act on this branch
+      const branch = await req.prismaTenant.branch.findFirst({
+        where: { id: requestedBranchId, isActive: true },
+        include: { hospital: true },
+      });
+
+      if (!branch) {
+        return next(AppError.forbidden(`Invalid branch ID or branch is inactive: "${requestedBranchId}"`));
+      }
+
+      // Check if user has staff assignment or admin privileges
+      const isSystemAdmin =
+        payload.roles.includes('System Administrator') ||
+        payload.roles.includes('Super Admin') ||
+        payload.roles.includes('Hospital Admin') ||
+        payload.permissions.includes('*');
+
+      if (!isSystemAdmin) {
+        // Normal users must be assigned to this branch
+        const staff = await req.prismaTenant.staff.findFirst({
+          where: { userId: payload.userId, branchId: requestedBranchId, isActive: true },
+        });
+        const doctor = await req.prismaTenant.doctor.findFirst({
+          where: { userId: payload.userId, branchId: requestedBranchId, isActive: true },
+        });
+
+        if (!staff && !doctor) {
+          return next(
+            AppError.forbidden(`Unauthorized branch access. You are not assigned to branch "${branch.name}".`)
+          );
+        }
+      }
+
+      req.branchId = branch.id;
+      req.hospitalId = branch.hospitalId;
+    }
 
     next();
   } catch (err) {

@@ -212,22 +212,86 @@ describe('Workstream D: Master Patient Index (MPI), Allergies, Alerts, Merge & 3
     expect(sourceCheck?.mergedAt).toBeDefined();
   });
 
-  it('8. Document upload: attaches identity document to patient record', async () => {
+  it('8. Document upload: attaches identity document to patient record and supports soft-delete with audit', async () => {
+    // 8a. Real multipart upload endpoint test
+    const dummyPdfBuffer = Buffer.from('%PDF-1.4 dummy pdf binary stream test\n%%EOF');
+    const uploadRes = await request(app)
+      .post('/api/v1/platform/files/upload-multipart')
+      .set('Authorization', `Bearer ${token}`)
+      .set('X-Tenant-Id', tenantId)
+      .attach('file', dummyPdfBuffer, 'patient_passport.pdf');
+
+    expect(uploadRes.status).toBe(201);
+    expect(uploadRes.body.data).toBeDefined();
+    expect(uploadRes.body.data.key).toBeDefined();
+    expect(uploadRes.body.data.fileUrl).toContain('/api/v1/platform/files/download/');
+
+    const uploadedMeta = uploadRes.body.data;
+
+    // 8b. Attach document to patient
     const res = await request(app)
       .post(`/api/v1/patients/${patientAId}/documents`)
       .set('Authorization', `Bearer ${token}`)
       .send({
         title: 'National Identity Card Scan',
         documentType: 'ID_PROOF',
-        fileUrl: 'https://secure-docs.hospital.org/mpi/id-proof.pdf',
+        fileUrl: uploadedMeta.fileUrl,
+        fileSize: uploadedMeta.sizeBytes,
+        mimeType: uploadedMeta.mimeType,
       });
 
     expect(res.status).toBe(201);
     expect(res.body.data.title).toBe('National Identity Card Scan');
     expect(res.body.data.documentType).toBe('ID_PROOF');
+    const docId = res.body.data.id;
+
+    // 8c. Verify document is present in patient record
+    const patientDetail = await request(app)
+      .get(`/api/v1/patients/${patientAId}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(patientDetail.status).toBe(200);
+    const hasDoc = patientDetail.body.data.documents.some((d: any) => d.id === docId);
+    expect(hasDoc).toBe(true);
+
+    // 8d. Soft-delete document
+    const deleteRes = await request(app)
+      .delete(`/api/v1/patients/${patientAId}/documents/${docId}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(deleteRes.status).toBe(200);
+    expect(deleteRes.body.success).toBe(true);
+
+    // 8e. Verify document is excluded from active patient record
+    const patientAfterDelete = await request(app)
+      .get(`/api/v1/patients/${patientAId}`)
+      .set('Authorization', `Bearer ${token}`);
+    const docStillVisible = patientAfterDelete.body.data.documents.some((d: any) => d.id === docId);
+    expect(docStillVisible).toBe(false);
+
+    // 8f. Verify audit log entry was created
+    const auditLog = await prisma.auditLog.findFirst({
+      where: {
+        tenantId,
+        action: 'PATIENT_DOCUMENT_DELETE',
+        entityId: docId,
+      },
+    });
+    expect(auditLog).toBeDefined();
+    expect(auditLog?.entity).toBe('PatientDocument');
   });
 
-  it('9. Timeline: retrieves clinical timeline of all encounters and events', async () => {
+  it('9. Patient search: searches patients by name or MRN query for patient picker', async () => {
+    const searchRes = await request(app)
+      .get('/api/v1/patients')
+      .set('Authorization', `Bearer ${token}`)
+      .query({ q: 'John', limit: 10 });
+
+    expect(searchRes.status).toBe(200);
+    expect(searchRes.body.data.length).toBeGreaterThanOrEqual(1);
+    const found = searchRes.body.data.some((p: any) => p.id === patientAId);
+    expect(found).toBe(true);
+  });
+
+  it('10. Timeline: retrieves clinical timeline of all encounters and events', async () => {
     const res = await request(app)
       .get(`/api/v1/patients/${patientAId}/timeline`)
       .set('Authorization', `Bearer ${token}`);

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { radiologyApi } from '@/lib/api';
-import { Badge, Button, Input } from '@enterprise-hms/ui';
+import { Badge, Button, Input, Select } from '@enterprise-hms/ui';
 
 export default function RadiologyWorklist() {
   const [studies, setStudies] = useState<any[]>([]);
@@ -126,7 +126,7 @@ export default function RadiologyWorklist() {
             />
           </div>
           <div className="flex gap-2">
-            <select
+            <Select
               value={modalityFilter}
               onChange={(e) => setModalityFilter(e.target.value)}
               className="px-3 py-2 border border-border rounded-lg text-sm bg-surface text-text focus:outline-none focus:ring-2 focus:ring-brand"
@@ -137,7 +137,7 @@ export default function RadiologyWorklist() {
               <option value="MRI">Magnetic Resonance (MRI)</option>
               <option value="ULTRASOUND">Ultrasound (US)</option>
               <option value="MAMMOGRAPHY">Mammography (MG)</option>
-            </select>
+            </Select>
           </div>
         </div>
         <div className="overflow-x-auto">

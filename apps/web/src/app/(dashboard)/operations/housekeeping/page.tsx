@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { housekeepingApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function HousekeepingDashboard() {
   const [loading, setLoading] = useState(true);
@@ -169,7 +170,7 @@ export default function HousekeepingDashboard() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <select
+            <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-3 py-1.5 border border-border rounded-lg text-xs bg-surface focus:outline-none focus:ring-1 focus:ring-brand"
@@ -180,9 +181,9 @@ export default function HousekeepingDashboard() {
               <option value="IN_PROGRESS">In Progress</option>
               <option value="COMPLETED">Completed</option>
               <option value="VERIFIED">Verified</option>
-            </select>
+            </Select>
 
-            <select
+            <Select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
               className="px-3 py-1.5 border border-border rounded-lg text-xs bg-surface focus:outline-none focus:ring-1 focus:ring-brand"
@@ -191,9 +192,9 @@ export default function HousekeepingDashboard() {
               <option value="TERMINAL">Terminal Clean</option>
               <option value="ROUTINE">Routine Clean</option>
               <option value="SPILL">Spill / Biohazard</option>
-            </select>
+            </Select>
 
-            <select
+            <Select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
               className="px-3 py-1.5 border border-border rounded-lg text-xs bg-surface focus:outline-none focus:ring-1 focus:ring-brand"
@@ -203,7 +204,7 @@ export default function HousekeepingDashboard() {
               <option value="HIGH">High</option>
               <option value="NORMAL">Normal</option>
               <option value="LOW">Low</option>
-            </select>
+            </Select>
           </div>
         </div>
 
@@ -338,7 +339,7 @@ export default function HousekeepingDashboard() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Location Type</label>
-                  <select
+                  <Select
                     value={locationType}
                     onChange={(e) => setLocationType(e.target.value)}
                     className="w-full px-3 py-1.5 border border-border rounded text-xs bg-surface"
@@ -349,11 +350,11 @@ export default function HousekeepingDashboard() {
                     <option value="OT">Operating Theatre</option>
                     <option value="ICU">ICU Bay</option>
                     <option value="AREA">General Area</option>
-                  </select>
+                  </Select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Task Type</label>
-                  <select
+                  <Select
                     value={taskType}
                     onChange={(e) => setTaskType(e.target.value)}
                     className="w-full px-3 py-1.5 border border-border rounded text-xs bg-surface font-semibold"
@@ -361,13 +362,13 @@ export default function HousekeepingDashboard() {
                     <option value="TERMINAL">Terminal Clean</option>
                     <option value="ROUTINE">Routine Daily Clean</option>
                     <option value="SPILL">Spill / Biohazard</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Priority</label>
-                <select
+                <Select
                   value={priority}
                   onChange={(e) => setPriority(e.target.value)}
                   className="w-full px-3 py-1.5 border border-border rounded text-xs bg-surface"
@@ -376,7 +377,7 @@ export default function HousekeepingDashboard() {
                   <option value="HIGH">High (Turnaround pending)</option>
                   <option value="NORMAL">Normal</option>
                   <option value="LOW">Low</option>
-                </select>
+                </Select>
               </div>
 
               <div className="flex justify-end gap-3 pt-3 border-t border-border">

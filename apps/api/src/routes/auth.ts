@@ -37,6 +37,11 @@ router.post('/login', async (req, res, next) => {
             },
           },
         },
+        staffRecord: {
+          include: {
+            branch: true,
+          },
+        },
       },
     });
 
@@ -102,6 +107,8 @@ router.post('/login', async (req, res, next) => {
       email: user.email,
       roles,
       permissions,
+      hospitalId: user.staffRecord?.branch?.hospitalId,
+      branchId: user.staffRecord?.branchId,
     });
 
     const refreshToken = authService.generateRefreshToken();
@@ -137,6 +144,8 @@ router.post('/login', async (req, res, next) => {
           tenantName: user.tenant.name,
           roles,
           permissions,
+          hospitalId: user.staffRecord?.branch?.hospitalId,
+          branchId: user.staffRecord?.branchId,
         },
         enabledModules,
       },
@@ -218,6 +227,11 @@ router.get('/me', authenticateToken, async (req, res, next) => {
             role: true,
           },
         },
+        staffRecord: {
+          include: {
+            branch: true,
+          },
+        },
       },
     });
 
@@ -236,6 +250,8 @@ router.get('/me', authenticateToken, async (req, res, next) => {
         tenantName: user.tenant.name,
         roles: req.user!.roles,
         permissions: req.user!.permissions,
+        hospitalId: user.staffRecord?.branch?.hospitalId,
+        branchId: user.staffRecord?.branchId,
       },
     });
   } catch (err) {
@@ -298,6 +314,24 @@ router.post('/change-password', authenticateToken, async (req, res, next) => {
       success: true,
       message: 'Password changed successfully',
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/v1/auth/demo-accounts
+router.get('/demo-accounts', async (req, res, next) => {
+  try {
+    if (process.env.NODE_ENV === 'production' || process.env.DEMO_MODE !== 'true') {
+      res.status(404).json({ success: false, error: 'Not Found' });
+      return;
+    }
+
+    const demoAccounts = [
+      { role: 'Hospital Admin', email: 'admin@demo.com', description: 'Full access to hospital settings and modules' },
+    ];
+
+    res.json({ success: true, data: demoAccounts });
   } catch (err) {
     next(err);
   }

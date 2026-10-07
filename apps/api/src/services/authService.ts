@@ -147,6 +147,11 @@ export class AuthService {
                 },
               },
             },
+            staffRecord: {
+              include: {
+                branch: true,
+              },
+            },
           },
         },
       },

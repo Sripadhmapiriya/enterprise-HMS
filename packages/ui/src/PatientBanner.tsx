@@ -8,9 +8,10 @@ export interface PatientBannerProps {
   patient: PatientBannerData;
   className?: string;
   actions?: React.ReactNode;
+  onConfirmNKDA?: () => void;
 }
 
-export function PatientBanner({ patient, className, actions }: PatientBannerProps) {
+export function PatientBanner({ patient, className, actions, onConfirmNKDA }: PatientBannerProps) {
   const ageDisplay = patient.ageYears
     ? `${patient.ageYears}y`
     : patient.dateOfBirth
@@ -77,13 +78,13 @@ export function PatientBanner({ patient, className, actions }: PatientBannerProp
         {/* Clinical Alerts & Allergies */}
         <div className="flex items-center gap-2 flex-wrap lg:justify-end">
           {/* Allergies */}
-          {patient.allergies && patient.allergies.length > 0 ? (
+          {patient.allergyStatus === 'HAS_ALLERGIES' || (patient.allergies && patient.allergies.length > 0) ? (
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-xs font-semibold text-muted flex items-center gap-1">
                 <AlertTriangle className="w-3.5 h-3.5 text-warning" aria-hidden="true" />
                 <span>Allergies:</span>
               </span>
-              {patient.allergies.map((allergy, idx) => (
+              {patient.allergies?.map((allergy, idx) => (
                 <Badge
                   key={allergy.id || idx}
                   variant={allergy.severity === 'severe' ? 'critical' : 'warning'}
@@ -93,10 +94,25 @@ export function PatientBanner({ patient, className, actions }: PatientBannerProp
                 </Badge>
               ))}
             </div>
-          ) : (
+          ) : patient.allergyStatus === 'NKDA_CONFIRMED' ? (
             <Badge variant="stable" size="sm">
-              NKDA (No Known Drug Allergies)
+              No Known Drug Allergies
             </Badge>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Badge variant="neutral" size="sm" className="bg-surface-subtle text-muted">
+                Allergies Not Assessed
+              </Badge>
+              {onConfirmNKDA && (
+                <button
+                  type="button"
+                  onClick={onConfirmNKDA}
+                  className="text-[10px] px-2 py-0.5 border border-border rounded bg-surface hover:bg-surface-subtle text-text transition-colors font-medium cursor-pointer"
+                >
+                  Confirm NKDA
+                </button>
+              )}
+            </div>
           )}
 
           {/* Clinical Alerts */}

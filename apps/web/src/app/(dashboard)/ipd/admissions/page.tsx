@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ipdApi, patientsApi } from '@/lib/api';
+import { Select } from '@enterprise-hms/ui';
 
 export default function AdmissionsPage() {
   const [loading, setLoading] = useState(true);
@@ -147,7 +148,7 @@ export default function AdmissionsPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full sm:w-80 px-3 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand"
           />
-          <select
+          <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -156,7 +157,7 @@ export default function AdmissionsPage() {
             <option value="ADMITTED">Admitted</option>
             <option value="DISCHARGED">Discharged</option>
             <option value="CANCELLED">Cancelled</option>
-          </select>
+          </Select>
         </div>
 
         <div className="overflow-x-auto">
@@ -282,7 +283,7 @@ export default function AdmissionsPage() {
             <form onSubmit={handleAllocateBed} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Select Available Bed *</label>
-                <select
+                <Select
                   value={selectedBedId}
                   onChange={(e) => setSelectedBedId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -294,7 +295,7 @@ export default function AdmissionsPage() {
                       {b.bedNumber} ({b.ward?.name || 'Ward'} • {b.bedType})
                     </option>
                   ))}
-                </select>
+                </Select>
                 {availableBeds.length === 0 && (
                   <p className="text-xs text-critical mt-1">No beds currently available with status AVAILABLE.</p>
                 )}
@@ -344,7 +345,7 @@ export default function AdmissionsPage() {
             <form onSubmit={handleCreateAdmission} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Select Patient *</label>
-                <select
+                <Select
                   value={selectedPatientId}
                   onChange={(e) => setSelectedPatientId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -356,13 +357,13 @@ export default function AdmissionsPage() {
                       {p.firstName} {p.lastName} (MRN: {p.mrn})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Admission Type</label>
-                  <select
+                  <Select
                     value={admissionType}
                     onChange={(e) => setAdmissionType(e.target.value)}
                     className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -371,11 +372,11 @@ export default function AdmissionsPage() {
                     <option value="EMERGENCY">Emergency</option>
                     <option value="TRANSFER">Transfer</option>
                     <option value="DAY_CARE">Day Care</option>
-                  </select>
+                  </Select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-text mb-1">Admission Source</label>
-                  <select
+                  <Select
                     value={admissionSource}
                     onChange={(e) => setAdmissionSource(e.target.value)}
                     className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
@@ -384,7 +385,7 @@ export default function AdmissionsPage() {
                     <option value="OPD">OPD Clinic</option>
                     <option value="EMERGENCY">Emergency Dept</option>
                     <option value="TRANSFER">Transfer</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 
