@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, ReactNode } from 'react';
+import React, { useEffect, useRef, useState, ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 import { cn } from './utils';
@@ -59,7 +60,13 @@ export function Dialog({
     '2xl': 'max-w-2xl',
   };
 
-  return (
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const dialogContent = (
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -133,4 +140,10 @@ export function Dialog({
       )}
     </AnimatePresence>
   );
+
+  if (!mounted || typeof document === 'undefined') {
+    return dialogContent;
+  }
+
+  return createPortal(dialogContent, document.body);
 }

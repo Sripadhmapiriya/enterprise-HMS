@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ipdApi, housekeepingApi } from '@/lib/api';
-import { Select } from '@enterprise-hms/ui';
+import { Select, Dialog, ToastContainer } from '@enterprise-hms/ui';
+import type { ToastMessage, ToastVariant } from '@enterprise-hms/ui';
 
 export default function IpdChartPage() {
   const params = useParams();
@@ -24,6 +25,15 @@ export default function IpdChartPage() {
 
   // Forms / Action States
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const showToast = (title: string, description?: string, variant: ToastVariant = 'info') => {
+    const toastId = Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id: toastId, title, description, variant }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== toastId));
+    }, 4500);
+  };
 
   // MAR Administer Modal
   const [administerOrder, setAdministerOrder] = useState<any>(null);
@@ -140,7 +150,9 @@ export default function IpdChartPage() {
         !marChecks.doseVerificationChecked ||
         !marChecks.routeVerificationChecked ||
         !marChecks.timeVerificationChecked) {
-      setMsg({ type: 'error', text: 'All 5 Rights of Medication Administration must be checked and verified' });
+      const errorMsg = 'All 5 Rights of Medication Administration must be checked and verified';
+      setMsg({ type: 'error', text: errorMsg });
+      showToast('Verification Incomplete', errorMsg, 'error');
       return;
     }
 
@@ -150,7 +162,9 @@ export default function IpdChartPage() {
         ...marChecks,
         notes: marNotes,
       });
-      setMsg({ type: 'success', text: `Dose administered and signed for ${administerOrder.medicationName}` });
+      const successMsg = `Dose administered and signed for ${administerOrder.medicationName}`;
+      setMsg({ type: 'success', text: successMsg });
+      showToast('Medication Administered', successMsg, 'success');
       setAdministerOrder(null);
       setMarChecks({
         patientVerificationChecked: false,
@@ -162,7 +176,9 @@ export default function IpdChartPage() {
       setMarNotes('');
       await loadAllData();
     } catch (err: any) {
-      setMsg({ type: 'error', text: err.message || 'Administration check failed' });
+      const errText = err.message || 'Administration check failed';
+      setMsg({ type: 'error', text: errText });
+      showToast('Administration Failed', errText, 'error');
     } finally {
       setMarSubmitting(false);
     }
@@ -818,24 +834,16 @@ export default function IpdChartPage() {
       )}
 
       {/* MAR 5-Rights Administration Modal */}
-      {administerOrder && (
-        <div className="fixed inset-0 z-50 bg-surface/50 flex items-center justify-center p-4">
-          <div className="bg-surface rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4">
-            <div className="border-b border-border pb-3 flex justify-between items-center">
-              <div>
-                <h3 className="text-base font-bold text-text">MAR 5-Rights Administration Check</h3>
-                <p className="text-xs text-text-muted">
-                  Verify and check each right prior to medication administration.
-                </p>
-              </div>
-              <button
-                onClick={() => setAdministerOrder(null)}
-                className="text-text-muted hover:text-text-muted font-bold"
-              >
-                x
-              </button>
-            </div>
-
+      <Dialog
+        isOpen={Boolean(administerOrder)}
+        onClose={() => setAdministerOrder(null)}
+        title="MAR 5-Rights Administration Check"
+        description="Verify and check each right prior to medication administration."
+        maxWidth="lg"
+        zIndex={60}
+      >
+        {administerOrder && (
+          <div className="space-y-4">
             {/* Dose Details */}
             <div className="p-3 bg-info-bg border border-info-border rounded-lg text-xs space-y-1">
               <p className="font-bold text-info-text text-sm">{administerOrder.medicationName}</p>
@@ -927,8 +935,8 @@ export default function IpdChartPage() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+        )}
+      </Dialog>
 
       {/* New Medication Modal */}
       {showMedModal && (
@@ -1227,6 +1235,12 @@ export default function IpdChartPage() {
           </div>
         </div>
       )}
+
+      {/* Toast Notification Container (Top-Right) */}
+      <ToastContainer
+        toasts={toasts}
+        onDismiss={(toastId) => setToasts((prev) => prev.filter((t) => t.id !== toastId))}
+      />
     </div>
   );
 }

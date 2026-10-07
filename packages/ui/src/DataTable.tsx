@@ -1,4 +1,3 @@
-import { Select } from './Select';
 import React, { useState, useMemo } from 'react';
 import {
   useReactTable,
@@ -294,20 +293,20 @@ export function DataTable<TData, TValue>({
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1">
-              <span>Rows:</span>
-              <Select
+            <div className="flex items-center gap-1.5">
+              <span className="text-muted text-xs">Rows:</span>
+              <select
                 value={table.getState().pagination.pageSize}
                 onChange={(e) => table.setPageSize(Number(e.target.value))}
                 aria-label="Select rows per page"
-                className="text-xs rounded border border-border bg-surface px-2 py-1 text-text focus:outline-none focus:ring-1 focus:ring-ring"
+                className="text-xs rounded border border-border bg-surface px-2.5 py-1 text-text focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
               >
                 {[10, 25, 50, 100].map((size) => (
                   <option key={size} value={size}>
                     {size}
                   </option>
                 ))}
-              </Select>
+              </select>
             </div>
 
             <div className="flex items-center gap-1">

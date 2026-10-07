@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, AlertTriangle, AlertCircle, Info, X } from 'lucide-react';
 import { cn } from './utils';
@@ -26,18 +27,25 @@ const toastIcons = {
 };
 
 const toastStyles = {
-  success: 'bg-surface-raised border-stable-border text-text shadow-lg',
-  warning: 'bg-surface-raised border-warning-border text-text shadow-lg',
-  error: 'bg-surface-raised border-critical-border text-text shadow-lg',
-  info: 'bg-surface-raised border-info-border text-text shadow-lg',
+  success: 'bg-surface-raised border-stable-border text-text shadow-xl',
+  warning: 'bg-surface-raised border-warning-border text-text shadow-xl',
+  error: 'bg-surface-raised border-critical-border text-text shadow-xl',
+  info: 'bg-surface-raised border-info-border text-text shadow-xl',
 };
 
 export function ToastContainer({ toasts, onDismiss }: ToastProps) {
-  return (
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const content = (
     <div
       aria-live="polite"
       aria-label="Notification toasts"
-      className="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"
+      style={{ zIndex: 999999 }}
+      className="fixed top-4 right-4 z-[999999] flex flex-col gap-2 max-w-sm w-full pointer-events-none"
     >
       <AnimatePresence mode="popLayout">
         {toasts.map((toast) => {
@@ -80,4 +88,10 @@ export function ToastContainer({ toasts, onDismiss }: ToastProps) {
       </AnimatePresence>
     </div>
   );
+
+  if (!mounted || typeof document === 'undefined') {
+    return content;
+  }
+
+  return createPortal(content, document.body);
 }

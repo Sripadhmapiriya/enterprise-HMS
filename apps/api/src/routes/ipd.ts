@@ -603,6 +603,20 @@ router.post('/admissions/:id/nursing-assessments', requirePermission('ipd.nursin
   }
 });
 
+// GET /api/v1/ipd/admissions/:id/nursing-assessments
+router.get('/admissions/:id/nursing-assessments', requirePermission('ipd.nursing.create'), async (req, res, next) => {
+  try {
+    const assessments = await req.prismaTenant.nursingAssessment.findMany({
+      where: { admissionId: req.params.id },
+      include: { nurse: { select: { firstName: true, lastName: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json({ success: true, data: assessments });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // POST /api/v1/ipd/admissions/:id/intake-output
 router.post('/admissions/:id/intake-output', requirePermission('ipd.nursing.create'), async (req, res, next) => {
   try {
@@ -681,6 +695,20 @@ router.post('/admissions/:id/rounds', requirePermission('ipd.rounds.create'), as
   }
 });
 
+// GET /api/v1/ipd/admissions/:id/rounds
+router.get('/admissions/:id/rounds', requirePermission('ipd.rounds.create'), async (req, res, next) => {
+  try {
+    const rounds = await req.prismaTenant.doctorRound.findMany({
+      where: { admissionId: req.params.id },
+      include: { doctor: { include: { user: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json({ success: true, data: rounds });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // =========================================================================
 // 5. MEDICATION ORDERS & MAR (5-RIGHTS ADMINISTRATION CHECK)
 // =========================================================================
@@ -736,6 +764,24 @@ router.post('/admissions/:id/medication-orders', requirePermission('ipd.medicati
     });
 
     res.status(201).json({ success: true, data: fullOrder });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/v1/ipd/admissions/:id/medication-orders
+router.get('/admissions/:id/medication-orders', requirePermission('ipd.medication.read'), async (req, res, next) => {
+  try {
+    const orders = await req.prismaTenant.medicationOrder.findMany({
+      where: { admissionId: req.params.id },
+      include: {
+        administrations: { orderBy: { scheduledTime: 'asc' } },
+        doctor: { include: { user: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.json({ success: true, data: orders });
   } catch (error) {
     next(error);
   }
@@ -932,6 +978,19 @@ router.post('/admissions/:id/discharge-summary', requirePermission('ipd.admissio
       message: 'Discharge summary signed and recorded',
       data: summary,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/v1/ipd/admissions/:id/discharge-summary
+router.get('/admissions/:id/discharge-summary', requirePermission('ipd.admissions.read'), async (req, res, next) => {
+  try {
+    const summary = await req.prismaTenant.dischargeSummary.findFirst({
+      where: { admissionId: req.params.id },
+      include: { completedBy: { select: { firstName: true, lastName: true } } },
+    });
+    res.json({ success: true, data: summary });
   } catch (error) {
     next(error);
   }

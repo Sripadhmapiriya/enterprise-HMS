@@ -117,8 +117,8 @@ export function PatientPicker({
     setQuery('');
   };
 
-  const handleQuickRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleQuickRegister = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const firstName = regForm.firstName.trim();
     const lastName = regForm.lastName.trim() || firstName || 'Patient';
     const mobile = regForm.mobile.trim() || '+15551234567';
@@ -310,7 +310,15 @@ export function PatientPicker({
         description="Register a new patient and automatically select them for this action."
         zIndex={60}
       >
-        <form onSubmit={handleQuickRegister} className="space-y-4">
+        <div
+          className="space-y-4"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleQuickRegister();
+            }
+          }}
+        >
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="First Name"
@@ -355,11 +363,16 @@ export function PatientPicker({
             <Button type="button" variant="outline" onClick={() => setIsRegisterOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={registering}>
+            <Button
+              type="button"
+              variant="primary"
+              disabled={registering}
+              onClick={() => handleQuickRegister()}
+            >
               {registering ? 'Registering...' : 'Register & Select'}
             </Button>
           </div>
-        </form>
+        </div>
       </Dialog>
     </div>
   );
