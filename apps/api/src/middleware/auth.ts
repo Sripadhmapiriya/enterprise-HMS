@@ -19,7 +19,12 @@ declare global {
 
 export async function authenticateToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  let token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+  // Also support ?token=... query parameter for direct browser anchor/downloads
+  if (!token && typeof req.query?.token === 'string') {
+    token = req.query.token;
+  }
 
   if (!token) {
     return next(AppError.unauthorized('Authentication token missing.'));

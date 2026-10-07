@@ -745,24 +745,38 @@ export default function PatientDetailPage({
 
                       <div className="pt-2 border-t border-border/60 flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
-                          <a
-                            href={doc.fileUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                await patientsApi.downloadDocument(doc.fileUrl, doc.title || 'document', true);
+                              } catch (err: any) {
+                                showToast('View Failed', err.message || 'Could not load document preview', 'error');
+                              }
+                            }}
+                            className="inline-flex items-center gap-1 text-primary hover:underline font-medium cursor-pointer"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                             View
-                          </a>
+                          </button>
                           <span className="text-text-muted">•</span>
-                          <a
-                            href={doc.fileUrl}
-                            download
-                            className="inline-flex items-center gap-1 text-text-muted hover:text-text font-medium"
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const ext = doc.mimeType === 'application/pdf' ? '.pdf' : doc.mimeType?.includes('png') ? '.png' : doc.mimeType?.includes('jpeg') ? '.jpg' : '';
+                                const downloadName = (doc.title?.trim() || 'patient_document') + (doc.title?.includes('.') ? '' : ext);
+                                await patientsApi.downloadDocument(doc.fileUrl, downloadName, false);
+                                showToast('Download Started', 'Your document is downloading.', 'success');
+                              } catch (err: any) {
+                                showToast('Download Failed', err.message || 'Could not download file', 'error');
+                              }
+                            }}
+                            className="inline-flex items-center gap-1 text-text-muted hover:text-text font-medium cursor-pointer"
                           >
                             <Download className="w-3.5 h-3.5" />
                             Download
-                          </a>
+                          </button>
                         </div>
                         <Button
                           variant="ghost"

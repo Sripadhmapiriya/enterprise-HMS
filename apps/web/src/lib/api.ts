@@ -260,6 +260,49 @@ export const patientsApi = {
     return json;
   },
 
+  downloadDocument: async (fileUrl: string, filename: string, isView: boolean = false) => {
+    // If it's a legacy external URL, open directly
+    if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+      window.open(fileUrl, '_blank');
+      return;
+    }
+
+    const token = typeof window !== 'undefined' ? localStorage.getItem('hms_access_token') : null;
+    const tenantId = typeof window !== 'undefined' ? localStorage.getItem('hms_tenant_id') : null;
+
+    const fullUrl = fileUrl.startsWith('http')
+      ? fileUrl
+      : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1') + fileUrl.replace(/^\/api\/v1/, '');
+
+    const res = await fetch(fullUrl, {
+      method: 'GET',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(tenantId ? { 'X-Tenant-Id': tenantId } : {}),
+      },
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson?.error?.message || 'Failed to download file');
+    }
+
+    const blob = await res.blob();
+    const objectUrl = window.URL.createObjectURL(blob);
+
+    if (isView) {
+      window.open(objectUrl, '_blank');
+    } else {
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+    setTimeout(() => window.URL.revokeObjectURL(objectUrl), 10000);
+  },
+
   addConsent: async (patientId: string, data: { consentType: string; notes?: string; witnessName?: string; expiresAt?: string }) => {
     return request('/patients/' + patientId + '/consents', {
       method: 'POST',
