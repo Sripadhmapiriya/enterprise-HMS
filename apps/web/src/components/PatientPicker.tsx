@@ -71,25 +71,24 @@ export function PatientPicker({
     }
   }, [value, selectedPatient]);
 
-  // Debounced search
+  // Fetch patients on open or query change
   useEffect(() => {
     if (!isOpen) return;
-    if (!query.trim()) {
-      setResults([]);
-      return;
-    }
 
     const timer = setTimeout(async () => {
       try {
         setLoading(true);
-        const res = await patientsApi.list({ q: query.trim(), limit: 10 });
+        const res = await patientsApi.list({
+          q: query.trim() || undefined,
+          limit: 10,
+        });
         setResults(res.data || []);
       } catch (err) {
         setResults([]);
       } finally {
         setLoading(false);
       }
-    }, 300);
+    }, query.trim() ? 250 : 0);
 
     return () => clearTimeout(timer);
   }, [query, isOpen]);
@@ -229,7 +228,7 @@ export function PatientPicker({
             )}
           </div>
 
-          {isOpen && query.trim().length > 0 && (
+          {isOpen && (
             <div className="absolute left-0 right-0 mt-1 z-50 rounded-lg border border-border bg-surface-raised shadow-xl max-h-64 overflow-y-auto divide-y divide-border">
               {results.length > 0 ? (
                 results.map((patient) => {
@@ -270,7 +269,9 @@ export function PatientPicker({
                 })
               ) : !loading ? (
                 <div className="p-4 text-center space-y-2">
-                  <p className="text-xs text-text-muted">No patients found matching "{query}"</p>
+                  <p className="text-xs text-text-muted">
+                    {query.trim() ? `No patients found matching "${query}"` : 'No patients registered yet'}
+                  </p>
                   <Button
                     type="button"
                     variant="outline"
