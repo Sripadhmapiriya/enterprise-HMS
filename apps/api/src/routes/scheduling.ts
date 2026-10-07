@@ -28,9 +28,9 @@ const CreateScheduleSchema = z.object({
 
 const BookAppointmentSchema = z.object({
   patientId: z.string().min(1),
-  doctorId: z.string().min(1),
-  branchId: z.string().min(1),
-  departmentId: z.string().min(1),
+  doctorId: z.string().optional(),
+  branchId: z.string().optional(),
+  departmentId: z.string().optional(),
   appointmentDate: z.string().optional(),
   scheduledDate: z.string().optional(),
   startTime: z.string(),
@@ -315,6 +315,52 @@ router.post('/appointments', requirePermission('scheduling.appointments.create')
   try {
     const validatedData = BookAppointmentSchema.parse(req.body);
 
+    // Resolve branchId
+    let branchId = validatedData.branchId;
+    if (!branchId || branchId === 'branch-default') {
+      branchId = req.branchId;
+    }
+    if (!branchId || branchId === 'branch-default') {
+      const dbBranch = await req.prismaTenant.branch.findFirst({
+        where: { isActive: true },
+        select: { id: true },
+      });
+      branchId = dbBranch?.id;
+    }
+
+    // Resolve doctorId
+    let doctorId = validatedData.doctorId;
+    if (!doctorId || doctorId === 'doc-default') {
+      const dbDoc = await req.prismaTenant.doctor.findFirst({
+        where: branchId ? { branchId, isActive: true } : { isActive: true },
+        select: { id: true, branchId: true, departmentId: true },
+      }) || await req.prismaTenant.doctor.findFirst({
+        where: { isActive: true },
+        select: { id: true, branchId: true, departmentId: true },
+      });
+      if (dbDoc) {
+        doctorId = dbDoc.id;
+        if (!branchId) branchId = dbDoc.branchId;
+      }
+    }
+
+    // Resolve departmentId
+    let departmentId = validatedData.departmentId;
+    if (!departmentId || departmentId === 'dept-opd') {
+      const dbDept = await req.prismaTenant.department.findFirst({
+        where: branchId ? { branchId, isActive: true } : { isActive: true },
+        select: { id: true },
+      }) || await req.prismaTenant.department.findFirst({
+        where: { isActive: true },
+        select: { id: true },
+      });
+      departmentId = dbDept?.id;
+    }
+
+    if (!doctorId || !branchId || !departmentId) {
+      throw AppError.badRequest('A valid doctor, branch, and department are required to schedule an appointment');
+    }
+
     const slotStart = new Date(validatedData.startTime);
     const slotEnd = new Date(validatedData.endTime);
 
@@ -322,8 +368,8 @@ router.post('/appointments', requirePermission('scheduling.appointments.create')
     const dayOfWeek = new Date(validatedData.appointmentDate).getUTCDay();
     const schedule = await req.prismaTenant.doctorSchedule.findFirst({
       where: {
-        doctorId: validatedData.doctorId,
-        branchId: validatedData.branchId,
+        doctorId,
+        branchId,
         dayOfWeek,
         isActive: true,
       },
@@ -333,7 +379,7 @@ router.post('/appointments', requirePermission('scheduling.appointments.create')
 
     const overlappingCount = await req.prismaTenant.appointment.count({
       where: {
-        doctorId: validatedData.doctorId,
+        doctorId,
         status: { notIn: ['CANCELLED', 'NO_SHOW'] },
         OR: [
           {
@@ -354,9 +400,9 @@ router.post('/appointments', requirePermission('scheduling.appointments.create')
       data: {
         tenantId: req.tenantId!,
         patientId: validatedData.patientId,
-        doctorId: validatedData.doctorId,
-        branchId: validatedData.branchId,
-        departmentId: validatedData.departmentId,
+        doctorId,
+        branchId,
+        departmentId,
         appointmentDate: new Date(validatedData.appointmentDate),
         startTime: slotStart,
         endTime: slotEnd,

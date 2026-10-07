@@ -6,7 +6,7 @@ import { AppError } from '../utils/errors';
 const router = Router();
 
 const CreatePatientSchema = z.object({
-  hospitalId: z.string().min(1),
+  hospitalId: z.string().optional(),
   mrn: z.string().optional(),
   firstName: z.string().min(1, 'First name is required'),
   middleName: z.string().optional(),
@@ -217,8 +217,22 @@ router.post('/', requirePermission('patients.create'), async (req, res, next) =>
       emergencyContactPhone,
       emergencyRelationship,
       nationalId,
+      hospitalId: inputHospitalId,
       ...patientFields
     } = validatedData;
+
+    // Resolve valid hospitalId
+    let hospitalId = inputHospitalId;
+    if (!hospitalId || hospitalId === 'default-hospital') {
+      hospitalId = req.hospitalId;
+    }
+    if (!hospitalId || hospitalId === 'default-hospital') {
+      const defaultHosp = await req.prismaTenant.hospital.findFirst({
+        where: { tenantId: req.tenantId },
+        select: { id: true },
+      });
+      hospitalId = defaultHosp?.id || 'default-hospital';
+    }
 
     const emergencyContact =
       inputContact ||
@@ -233,6 +247,7 @@ router.post('/', requirePermission('patients.create'), async (req, res, next) =>
     const patient = await req.prismaTenant.patient.create({
       data: {
         ...patientFields,
+        hospitalId,
         mrn,
         dateOfBirth: new Date(validatedData.dateOfBirth),
         emergencyContacts: emergencyContact

@@ -125,7 +125,7 @@ export default function PatientsDirectoryPage() {
     try {
       setIsSubmitting(true);
       const payload: any = {
-        hospitalId: formData.hospitalId || 'default-hospital',
+        hospitalId: formData.hospitalId || undefined,
         firstName: formData.firstName,
         lastName: formData.lastName,
         dateOfBirth: formData.dateOfBirth,
