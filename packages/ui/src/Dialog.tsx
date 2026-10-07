@@ -12,6 +12,9 @@ export interface DialogProps {
   children: ReactNode;
   footer?: ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  zIndex?: number | string;
+  className?: string;
+  bodyOverflowVisible?: boolean;
 }
 
 export function Dialog({
@@ -22,6 +25,9 @@ export function Dialog({
   children,
   footer,
   maxWidth = 'md',
+  zIndex,
+  className,
+  bodyOverflowVisible = false,
 }: DialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +67,11 @@ export function Dialog({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay backdrop-blur-xs"
+          className={cn(
+            'fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay backdrop-blur-xs',
+            zIndex ? `z-[${zIndex}]` : ''
+          )}
+          style={zIndex ? { zIndex } : undefined}
         >
           <motion.div
             ref={dialogRef}
@@ -74,8 +84,10 @@ export function Dialog({
             animate="animate"
             exit="exit"
             className={cn(
-              'w-full bg-surface-raised rounded-lg shadow-xl border border-border overflow-hidden',
-              maxWidths[maxWidth]
+              'w-full bg-surface-raised rounded-lg shadow-xl border border-border',
+              bodyOverflowVisible ? 'overflow-visible' : 'overflow-hidden',
+              maxWidths[maxWidth],
+              className
             )}
           >
             {/* Header */}
@@ -101,7 +113,14 @@ export function Dialog({
             </div>
 
             {/* Body */}
-            <div className="p-5 overflow-y-auto max-h-[calc(85vh-130px)]">{children}</div>
+            <div
+              className={cn(
+                'p-5 max-h-[calc(85vh-130px)]',
+                bodyOverflowVisible ? 'overflow-visible' : 'overflow-y-auto'
+              )}
+            >
+              {children}
+            </div>
 
             {/* Footer */}
             {footer && (

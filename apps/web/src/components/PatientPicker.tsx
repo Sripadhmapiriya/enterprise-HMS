@@ -120,14 +120,18 @@ export function PatientPicker({
 
   const handleQuickRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    const firstName = regForm.firstName.trim();
+    const lastName = regForm.lastName.trim() || firstName || 'Patient';
+    const mobile = regForm.mobile.trim() || '+15551234567';
+
     try {
       setRegistering(true);
       const res = await patientsApi.create({
-        firstName: regForm.firstName,
-        lastName: regForm.lastName,
+        firstName,
+        lastName,
         gender: regForm.gender,
-        dateOfBirth: regForm.dateOfBirth,
-        mobile: regForm.mobile,
+        dateOfBirth: regForm.dateOfBirth || '1995-01-01',
+        mobile,
         registrationSource: 'QUICK_PICKER',
       });
 
@@ -278,11 +282,11 @@ export function PatientPicker({
                       if (/^\+?\d+$/.test(query.trim())) {
                         setRegForm((prev) => ({ ...prev, mobile: query.trim() }));
                       } else {
-                        const parts = query.trim().split(' ');
+                        const parts = query.trim().split(' ').filter(Boolean);
                         setRegForm((prev) => ({
                           ...prev,
                           firstName: parts[0] || '',
-                          lastName: parts.slice(1).join(' ') || '',
+                          lastName: parts.slice(1).join(' ') || parts[0] || '',
                         }));
                       }
                     }}
@@ -303,6 +307,7 @@ export function PatientPicker({
         onClose={() => setIsRegisterOpen(false)}
         title="Quick Patient Registration"
         description="Register a new patient and automatically select them for this action."
+        zIndex={60}
       >
         <form onSubmit={handleQuickRegister} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">

@@ -49,7 +49,7 @@ router.get('/allowed', async (req, res, next) => {
     if (isSystemAdmin) {
       branches = await req.prismaTenant.branch.findMany({
         where: { isActive: true },
-        include: { hospital: { select: { id: true, name: true, code: true } } },
+        include: { hospital: { select: { id: true, name: true } } },
         orderBy: { name: 'asc' },
       });
     } else {
@@ -57,7 +57,7 @@ router.get('/allowed', async (req, res, next) => {
         where: { userId, isActive: true },
         include: {
           branch: {
-            include: { hospital: { select: { id: true, name: true, code: true } } },
+            include: { hospital: { select: { id: true, name: true } } },
           },
         },
       });
@@ -66,7 +66,7 @@ router.get('/allowed', async (req, res, next) => {
         where: { userId, isActive: true },
         include: {
           branch: {
-            include: { hospital: { select: { id: true, name: true, code: true } } },
+            include: { hospital: { select: { id: true, name: true } } },
           },
         },
       });

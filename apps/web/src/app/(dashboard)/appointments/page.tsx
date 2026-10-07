@@ -422,6 +422,7 @@ function AppointmentsContent() {
         onClose={() => setIsBookOpen(false)}
         title="Book Patient Appointment"
         description="Select patient MRN, doctor, and schedule slot with overbooking capacity checks."
+        bodyOverflowVisible
       >
         <form onSubmit={handleBook} className="space-y-4">
           <PatientPicker
