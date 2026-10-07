@@ -785,6 +785,7 @@ model InvestigationOrderItem {
   testName String
   category String // LABORATORY, RADIOLOGY
   status   String  @default("ORDERED")
+  orderedAt DateTime @default(now())
 
   order           InvestigationOrder @relation(fields: [orderId], references: [id])
   serviceId       String?

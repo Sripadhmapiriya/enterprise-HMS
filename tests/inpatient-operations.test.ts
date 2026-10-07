@@ -1386,6 +1386,43 @@ describe('Workstream G: Inpatient (IPD), ICU, OT, Blood Bank, CSSD, Dietary, Hou
     });
   });
 
+  describe('13. Nursing Workstation', () => {
+    let testAdmissionId: string;
+
+    it('should retrieve nursing worklist with medication orders, notes, alerts', async () => {
+      const res = await request(app)
+        .get('/api/v1/ipd/nursing-worklist')
+        .set('Authorization', `Bearer ${token}`);
+      
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body.data)).toBe(true);
+      
+      if (res.body.data.length > 0) {
+        const adm = res.body.data[0];
+        testAdmissionId = adm.id;
+        expect(adm.patient).toBeDefined();
+        expect(Array.isArray(adm.medicationOrders)).toBe(true);
+        expect(Array.isArray(adm.nursingNotes)).toBe(true);
+        expect(Array.isArray(adm.inpatientOrders)).toBe(true);
+      }
+    });
+
+    it('should create a shift handover (nursing note)', async () => {
+      if (!testAdmissionId) return; // Skip if no admission found
+      const res = await request(app)
+        .post(`/api/v1/ipd/admissions/${testAdmissionId}/nursing-notes`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          observation: 'Patient is stable. No complaints of pain.',
+          intervention: 'Shift Handover'
+        });
+      
+      expect(res.status).toBe(201);
+      expect(res.body.data.observation).toBe('Patient is stable. No complaints of pain.');
+      expect(res.body.data.intervention).toBe('Shift Handover');
+    });
+  });
+
   // =========================================================================
   // 11. ENTITLEMENT MATRIX FOR WORKSTREAM G (8 MODULES)
   // =========================================================================

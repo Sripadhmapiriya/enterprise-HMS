@@ -158,7 +158,7 @@ export default function DoctorRoundsPage() {
                 </tr>
               ) : (
                 filtered.map((adm) => {
-                  const alloc = adm.bedAllocations?.find((a: any) => a.status === 'OCCUPIED');
+                  const alloc = adm.bedAllocations?.find((a: any) => a.status === 'ACTIVE');
                   const bed = alloc?.bed;
 
                   return (

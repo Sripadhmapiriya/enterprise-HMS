@@ -925,6 +925,12 @@ export const ipdApi = {
     request('/ipd/admissions/' + admissionId + '/nursing-assessments'),
   createNursingAssessment: async (admissionId: string, data: any) =>
     request('/ipd/admissions/' + admissionId + '/nursing-assessments', { method: 'POST', body: JSON.stringify(data) }),
+  getNursingWorklist: async (params?: any) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('/ipd/nursing-worklist' + (qs ? '?' + qs : ''));
+  },
+  createNursingNote: async (admissionId: string, data: any) =>
+    request('/ipd/admissions/' + admissionId + '/nursing-notes', { method: 'POST', body: JSON.stringify(data) }),
   getIntakeOutput: async (admissionId: string) =>
     request('/ipd/admissions/' + admissionId + '/intake-output'),
   createIntakeOutput: async (admissionId: string, data: any) =>

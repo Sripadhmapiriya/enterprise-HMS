@@ -14,6 +14,7 @@ export default function AdmissionsPage() {
   // Allocation Modal
   const [allocatingAdm, setAllocatingAdm] = useState<any>(null);
   const [availableBeds, setAvailableBeds] = useState<any[]>([]);
+  const [fetchingBeds, setFetchingBeds] = useState(false);
   const [selectedBedId, setSelectedBedId] = useState('');
   const [submittingAlloc, setSubmittingAlloc] = useState(false);
   const [allocError, setAllocError] = useState('');
@@ -48,11 +49,15 @@ export default function AdmissionsPage() {
     setAllocatingAdm(adm);
     setSelectedBedId('');
     setAllocError('');
+    setFetchingBeds(true);
     try {
       const res = await ipdApi.getBeds({ status: 'AVAILABLE' });
       setAvailableBeds(res.data || []);
     } catch (err: any) {
       console.error(err);
+      setAllocError('Failed to fetch available beds.');
+    } finally {
+      setFetchingBeds(false);
     }
   };
 
@@ -187,7 +192,7 @@ export default function AdmissionsPage() {
                 </tr>
               ) : (
                 filtered.map((adm) => {
-                  const currentAlloc = adm.bedAllocations?.find((a: any) => a.status === 'OCCUPIED');
+                  const currentAlloc = adm.bedAllocations?.find((a: any) => a.status === 'ACTIVE');
                   const bed = currentAlloc?.bed;
 
                   return (
@@ -288,15 +293,16 @@ export default function AdmissionsPage() {
                   onChange={(e) => setSelectedBedId(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand bg-surface"
                   required
+                  disabled={fetchingBeds}
                 >
-                  <option value="">-- Choose Bed --</option>
+                  <option value="">{fetchingBeds ? 'Loading available beds...' : '-- Choose Bed --'}</option>
                   {availableBeds.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.bedNumber} ({b.ward?.name || 'Ward'} • {b.bedType})
                     </option>
                   ))}
                 </Select>
-                {availableBeds.length === 0 && (
+                {!fetchingBeds && availableBeds.length === 0 && (
                   <p className="text-xs text-critical mt-1">No beds currently available with status AVAILABLE.</p>
                 )}
               </div>

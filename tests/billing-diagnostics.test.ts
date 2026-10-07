@@ -585,6 +585,61 @@ describe('Workstream F: Billing, Insurance, Laboratory & Radiology with Section 
       const headerStr = res.body.slice(0, 5).toString('utf-8');
       expect(headerStr).toBe('%PDF-');
     });
+
+    it('should verify worklist tab counts and transitions', async () => {
+      // 1. Create a fresh order (appears in TO_COLLECT)
+      const resOrder = await request(app)
+        .post('/api/v1/laboratory/orders')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          patientId,
+          doctorId,
+          priority: 'ROUTINE',
+          items: [{ testName: 'Complete Blood Count', testCode: 'CBC' }]
+        });
+      
+      const newOrderItemId = resOrder.body.data.items[0].id;
+      
+      // Check TO_COLLECT
+      const resToCollect = await request(app)
+        .get('/api/v1/laboratory/worklist?status=TO_COLLECT')
+        .set('Authorization', `Bearer ${token}`);
+      
+      expect(resToCollect.body.data.some((item: any) => item.id === newOrderItemId)).toBe(true);
+      
+      // 2. Collect sample (moves to IN_PROCESS)
+      const resCollect = await request(app)
+        .post('/api/v1/laboratory/samples/collect')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ orderItemId: newOrderItemId, specimenTypeName: 'Whole Blood' });
+      
+      const newSampleId = resCollect.body.data.id;
+      
+      // Check IN_PROCESS
+      const resInProcess = await request(app)
+        .get('/api/v1/laboratory/worklist?status=IN_PROCESS')
+        .set('Authorization', `Bearer ${token}`);
+      
+      expect(resInProcess.body.data.some((item: any) => item.id === newOrderItemId)).toBe(true);
+      
+      // 3. Enter results and validate (moves to COMPLETED)
+      await request(app)
+        .post(`/api/v1/laboratory/samples/${newSampleId}/results`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ results: [{ parameterName: 'WBC', numericValue: 7.5 }] });
+        
+      await request(app)
+        .post(`/api/v1/laboratory/samples/${newSampleId}/validate`)
+        .set('Authorization', `Bearer ${token}`);
+        
+      // Check COMPLETED
+      const resCompleted = await request(app)
+        .get('/api/v1/laboratory/worklist?status=COMPLETED')
+        .set('Authorization', `Bearer ${token}`);
+        
+      expect(resCompleted.body.data.some((item: any) => item.id === newOrderItemId)).toBe(true);
+    });
+
   });
 
   // =========================================================================

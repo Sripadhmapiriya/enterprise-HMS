@@ -102,35 +102,88 @@ const criticalAlerts: CriticalAlertItem[] = [];
 router.get('/worklist', requirePermission('laboratory.worklist.read'), async (req, res, next) => {
   try {
     const tenantId = req.tenantId!;
-    const { status = 'ORDERED' } = req.query;
+    const { status, search, priority, page = '1', limit = '10' } = req.query;
 
-    const items = await req.prismaTenant.investigationOrderItem.findMany({
-      where: {
-        category: 'LABORATORY',
-        order: {
-          tenantId,
-          ...(status ? { status: String(status) } : {}),
-        },
-      },
-      include: {
-        order: {
-          include: {
-            patient: { select: { id: true, mrn: true, firstName: true, lastName: true, gender: true, dateOfBirth: true } },
-            doctor: { include: { user: { select: { firstName: true, lastName: true } } } },
+    const pageNum = parseInt(String(page), 10);
+    const limitNum = parseInt(String(limit), 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    const whereClause: any = {
+      category: 'LABORATORY',
+      order: { tenantId },
+    };
+
+    if (status) {
+      if (status === 'TO_COLLECT') {
+        whereClause.status = 'ORDERED';
+      } else if (status === 'IN_PROCESS') {
+        whereClause.status = 'SAMPLE_COLLECTED';
+      } else if (status === 'TO_VALIDATE') {
+        whereClause.sample = { status: { in: ['TESTED', 'CRITICAL'] } };
+      } else if (status === 'COMPLETED') {
+        whereClause.status = 'VERIFIED';
+      } else if (status === 'CRITICAL') {
+        whereClause.sample = { status: 'CRITICAL' };
+      } else {
+        whereClause.status = String(status);
+      }
+    }
+
+    if (priority) {
+      whereClause.order.priority = String(priority);
+    }
+
+    if (search) {
+      const q = String(search);
+      whereClause.OR = [
+        { testName: { contains: q, mode: 'insensitive' } },
+        { order: { patient: { firstName: { contains: q, mode: 'insensitive' } } } },
+        { order: { patient: { lastName: { contains: q, mode: 'insensitive' } } } },
+        { order: { patient: { mrn: { contains: q, mode: 'insensitive' } } } },
+      ];
+    }
+
+    const [items, total] = await Promise.all([
+      req.prismaTenant.investigationOrderItem.findMany({
+        where: whereClause,
+        include: {
+          order: {
+            include: {
+              patient: { select: { id: true, mrn: true, firstName: true, lastName: true, gender: true, dateOfBirth: true } },
+              doctor: { include: { user: { select: { firstName: true, lastName: true } } } },
+              department: true,
+            },
+          },
+          labSample: {
+            include: {
+              specimenType: true,
+              results: true,
+            },
           },
         },
-        sample: {
-          include: {
-            specimenType: true,
-            results: true,
-          },
-        },
+        orderBy: { orderedAt: 'desc' },
+        skip,
+        take: limitNum,
+      }),
+      req.prismaTenant.investigationOrderItem.count({ where: whereClause }),
+    ]);
+
+    // Format the response to map `labSample` to `sample` for backward compatibility with UI if needed
+    const mappedItems = items.map(item => ({
+      ...item,
+      sample: item.labSample,
+    }));
+
+    res.json({
+      success: true,
+      data: mappedItems,
+      meta: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum),
       },
-      orderBy: { id: 'desc' },
-      take: 50,
     });
-
-    res.json({ success: true, data: items });
   } catch (error) {
     next(error);
   }

@@ -226,7 +226,7 @@ export default function IpdDashboard() {
               ) : (
                 filteredAdmissions.map((adm) => {
                   const patientName = `${adm.patient?.firstName || ''} ${adm.patient?.lastName || ''}`;
-                  const currentBed = adm.bedAllocations?.find((a: any) => a.status === 'OCCUPIED')?.bed;
+                  const currentBed = adm.bedAllocations?.find((a: any) => a.status === 'ACTIVE')?.bed;
 
                   return (
                     <tr key={adm.id} className="hover:bg-surface-subtle/80 transition-colors">

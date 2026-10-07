@@ -295,7 +295,7 @@ export default function IpdChartPage() {
   }
 
   const patient = admission.patient;
-  const currentBedAlloc = admission.bedAllocations?.find((a: any) => a.status === 'OCCUPIED');
+  const currentBedAlloc = admission.bedAllocations?.find((a: any) => a.status === 'ACTIVE');
   const bed = currentBedAlloc?.bed;
 
   // Calculate fluid totals

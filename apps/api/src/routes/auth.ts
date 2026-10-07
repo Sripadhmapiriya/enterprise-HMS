@@ -181,6 +181,8 @@ router.post('/refresh', async (req, res, next) => {
       email: user.email,
       roles,
       permissions: Array.from(permissionsSet),
+      hospitalId: user.staffRecord?.branch?.hospitalId,
+      branchId: user.staffRecord?.branchId,
     });
 
     res.json({

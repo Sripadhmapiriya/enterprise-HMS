@@ -77,6 +77,12 @@ const IntakeOutputSchema = z.object({
   notes: z.string().optional(),
 });
 
+const NursingNoteSchema = z.object({
+  observation: z.string().min(1, 'Observation (Situation/Background) is required'),
+  intervention: z.string().optional(),
+  response: z.string().optional(),
+});
+
 const DoctorRoundSchema = z.object({
   clinicalStatus: z.string().optional(),
   progressNote: z.string().min(1, 'Progress note is required'),
@@ -572,6 +578,50 @@ router.post('/admissions/:id/allocate-bed', requirePermission('ipd.admissions.ed
 // 3. NURSING ASSESSMENTS, VITALS & INTAKE/OUTPUT
 // =========================================================================
 
+// GET /api/v1/ipd/nursing-worklist
+router.get('/nursing-worklist', requirePermission('ipd.nursing.read'), async (req, res, next) => {
+  try {
+    const tenantId = req.tenantId!;
+    const admissions = await req.prismaTenant.admission.findMany({
+      where: { tenantId, status: 'ADMITTED' },
+      include: {
+        patient: {
+          include: {
+            alerts: { where: { isActive: true } },
+            allergies: { where: { status: 'ACTIVE' } }
+          }
+        },
+        bedAllocations: {
+          where: { status: 'ACTIVE' },
+          include: { bed: { include: { ward: true, room: true } } }
+        },
+        medicationOrders: {
+          where: { status: 'ACTIVE' },
+          include: {
+            administrations: { 
+              where: { status: 'SCHEDULED' },
+              orderBy: { scheduledTime: 'asc' } 
+            }
+          }
+        },
+        nursingNotes: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          include: { nurse: { select: { firstName: true, lastName: true } } }
+        },
+        inpatientOrders: {
+          where: { status: { in: ['ORDERED', 'IN_PROGRESS'] } }
+        }
+      },
+      orderBy: { admissionDate: 'desc' }
+    });
+
+    res.json({ success: true, data: admissions });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // POST /api/v1/ipd/admissions/:id/nursing-assessments
 router.post('/admissions/:id/nursing-assessments', requirePermission('ipd.nursing.create'), async (req, res, next) => {
   try {
@@ -652,6 +702,32 @@ router.get('/admissions/:id/intake-output', requirePermission('ipd.nursing.creat
       orderBy: { recordedAt: 'asc' },
     });
     res.json({ success: true, data: records });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/v1/ipd/admissions/:id/nursing-notes
+router.post('/admissions/:id/nursing-notes', requirePermission('ipd.nursing.create'), async (req, res, next) => {
+  try {
+    const userId = req.user!.userId;
+    const body = NursingNoteSchema.parse(req.body);
+
+    const admission = await req.prismaTenant.admission.findFirst({ where: { id: req.params.id } });
+    if (!admission) throw AppError.notFound('Admission not found');
+
+    const note = await req.prismaTenant.nursingNote.create({
+      data: {
+        admissionId: admission.id,
+        nurseId: userId,
+        observation: body.observation,
+        intervention: body.intervention,
+        response: body.response,
+      },
+      include: { nurse: { select: { firstName: true, lastName: true } } },
+    });
+
+    res.status(201).json({ success: true, data: note });
   } catch (error) {
     next(error);
   }

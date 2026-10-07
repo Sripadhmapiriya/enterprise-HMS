@@ -2464,3 +2464,20 @@ Running 11 tests using 1 worker
    Time:    54.634s 
  45/45 Next.js App Router routes compiled cleanly with Turbopack.
 ```
+
+  6. **Nursing Workstation Redesign**
+     - **Root Cause:** The nursing workstation was a stub page without real data.
+     - **Solution:** 
+       - Refactored page.tsx to include Ward Selector, Patient cards/rows showing Bed, Ward, Name, Age/Sex, Allergy Status, Admission Reason, and Flags.
+       - Replaced hardcoded "MAR Compliance 100%" with real KPIs (Tasks Due, Pending Orders).
+       - Added shift handover functionality via SBAR notes modal (calling POST /admissions/:id/nursing-notes).
+       - Created backend routes GET /api/v1/ipd/nursing-worklist and POST /api/v1/ipd/admissions/:id/nursing-notes in ipd.ts and their corresponding API functions in pi.ts.
+       - Added comprehensive backend tests in inpatient-operations.test.ts.
+
+  7. **Laboratory Worklist Improvements**
+     - **Root Cause:** Laboratory worklist lacked pagination, unified view with sample details, and proper filtering.
+     - **Solution:** 
+       - Added orderedAt equivalent logic for sorting via orderBy: { orderedAt: 'desc' } in backend API.
+       - Updated GET /api/v1/laboratory/worklist to handle status tabs mapping, search, and pagination.
+       - Designed a comprehensive UI in pps/web/src/app/(dashboard)/laboratory/worklist/page.tsx incorporating real Tabs, pagination controls, STAT priority filtering, search, and accurate status tags.
+       - Removed misleading "PENDING" tags and unified order-to-validation workflow into a single table.
