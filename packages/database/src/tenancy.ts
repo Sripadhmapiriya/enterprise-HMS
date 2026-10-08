@@ -99,7 +99,7 @@ export function createTenantClient(tenantId: string, basePrisma: PrismaClient) {
     name: 'tenant-isolation-extension',
     query: {
       $allModels: {
-        async findMany({ model, args, query }) {
+        async findMany({ model, args, query }: any) {
           if (GLOBAL_OR_UNSCOPED_MODELS.has(model)) {
             return query(args);
           }
@@ -114,7 +114,7 @@ export function createTenantClient(tenantId: string, basePrisma: PrismaClient) {
           return query(args);
         },
 
-        async findFirst({ model, args, query }) {
+        async findFirst({ model, args, query }: any) {
           if (GLOBAL_OR_UNSCOPED_MODELS.has(model)) {
             return query(args);
           }
@@ -129,7 +129,7 @@ export function createTenantClient(tenantId: string, basePrisma: PrismaClient) {
           return query(args);
         },
 
-        async count({ model, args, query }) {
+        async count({ model, args, query }: any) {
           if (GLOBAL_OR_UNSCOPED_MODELS.has(model)) {
             return query(args);
           }
@@ -144,7 +144,7 @@ export function createTenantClient(tenantId: string, basePrisma: PrismaClient) {
           return query(args);
         },
 
-        async create({ model, args, query }) {
+        async create({ model, args, query }: any) {
           if (GLOBAL_OR_UNSCOPED_MODELS.has(model)) {
             return query(args);
           }
@@ -160,7 +160,7 @@ export function createTenantClient(tenantId: string, basePrisma: PrismaClient) {
           return query(args);
         },
 
-        async updateMany({ model, args, query }) {
+        async updateMany({ model, args, query }: any) {
           if (GLOBAL_OR_UNSCOPED_MODELS.has(model)) {
             return query(args);
           }
@@ -169,7 +169,7 @@ export function createTenantClient(tenantId: string, basePrisma: PrismaClient) {
           return query(args);
         },
 
-        async deleteMany({ model, args, query }) {
+        async deleteMany({ model, args, query }: any) {
           if (GLOBAL_OR_UNSCOPED_MODELS.has(model)) {
             return query(args);
           }
