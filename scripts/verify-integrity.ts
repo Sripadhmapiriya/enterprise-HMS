@@ -163,6 +163,51 @@ export function checkNoCommittedSecrets(): CheckResult {
   };
 }
 
+// 5. Check: No hardcoded data
+export function checkNoHardcodedData(): CheckResult {
+  const targets = [
+    path.join(ROOT_DIR, 'apps', 'web', 'src'),
+    path.join(ROOT_DIR, 'apps', 'api', 'src'),
+  ];
+  const files: string[] = [];
+  for (const t of targets) {
+    files.push(...walkDir(t, (f) => /\.(ts|tsx)$/.test(f)));
+  }
+
+  const hardcodedPatterns = [
+    { pattern: /Math\.random\s*\(/, desc: 'Math.random() is prohibited (use crypto or DB sequences)' },
+    { pattern: /['"]doc-default['"]/, desc: 'Hardcoded doctor ID doc-default' },
+    { pattern: /['"]branch-default['"]/, desc: 'Hardcoded branch ID branch-default' },
+    { pattern: /['"]dept-opd['"]/, desc: 'Hardcoded department ID dept-opd' },
+    { pattern: /\|\|\s*98\.6\b/, desc: 'Hardcoded temperature fallback 98.6' },
+    { pattern: /\|\|\s*76\b/, desc: 'Hardcoded pulse fallback 76' },
+    { pattern: /MOCK_DOCTORS/, desc: 'Hardcoded mock doctors array' },
+  ];
+
+  const violations: string[] = [];
+
+  for (const file of files) {
+    const lines = fs.readFileSync(file, 'utf8').split('\n');
+    lines.forEach((line, idx) => {
+      for (const { pattern, desc } of hardcodedPatterns) {
+        if (pattern.test(line)) {
+          const rel = path.relative(ROOT_DIR, file).replace(/\\/g, '/');
+          violations.push(`${rel}:${idx + 1} - ${desc}: "${line.trim()}"`);
+        }
+      }
+    });
+  }
+
+  return {
+    name: 'check:no-hardcoded-data',
+    passed: violations.length === 0,
+    message: violations.length === 0
+      ? 'Zero hardcoded identifiers, Math.random calls, or mock clinical fallbacks detected.'
+      : `Found ${violations.length} hardcoded data violations.`,
+    violations,
+  };
+}
+
 export function runAllIntegrityChecks(): boolean {
   console.log('\n========================================');
   console.log('Running Monorepo Integrity Checks');
@@ -173,6 +218,7 @@ export function runAllIntegrityChecks(): boolean {
     checkNoDirectPrismaInWeb(),
     checkPlaceholders(),
     checkNoCommittedSecrets(),
+    checkNoHardcodedData(),
   ];
 
   let allPassed = true;

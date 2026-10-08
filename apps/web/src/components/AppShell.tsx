@@ -276,12 +276,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   });
 
   // Active hospital branch state
-  const [allowedBranches, setAllowedBranches] = useState<Array<{ id: string; name: string; displayName: string }>>([
-    { id: '', name: 'Main Branch', displayName: 'City General Hospital - Main Branch' },
-  ]);
+  const [allowedBranches, setAllowedBranches] = useState<Array<{ id: string; name: string; displayName: string }>>([]);
   const [selectedBranch, setSelectedBranch] = useState<{ id: string; displayName: string }>({
     id: '',
-    displayName: 'City General Hospital - Main Branch',
+    displayName: '',
   });
 
   // Group Open/Closed states (per user)
@@ -1378,25 +1376,23 @@ export function AppShell({ children }: { children: ReactNode }) {
                       <span>Clinical Alerts</span>
                     </span>
                     <Badge variant="critical" size="sm">
-                      {badges.criticalAlerts || 3} New
+                      {badges.criticalAlerts} New
                     </Badge>
                   </div>
                   <div className="space-y-2 text-xs">
-                    <div className="p-2 rounded bg-critical-bg border border-critical-border text-critical-text">
-                      <div className="font-semibold flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3 text-critical" />
-                        <span>Critical Lab Value: MRN-2024-0012</span>
+                    {badges.criticalAlerts === 0 ? (
+                      <div className="p-3 text-center text-text-muted text-xs">
+                        No active clinical alerts at this time.
                       </div>
-                      <div className="text-[11px] opacity-90">Serum Potassium 6.2 mEq/L (Ref: 3.5 - 5.0)</div>
-                    </div>
-                    <div className="p-2 rounded bg-warning-bg border border-warning-border text-warning-text">
-                      <div className="font-semibold">Bed Turnaround Alert</div>
-                      <div className="text-[11px] opacity-90">ICU Bed #4 sanitized and ready for admission</div>
-                    </div>
-                    <div className="p-2 rounded bg-info-bg border border-info-border text-info-text">
-                      <div className="font-semibold">Pharmacy Shift Closing</div>
-                      <div className="text-[11px] opacity-90">Narcotics reconciliation pending verification</div>
-                    </div>
+                    ) : (
+                      <div className="p-2 rounded bg-critical-bg border border-critical-border text-critical-text">
+                        <div className="font-semibold flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3 text-critical" />
+                          <span>{badges.criticalAlerts} Unacknowledged Critical Notifications</span>
+                        </div>
+                        <div className="text-[11px] opacity-90">Review urgent notifications in clinical record.</div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { authenticateToken, requireModule, requirePermission } from '../middleware/auth';
 import { AppError } from '../utils/errors';
@@ -72,7 +73,7 @@ const AcknowledgeCriticalSchema = z.object({
 
 function generateSampleId(): string {
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const rand = Math.floor(1000 + Math.random() * 9000);
+  const rand = crypto.randomInt(1000, 10000);
   return `LAB-${dateStr}-${rand}`;
 }
 
@@ -460,7 +461,7 @@ router.post('/samples/:id/results', requirePermission('laboratory.results.enter'
 
       if (isPanic) {
         criticalAlerts.push({
-          id: `ALERT-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          id: `ALERT-${Date.now()}-${crypto.randomInt(100, 1000)}`,
           sampleId: sample.id,
           patientId: sample.orderItem.order.patientId,
           parameter: paramName,

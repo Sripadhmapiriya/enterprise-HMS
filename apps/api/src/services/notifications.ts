@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 export type NotificationChannel = 'IN_APP' | 'EMAIL' | 'SMS' | 'WHATSAPP';
 export type NotificationPriority = 'LOW' | 'NORMAL' | 'HIGH' | 'CRITICAL';
 
@@ -56,7 +58,7 @@ class NotificationService implements INotificationService {
   }
 
   async dispatch(payload: NotificationPayload): Promise<{ success: boolean; notificationId: string; status: string }> {
-    const id = 'notif-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
+    const id = 'notif-' + Date.now() + '-' + crypto.randomUUID().slice(0, 8);
     const priority = payload.priority || 'NORMAL';
 
     if (payload.channel === 'IN_APP') {

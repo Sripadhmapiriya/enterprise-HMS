@@ -20,16 +20,33 @@ const StartEncounterSchema = z.object({
     .transform((val) => (val === 'CONSULTATION' ? 'OPD' : val)),
 });
 
-const RecordVitalsSchema = z.object({
-  temperature: z.number().optional(), // Fahrenheit or Celsius
-  pulse: z.number().int().optional(), // bpm
-  respiratoryRate: z.number().int().optional(), // breaths/min
-  bpSystolic: z.number().int().optional(), // mmHg
-  bpDiastolic: z.number().int().optional(), // mmHg
-  spo2: z.number().optional(), // %
-  height: z.number().optional(), // cm
-  weight: z.number().optional(), // kg
-});
+const RecordVitalsSchema = z
+  .object({
+    temperature: z.number().min(25).max(115).optional(), // C or F physiological ranges
+    pulse: z.number().int().min(20).max(300).optional(), // bpm
+    respiratoryRate: z.number().int().min(4).max(80).optional(), // breaths/min
+    bpSystolic: z.number().int().min(40).max(300).optional(), // mmHg
+    bpDiastolic: z.number().int().min(20).max(200).optional(), // mmHg
+    spo2: z.number().min(50).max(100).optional(), // %
+    height: z.number().min(20).max(260).optional(), // cm
+    weight: z.number().min(0.5).max(500).optional(), // kg
+  })
+  .refine(
+    (data) => {
+      if (data.bpSystolic !== undefined && data.bpDiastolic !== undefined) {
+        return data.bpSystolic > data.bpDiastolic;
+      }
+      return true;
+    },
+    { message: 'Systolic blood pressure must be greater than diastolic blood pressure' }
+  )
+  .refine(
+    (data) => {
+      // Reject completely blank submissions so blank stays blank and is never saved as an empty record
+      return Object.values(data).some((v) => v !== undefined && v !== null);
+    },
+    { message: 'At least one vital sign measurement must be provided' }
+  );
 
 const RecordSoapSchema = z
   .object({

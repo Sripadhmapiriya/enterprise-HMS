@@ -41,12 +41,12 @@ export default function PrescriptionQueuePage() {
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const addToast = useCallback((toast: Omit<ToastMessage, 'id'>) => {
-    const id = Math.random().toString();
+    const id = `toast-${Date.now()}-${toasts.length + 1}`;
     setToasts(prev => [...prev, { ...toast, id }]);
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 5000);
-  }, []);
+  }, [toasts.length]);
 
   const fetchQueue = useCallback(async () => {
     try {

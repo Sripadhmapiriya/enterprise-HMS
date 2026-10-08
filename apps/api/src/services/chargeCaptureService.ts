@@ -86,8 +86,8 @@ export class ChargeCaptureService {
     if (!bill) {
       const now = new Date();
       const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      const billNumber = `INV-${dateStr}-${randomSuffix}`;
+      const billCount = await prisma.bill.count({ where: { tenantId: input.tenantId } });
+      const billNumber = `INV-${dateStr}-${String(billCount + 1).padStart(4, '0')}`;
 
       bill = await prisma.bill.create({
         data: {

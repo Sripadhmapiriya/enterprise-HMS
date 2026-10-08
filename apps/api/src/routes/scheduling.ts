@@ -5,6 +5,49 @@ import { AppError } from '../utils/errors';
 
 const router = Router();
 
+// GET /api/v1/scheduling/doctors (List active doctors with department and branch)
+router.get('/doctors', async (req, res, next) => {
+  try {
+    const doctors = await req.prismaTenant.doctor.findMany({
+      where: { isActive: true },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true } },
+        department: { select: { id: true, name: true, code: true } },
+        branch: { select: { id: true, name: true, code: true } },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+    res.json({
+      success: true,
+      data: doctors.map((d: any) => ({
+        id: d.id,
+        name: d.user ? `Dr. ${d.user.firstName} ${d.user.lastName}` : 'Physician',
+        specialization: d.specialization,
+        departmentId: d.departmentId,
+        departmentName: d.department?.name,
+        branchId: d.branchId,
+        branchName: d.branch?.name,
+      })),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/v1/scheduling/departments (List active clinical departments)
+router.get('/departments', async (req, res, next) => {
+  try {
+    const depts = await req.prismaTenant.department.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true, code: true, branchId: true },
+      orderBy: { name: 'asc' },
+    });
+    res.json({ success: true, data: depts });
+  } catch (err) {
+    next(err);
+  }
+});
+
 const CreateScheduleSchema = z.object({
   branchId: z.string().min(1),
   doctorId: z.string().min(1),
@@ -316,11 +359,8 @@ router.post('/appointments', requirePermission('scheduling.appointments.create')
     const validatedData = BookAppointmentSchema.parse(req.body);
 
     // Resolve branchId
-    let branchId = validatedData.branchId;
-    if (!branchId || branchId === 'branch-default') {
-      branchId = req.branchId;
-    }
-    if (!branchId || branchId === 'branch-default') {
+    let branchId = validatedData.branchId || req.branchId;
+    if (!branchId) {
       const dbBranch = await req.prismaTenant.branch.findFirst({
         where: { isActive: true },
         select: { id: true },
@@ -330,7 +370,7 @@ router.post('/appointments', requirePermission('scheduling.appointments.create')
 
     // Resolve doctorId
     let doctorId = validatedData.doctorId;
-    if (!doctorId || doctorId === 'doc-default') {
+    if (!doctorId) {
       const dbDoc = await req.prismaTenant.doctor.findFirst({
         where: branchId ? { branchId, isActive: true } : { isActive: true },
         select: { id: true, branchId: true, departmentId: true },
@@ -346,7 +386,7 @@ router.post('/appointments', requirePermission('scheduling.appointments.create')
 
     // Resolve departmentId
     let departmentId = validatedData.departmentId;
-    if (!departmentId || departmentId === 'dept-opd') {
+    if (!departmentId) {
       const dbDept = await req.prismaTenant.department.findFirst({
         where: branchId ? { branchId, isActive: true } : { isActive: true },
         select: { id: true },

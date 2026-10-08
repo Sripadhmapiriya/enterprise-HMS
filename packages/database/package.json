@@ -8,8 +8,9 @@
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "db:generate": "prisma generate",
-    "db:seed": "tsx seed.ts"
+    "db:seed": "tsx seed.ts",
+    "seed:minimal": "tsx seed.ts",
+    "seed:demo": "tsx seed.ts --demo"
   },
   "dependencies": {
     "@prisma/client": "^5.10.0"

@@ -334,6 +334,8 @@ export const encountersApi = {
 // ==========================================
 
 export const schedulingApi = {
+  getDoctors: async () => request('/scheduling/doctors'),
+  getDepartments: async () => request('/scheduling/departments'),
   getSchedules: async (params?: { branchId?: string; doctorId?: string }) => {
     const searchParams = new URLSearchParams(params as any);
     const qs = searchParams.toString();
@@ -1297,6 +1299,7 @@ export const crmApi = {
 
 export const analyticsApi = {
   getKpis: async () => request('/analytics/kpis'),
+  getDashboard: async () => request('/analytics/dashboard'),
   getMisPack: async () => request('/analytics/mis-pack'),
   getTrends: async (days: number = 7) => request('/analytics/trends?days=' + days),
   exportReport: async (data: { reportType: string; format?: string; async?: boolean }) =>

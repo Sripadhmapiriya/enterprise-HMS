@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import crypto from 'crypto';
 import { Queue, Worker, Job } from 'bullmq';
 import IORedis from 'ioredis';
 
@@ -50,7 +51,7 @@ class InMemoryWorkerSimulator extends EventEmitter implements IWorkerQueue {
   }
 
   async enqueue(jobType: JobType, tenantId: string, payload: any): Promise<JobStatusResult> {
-    const jobId = 'sim-job-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7);
+    const jobId = 'sim-job-' + Date.now() + '-' + crypto.randomUUID().slice(0, 8);
     const jobRecord: JobStatusResult = {
       id: jobId,
       jobType,

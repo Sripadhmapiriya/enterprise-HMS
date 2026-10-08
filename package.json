@@ -16,7 +16,10 @@
     "verify": "npm run check:params && npm run typecheck && npm run test && tsx scripts/verify-integrity.ts && npm run check:no-hardcoded-colors",
     "check:integrity": "tsx scripts/verify-integrity.ts",
     "check:no-phase": "tsx scripts/verify-integrity.ts",
+    "check:no-hardcoded-data": "tsx scripts/verify-integrity.ts",
     "check:no-hardcoded-colors": "tsx scripts/check-no-hardcoded-colors.ts",
+    "seed:minimal": "npm run seed:minimal --workspace=@enterprise-hms/database",
+    "seed:demo": "npm run seed:demo --workspace=@enterprise-hms/database",
     "provision": "tsx scripts/provision.ts",
     "build:edition": "tsx scripts/build-edition.ts",
     "issue:license": "tsx scripts/issue-license.ts"

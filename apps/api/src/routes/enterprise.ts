@@ -345,9 +345,9 @@ router.get('/cross-site-metrics', async (req, res, next) => {
         networkOverview: {
           totalHospitals: hospitalCount,
           totalBranches: branchCount,
-          totalLicensedBeds: bedCount || 250,
-          activeNetworkCensus: activeCensus || 42,
-          networkOccupancyRate: bedCount > 0 ? Number(((activeCensus / bedCount) * 100).toFixed(1)) : 68.5,
+          totalLicensedBeds: bedCount,
+          activeNetworkCensus: activeCensus,
+          networkOccupancyRate: bedCount > 0 ? Number(((activeCensus / bedCount) * 100).toFixed(1)) : 0,
           totalRegisteredPatients: totalPatients,
         },
         financialConsolidation: {

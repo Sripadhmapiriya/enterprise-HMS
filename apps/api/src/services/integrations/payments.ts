@@ -21,6 +21,10 @@ export interface IPaymentGateway {
   isSimulator(): boolean;
 }
 
+export function areSimulatorsEnabled(): boolean {
+  return process.env.NODE_ENV !== 'production' && process.env.DEV_SIMULATORS === 'true';
+}
+
 export class PaymentGatewaySimulator implements IPaymentGateway {
   private orders: Map<string, CreateOrderRequest> = new Map();
 
@@ -29,6 +33,9 @@ export class PaymentGatewaySimulator implements IPaymentGateway {
   }
 
   async createOrder(data: CreateOrderRequest): Promise<{ orderId: string; amount: number; currency: string; gateway: string }> {
+    if (!areSimulatorsEnabled()) {
+      throw new Error('Payment gateway simulator is disabled in production or when DEV_SIMULATORS is not true');
+    }
     const orderId = 'order_' + crypto.randomBytes(8).toString('hex');
     this.orders.set(orderId, data);
 
@@ -41,6 +48,9 @@ export class PaymentGatewaySimulator implements IPaymentGateway {
   }
 
   async verifyPayment(data: VerifyPaymentRequest): Promise<{ verified: boolean; transactionId: string; status: string }> {
+    if (!areSimulatorsEnabled()) {
+      throw new Error('Payment gateway simulator is disabled in production or when DEV_SIMULATORS is not true');
+    }
     // In simulator mode, accepts any signature or test string
     const txnId = 'txn_' + (data.paymentId || crypto.randomBytes(8).toString('hex'));
 

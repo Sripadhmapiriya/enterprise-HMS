@@ -8,9 +8,11 @@ const router = Router();
 router.use(authenticateToken);
 router.use(requireModule('assets'));
 
+import crypto from 'crypto';
+
 function generateAssetCode(category: string): string {
   const prefix = (category.slice(0, 3) || 'AST').toUpperCase();
-  const rand = Math.floor(1000 + Math.random() * 9000);
+  const rand = crypto.randomInt(1000, 10000);
   return `${prefix}-${Date.now().toString().slice(-4)}-${rand}`;
 }
 

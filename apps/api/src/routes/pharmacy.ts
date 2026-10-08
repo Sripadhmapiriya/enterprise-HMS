@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { authenticateToken, requireModule, requirePermission } from '../middleware/auth';
 import { AppError } from '../utils/errors';
@@ -375,7 +376,7 @@ router.post('/pos', requirePermission('pharmacy.pos'), async (req, res, next) =>
           data: {
             tenantId,
             hospitalId,
-            mrn: `POS-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            mrn: `POS-${Date.now()}-${crypto.randomInt(100, 1000)}`,
             firstName: body.customerName || 'Walk-in',
             lastName: 'Customer',
             gender: 'UNKNOWN',

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { authenticateToken, requireModule, requirePermission } from '../middleware/auth';
 import { AppError } from '../utils/errors';
@@ -308,7 +309,7 @@ router.post('/batches', requirePermission('inventory.adjust'), async (req, res, 
           data: {
             tenantId,
             name: body.supplierName,
-            code: 'SUP-' + Math.floor(1000 + Math.random() * 9000),
+            code: 'SUP-' + crypto.randomInt(1000, 10000),
           },
         });
       }

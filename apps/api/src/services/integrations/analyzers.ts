@@ -30,8 +30,15 @@ export interface AnalyzerIngestResponse {
   }>;
 }
 
+export function areSimulatorsEnabled(): boolean {
+  return process.env.NODE_ENV !== 'production' && process.env.DEV_SIMULATORS === 'true';
+}
+
 export class AnalyzerService {
   async processAnalyzerFeed(payload: AnalyzerFeedPayload): Promise<AnalyzerIngestResponse> {
+    if (!areSimulatorsEnabled()) {
+      throw new Error('Lab analyzer simulator is disabled in production or when DEV_SIMULATORS is not true');
+    }
     let criticalCount = 0;
 
     const processed = payload.results.map((r) => {

@@ -14,6 +14,7 @@ export const EnvSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60000),
   ACCESS_TOKEN_EXPIRES_IN: z.string().default('15m'),
   REFRESH_TOKEN_EXPIRES_DAYS: z.coerce.number().default(7),
+  DEV_SIMULATORS: z.string().default('true'),
 });
 
 export type EnvConfig = z.infer<typeof EnvSchema>;

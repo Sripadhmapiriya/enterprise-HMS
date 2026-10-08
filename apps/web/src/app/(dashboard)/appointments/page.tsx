@@ -26,7 +26,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
-import { schedulingApi, patientsApi } from '@/lib/api';
+import { schedulingApi, patientsApi, branchesApi } from '@/lib/api';
 import { PatientPicker, SelectedPatient } from '@/components/PatientPicker';
 
 interface AppointmentRecord {
@@ -79,13 +79,18 @@ function AppointmentsContent() {
   const [isCancelOpen, setIsCancelOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentRecord | null>(null);
 
+  // Dynamic clinical masters from DB
+  const [doctorsList, setDoctorsList] = useState<Array<{ id: string; name: string; departmentId?: string; branchId?: string }>>([]);
+  const [departmentsList, setDepartmentsList] = useState<Array<{ id: string; name: string }>>([]);
+  const [branchesList, setBranchesList] = useState<Array<{ id: string; displayName: string }>>([]);
+
   // Forms
   const [selectedPatient, setSelectedPatient] = useState<SelectedPatient | null>(null);
   const [bookForm, setBookForm] = useState({
     patientId: preselectedPatientId || '',
-    doctorId: 'doc-default',
-    departmentId: 'dept-opd',
-    branchId: 'branch-default',
+    doctorId: '',
+    departmentId: '',
+    branchId: '',
     appointmentDate: new Date().toISOString().slice(0, 10),
     startTime: `${new Date().toISOString().slice(0, 10)}T09:00:00Z`,
     endTime: `${new Date().toISOString().slice(0, 10)}T09:15:00Z`,
@@ -96,6 +101,30 @@ function AppointmentsContent() {
   const [rescheduleDate, setRescheduleDate] = useState('');
   const [cancelReason, setCancelReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    async function loadMasters() {
+      try {
+        const [docsRes, deptsRes, branchesRes] = await Promise.all([
+          schedulingApi.getDoctors().catch(() => ({ data: [] })),
+          schedulingApi.getDepartments().catch(() => ({ data: [] })),
+          branchesApi.getAllowedBranches().catch(() => ({ data: [] })),
+        ]);
+        if (docsRes?.data) setDoctorsList(docsRes.data);
+        if (deptsRes?.data) setDepartmentsList(deptsRes.data);
+        if (branchesRes?.data) setBranchesList(branchesRes.data);
+
+        // Preselect first if not yet set
+        setBookForm((prev) => ({
+          ...prev,
+          doctorId: prev.doctorId || docsRes?.data?.[0]?.id || '',
+          departmentId: prev.departmentId || deptsRes?.data?.[0]?.id || '',
+          branchId: prev.branchId || branchesRes?.data?.[0]?.id || '',
+        }));
+      } catch {}
+    }
+    loadMasters();
+  }, []);
 
   // If preselectedPatientId exists in query, fetch patient info
   useEffect(() => {
@@ -434,6 +463,39 @@ function AppointmentsContent() {
               setBookForm((prev) => ({ ...prev, patientId: p?.id || '' }));
             }}
           />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Select
+              label="Branch"
+              required
+              value={bookForm.branchId}
+              onChange={(e) => setBookForm({ ...bookForm, branchId: e.target.value })}
+              options={branchesList.map((b) => ({ value: b.id, label: b.displayName }))}
+            />
+            <Select
+              label="Department"
+              required
+              value={bookForm.departmentId}
+              onChange={(e) => setBookForm({ ...bookForm, departmentId: e.target.value })}
+              options={departmentsList.map((d) => ({ value: d.id, label: d.name }))}
+            />
+            <Select
+              label="Doctor"
+              required
+              value={bookForm.doctorId}
+              onChange={(e) => {
+                const docId = e.target.value;
+                const found = doctorsList.find((d) => d.id === docId);
+                setBookForm((prev) => ({
+                  ...prev,
+                  doctorId: docId,
+                  departmentId: found?.departmentId || prev.departmentId,
+                  branchId: found?.branchId || prev.branchId,
+                }));
+              }}
+              options={doctorsList.map((d) => ({ value: d.id, label: d.name }))}
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Appointment Date"

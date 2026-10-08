@@ -70,11 +70,14 @@ export default function IntegrationsDashboardPage() {
     loadStatus();
   }, [loadStatus]);
 
+  const [consoleError, setConsoleError] = useState<string | null>(null);
+
   // ABDM Actions
   const handleGenerateAbha = async () => {
     try {
       setAbdmLoading(true);
       setAbdmResult(null);
+      setConsoleError(null);
       const res = await integrationsApi.generateAbha({
         aadhaarOrMobile: abdmAadhaar,
         name: abdmName,
@@ -84,7 +87,7 @@ export default function IntegrationsDashboardPage() {
       setAbdmTxnId(res.data.txnId);
       setAbdmResult({ step: 'OTP_SENT', message: res.data.message, txnId: res.data.txnId });
     } catch (err: any) {
-      alert(`ABDM Request failed: ${err.message}`);
+      setConsoleError(`ABDM Request failed: ${err.message}`);
     } finally {
       setAbdmLoading(false);
     }
@@ -93,13 +96,14 @@ export default function IntegrationsDashboardPage() {
   const handleVerifyOtp = async () => {
     try {
       setAbdmLoading(true);
+      setConsoleError(null);
       const res = await integrationsApi.verifyAbhaOtp({
         txnId: abdmTxnId,
         otp: abdmOtp,
       });
       setAbdmResult({ step: 'VERIFIED', ...res.data });
     } catch (err: any) {
-      alert(`ABDM OTP Verification failed: ${err.message}`);
+      setConsoleError(`ABDM OTP Verification failed: ${err.message}`);
     } finally {
       setAbdmLoading(false);
     }
@@ -128,6 +132,7 @@ export default function IntegrationsDashboardPage() {
     try {
       setAnalyzerLoading(true);
       setAnalyzerResult(null);
+      setConsoleError(null);
       const res = await integrationsApi.feedAnalyzerResults({
         analyzerId: 'SYSMEX-XN550-01',
         analyzerModel: 'Automated 5-Part Hematology Analyzer',
@@ -141,7 +146,7 @@ export default function IntegrationsDashboardPage() {
       });
       setAnalyzerResult(res.data);
     } catch (err: any) {
-      alert(`Analyzer simulator failed: ${err.message}`);
+      setConsoleError(`Analyzer simulator failed: ${err.message}`);
     } finally {
       setAnalyzerLoading(false);
     }
@@ -153,6 +158,7 @@ export default function IntegrationsDashboardPage() {
       setPaymentLoading(true);
       setPaymentOrder(null);
       setPaymentVerified(null);
+      setConsoleError(null);
       const res = await integrationsApi.createPaymentOrder({
         invoiceId: 'INV-DEMO-' + Date.now(),
         amount: parseFloat(paymentAmount),
@@ -160,7 +166,7 @@ export default function IntegrationsDashboardPage() {
       });
       setPaymentOrder(res.data);
     } catch (err: any) {
-      alert(`Payment order failed: ${err.message}`);
+      setConsoleError(`Payment order failed: ${err.message}`);
     } finally {
       setPaymentLoading(false);
     }
@@ -170,14 +176,15 @@ export default function IntegrationsDashboardPage() {
     if (!paymentOrder) return;
     try {
       setPaymentLoading(true);
+      setConsoleError(null);
       const res = await integrationsApi.verifyPayment({
         orderId: paymentOrder.orderId,
-        paymentId: 'pay_' + Math.random().toString(36).substring(2, 9),
-        signature: 'simulated_sig_' + Math.random().toString(36).substring(2, 8),
+        paymentId: 'pay_' + Date.now().toString(36),
+        signature: 'simulated_sig_' + Date.now().toString(36),
       });
       setPaymentVerified(res.data);
     } catch (err: any) {
-      alert(`Verification failed: ${err.message}`);
+      setConsoleError(`Verification failed: ${err.message}`);
     } finally {
       setPaymentLoading(false);
     }
@@ -214,17 +221,29 @@ export default function IntegrationsDashboardPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {adapters.map((a: any) => (
-            <div key={a.id} className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-3">
-              <div className="flex justify-between items-start">
+            <div key={a.id} className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-3 relative overflow-hidden">
+              <div className="flex justify-between items-start gap-2">
                 <span className="font-semibold text-text text-sm">{a.name}</span>
-                <Badge variant={a.status.includes('ACTIVE') ? 'stable' : 'info'}>
-                  {a.status}
-                </Badge>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {a.isSimulator && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-600 border border-amber-500/30">
+                      SIMULATED
+                    </span>
+                  )}
+                  <Badge variant={a.status.includes('ACTIVE') ? 'stable' : 'info'}>
+                    {a.status}
+                  </Badge>
+                </div>
               </div>
               <div className="text-xs text-text-muted space-y-1">
                 <p>Type: <span className="font-medium text-text">{a.type}</span></p>
                 <p>Version: <span className="font-medium text-text">{a.version}</span></p>
-                <p>Adapter Mode: <span className="font-medium text-brand">{a.isSimulator ? 'Local Sandbox Simulator' : 'Live Gateway'}</span></p>
+                <p>
+                  Adapter Mode:{' '}
+                  <span className={`font-semibold ${a.isSimulator ? 'text-amber-600' : 'text-brand'}`}>
+                    {a.isSimulator ? 'DEV_SIMULATORS Sandbox' : 'Live Gateway'}
+                  </span>
+                </p>
               </div>
               <div className="flex flex-wrap gap-1 pt-2">
                 {a.capabilities.map((c: string, idx: number) => (
@@ -247,41 +266,49 @@ export default function IntegrationsDashboardPage() {
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => setActiveConsole('abdm')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole ==='abdm' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text'
-              }`}
+              onClick={() => { setActiveConsole('abdm'); setConsoleError(null); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole === 'abdm' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text' }`}
             >
               ABDM ABHA M1/M2
             </button>
             <button
-              onClick={() => setActiveConsole('fhir')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole ==='fhir' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text'
-              }`}
+              onClick={() => { setActiveConsole('fhir'); setConsoleError(null); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole === 'fhir' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text' }`}
             >
               FHIR R4 Inspector
             </button>
             <button
-              onClick={() => setActiveConsole('analyzer')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole ==='analyzer' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text'
-              }`}
+              onClick={() => { setActiveConsole('analyzer'); setConsoleError(null); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole === 'analyzer' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text' }`}
             >
               LIS Analyzer Feed
             </button>
             <button
-              onClick={() => setActiveConsole('payment')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole ==='payment' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text'
-              }`}
+              onClick={() => { setActiveConsole('payment'); setConsoleError(null); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${ activeConsole === 'payment' ? 'bg-brand text-brand-foreground' : 'bg-surface border border-border text-text' }`}
             >
               Payment Gateway
             </button>
           </div>
         </div>
 
+        {consoleError && (
+          <div className="mx-6 mt-4 p-3 bg-critical/10 border border-critical/30 rounded-lg text-xs text-critical flex items-center justify-between">
+            <span>{consoleError}</span>
+            <button onClick={() => setConsoleError(null)} className="font-bold underline ml-2">Dismiss</button>
+          </div>
+        )}
+
         <div className="p-6">
           {/* CONSOLE 1: ABDM */}
           {activeConsole === 'abdm' && (
             <div className="space-y-4 max-w-xl">
-              <h4 className="font-bold text-text text-sm">ABDM Sandbox ABHA Registration & OTP Flow</h4>
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-text text-sm">ABDM Sandbox ABHA Registration & OTP Flow</h4>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-600 border border-amber-500/30">
+                  SIMULATED
+                </span>
+              </div>
               <p className="text-xs text-text-muted">
                 Emulates the National Health Authority ABDM M1 protocol. Generates 14-digit ABHA ID and links hospital care context.
               </p>
@@ -373,7 +400,12 @@ export default function IntegrationsDashboardPage() {
           {/* CONSOLE 3: ANALYZER FEED */}
           {activeConsole === 'analyzer' && (
             <div className="space-y-4 max-w-xl">
-              <h4 className="font-bold text-text text-sm">Automated Laboratory Instrument Ingestion</h4>
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-text text-sm">Automated Laboratory Instrument Ingestion</h4>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-600 border border-amber-500/30">
+                  SIMULATED
+                </span>
+              </div>
               <p className="text-xs text-text-muted">
                 Simulates ASTM E1394 serial/network packet from a 5-part hematology automated cell counter.
               </p>
@@ -415,7 +447,12 @@ export default function IntegrationsDashboardPage() {
           {/* CONSOLE 4: PAYMENT GATEWAY */}
           {activeConsole === 'payment' && (
             <div className="space-y-4 max-w-xl">
-              <h4 className="font-bold text-text text-sm">Payment Gateway Checkout & Verification</h4>
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-text text-sm">Payment Gateway Checkout & Verification</h4>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-600 border border-amber-500/30">
+                  SIMULATED
+                </span>
+              </div>
               <p className="text-xs text-text-muted">
                 Simulates Razorpay / Stripe payment order creation, digital signature generation, and webhook verification.
               </p>

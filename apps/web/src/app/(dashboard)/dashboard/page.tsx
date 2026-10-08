@@ -8,11 +8,9 @@ import {
   Building2,
   Layers,
   ShieldCheck,
-  TrendingUp,
   Activity,
   Calendar,
   ArrowRight,
-  FileSpreadsheet,
 } from 'lucide-react';
 import {
   Button,
@@ -21,7 +19,7 @@ import {
   staggerContainerVariants,
   staggerItemVariants,
 } from '@enterprise-hms/ui';
-import { analyticsApi, userApi } from '@/lib/api';
+import { analyticsApi } from '@/lib/api';
 
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
@@ -29,23 +27,20 @@ export default function DashboardPage() {
   const [isFirstLoad, setIsFirstLoad] = useState(false);
 
   const [metrics, setMetrics] = useState({
-    activePersonnel: 24,
-    hospitalBranches: 2,
-    clinicalUnits: 12,
-    activeRoles: 6,
-    opdIntake: 142,
-    bedOccupancy: 86,
-    diagnosticsTat: '38m',
-    dispensesToday: 312,
+    activePersonnel: 0,
+    hospitalBranches: 0,
+    clinicalUnits: 0,
+    activeRoles: 0,
+    opdIntake: 0,
+    bedOccupancy: 0,
+    diagnosticsTat: '0m',
+    dispensesToday: 0,
   });
 
-  const [recentAudit, setRecentAudit] = useState<Array<{ id: string; action: string; entity: string; entityId?: string; createdAt: string }>>([
-    { id: '1', action: 'PATIENT_REGISTERED', entity: 'Patient', entityId: 'P-10023', createdAt: new Date(Date.now() - 5 * 60000).toISOString() },
-    { id: '2', action: 'PRESCRIPTION_DISPENSED', entity: 'Pharmacy', entityId: 'RX-9821', createdAt: new Date(Date.now() - 15 * 60000).toISOString() },
-    { id: '3', action: 'ADMISSION_CONFIRMED', entity: 'IPD', entityId: 'ADM-401', createdAt: new Date(Date.now() - 32 * 60000).toISOString() },
-    { id: '4', action: 'LAB_RESULT_VALIDATED', entity: 'Laboratory', entityId: 'LAB-5541', createdAt: new Date(Date.now() - 48 * 60000).toISOString() },
-    { id: '5', action: 'PAYMENT_RECEIVED', entity: 'Billing', entityId: 'INV-1092', createdAt: new Date(Date.now() - 65 * 60000).toISOString() },
-  ]);
+  const [onTimePercent, setOnTimePercent] = useState<number>(0);
+  const [averageVisitsPerHour, setAverageVisitsPerHour] = useState<number>(0);
+  const [hourlyDistribution, setHourlyDistribution] = useState<number[]>([]);
+  const [recentAudit, setRecentAudit] = useState<Array<{ id: string; action: string; entity: string; entityId?: string; createdAt: string }>>([]);
 
   useEffect(() => {
     setMounted(true);
@@ -59,28 +54,43 @@ export default function DashboardPage() {
 
     async function loadData() {
       try {
-        const [kpiRes, usersRes] = await Promise.all([
-          analyticsApi.getKpis().catch(() => null),
-          userApi.getUsers().catch(() => null),
-        ]);
+        const dashRes = await analyticsApi.getDashboard().catch(() => null);
 
-        if (kpiRes?.data) {
-          setMetrics((prev) => ({
-            ...prev,
-            opdIntake: kpiRes.data.operational?.opdVisits || prev.opdIntake,
-            bedOccupancy: kpiRes.data.operational?.bedOccupancyRate || prev.bedOccupancy,
-            dispensesToday: kpiRes.data.operational?.pharmacyDispenses || prev.dispensesToday,
-          }));
-        }
-
-        if (usersRes?.data && Array.isArray(usersRes.data)) {
-          setMetrics((prev) => ({
-            ...prev,
-            activePersonnel: usersRes.data.length || prev.activePersonnel,
-          }));
+        if (dashRes?.data) {
+          const d = dashRes.data;
+          setMetrics({
+            activePersonnel: d.metrics?.activePersonnel ?? 0,
+            hospitalBranches: d.metrics?.hospitalBranches ?? 0,
+            clinicalUnits: d.metrics?.clinicalUnits ?? 0,
+            activeRoles: d.metrics?.activeRoles ?? 0,
+            opdIntake: d.metrics?.opdIntake ?? 0,
+            bedOccupancy: d.metrics?.bedOccupancy ?? 0,
+            diagnosticsTat: d.metrics?.diagnosticsTat ?? '0m',
+            dispensesToday: d.metrics?.dispensesToday ?? 0,
+          });
+          setOnTimePercent(d.onTimePercent ?? 0);
+          setAverageVisitsPerHour(d.averageVisitsPerHour ?? 0);
+          setHourlyDistribution(d.hourlyDistribution ?? []);
+          setRecentAudit(d.recentAudit ?? []);
+        } else {
+          // Fallback to getKpis
+          const kpiRes = await analyticsApi.getKpis().catch(() => null);
+          if (kpiRes?.data) {
+            const op = kpiRes.data.operational || {};
+            setMetrics({
+              activePersonnel: op.activePersonnel ?? 0,
+              hospitalBranches: op.hospitalBranches ?? 0,
+              clinicalUnits: op.clinicalUnits ?? 0,
+              activeRoles: op.activeRoles ?? 0,
+              opdIntake: op.opdVisits ?? 0,
+              bedOccupancy: op.bedOccupancyRate ?? 0,
+              diagnosticsTat: op.diagnosticsTat ?? '0m',
+              dispensesToday: op.pharmacyDispenses ?? 0,
+            });
+          }
         }
       } catch {
-        // Fallback to default metrics
+        // Leave at initial zeros
       } finally {
         setLoading(false);
       }
@@ -131,8 +141,8 @@ export default function DashboardPage() {
           <StatCard
             title="Active Personnel"
             value={metrics.activePersonnel}
-            trend="+2.5%"
-            icon={<Users className="w-5 h-5 text-[var(--brand)]" aria-hidden="true" />}
+            trend="Staff"
+            icon={<Users className="w-5 h-5 text-brand" aria-hidden="true" />}
             loading={loading}
           />
         </motion.div>
@@ -140,7 +150,7 @@ export default function DashboardPage() {
           <StatCard
             title="Hospital Branches"
             value={metrics.hospitalBranches}
-            trend="Active"
+            trend="Configured"
             icon={<Building2 className="w-5 h-5 text-brand" aria-hidden="true" />}
             loading={loading}
           />
@@ -149,8 +159,8 @@ export default function DashboardPage() {
           <StatCard
             title="Clinical Units"
             value={metrics.clinicalUnits}
-            trend="100% online"
-            icon={<Layers className="w-5 h-5 text-[var(--stable)]" aria-hidden="true" />}
+            trend="Departments"
+            icon={<Layers className="w-5 h-5 text-stable" aria-hidden="true" />}
             loading={loading}
           />
         </motion.div>
@@ -158,7 +168,7 @@ export default function DashboardPage() {
           <StatCard
             title="RBAC Roles"
             value={metrics.activeRoles}
-            trend="Audited"
+            trend="Assigned"
             icon={<ShieldCheck className="w-5 h-5 text-warning" aria-hidden="true" />}
             loading={loading}
           />
@@ -170,10 +180,10 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 bg-surface border border-border rounded-xl shadow-xs overflow-hidden">
           <div className="p-4 border-b border-border flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-[var(--brand)]" aria-hidden="true" />
+              <Activity className="w-4 h-4 text-brand" aria-hidden="true" />
               <h2 className="text-sm font-semibold text-text">Operational Throughput</h2>
             </div>
-            <span className="text-xs text-text-muted">Past 24 Hours</span>
+            <span className="text-xs text-text-muted">Today</span>
           </div>
 
           <div className="p-5">
@@ -183,44 +193,51 @@ export default function DashboardPage() {
                 <p className="text-lg font-bold text-text tabular-nums mt-0.5">
                   <NumberCounter value={metrics.opdIntake} />
                 </p>
-                <span className="text-[11px] text-stable font-medium">98.4% on time</span>
+                <span className="text-[11px] text-stable font-medium tabular-nums">{onTimePercent}% on time</span>
               </div>
               <div className="bg-surface-subtle p-3 rounded-lg border border-border">
                 <span className="text-xs text-text-muted">Inpatient Bed Occ.</span>
                 <p className="text-lg font-bold text-text tabular-nums mt-0.5">
                   <NumberCounter value={metrics.bedOccupancy} suffix="%" />
                 </p>
-                <span className="text-[11px] text-info font-medium">Available</span>
+                <span className="text-[11px] text-info font-medium">Occupancy</span>
               </div>
               <div className="bg-surface-subtle p-3 rounded-lg border border-border">
                 <span className="text-xs text-text-muted">Diagnostics TAT</span>
                 <p className="text-lg font-bold text-text tabular-nums mt-0.5">{metrics.diagnosticsTat}</p>
-                <span className="text-[11px] text-stable font-medium">Within SLA</span>
+                <span className="text-[11px] text-stable font-medium">Average</span>
               </div>
               <div className="bg-surface-subtle p-3 rounded-lg border border-border">
                 <span className="text-xs text-text-muted">Dispenses Today</span>
                 <p className="text-lg font-bold text-text tabular-nums mt-0.5">
                   <NumberCounter value={metrics.dispensesToday} />
                 </p>
-                <span className="text-[11px] text-info font-medium">100% FEFO</span>
+                <span className="text-[11px] text-info font-medium">Pharmacy</span>
               </div>
             </div>
 
             {/* Hourly Volume Distribution */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs text-text-muted">
-                <span>Peak Load Hours (08:00 - 18:00)</span>
-                <span className="font-semibold text-text">Average: 42 visits/hr</span>
+                <span>Peak Load Hours (08:00 - 19:00)</span>
+                <span className="font-semibold text-text tabular-nums">Average: {averageVisitsPerHour} visits/hr</span>
               </div>
               <div className="h-28 flex items-end gap-2 pt-2 pb-1 px-2 bg-surface-subtle rounded-lg border border-border">
-                {[30, 45, 75, 95, 88, 92, 70, 85, 60, 40, 25, 20].map((height, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <div
-                      className="w-full bg-[var(--brand)] hover:bg-[var(--brand-hover)] rounded-xs transition-all cursor-pointer"
-                      style={{ height: `${height}%` }}
-                    />
+                {hourlyDistribution.length > 0 ? (
+                  hourlyDistribution.map((height, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                      <div
+                        className="w-full bg-brand hover:bg-brand-hover rounded-xs transition-all cursor-pointer"
+                        style={{ height: `${Math.max(4, height)}%` }}
+                        title={`${height}% of peak at ${8 + i}:00`}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-text-muted">
+                    No visit activity recorded during clinic hours today
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -230,7 +247,7 @@ export default function DashboardPage() {
         <div className="bg-surface border border-border rounded-xl shadow-xs overflow-hidden flex flex-col">
           <div className="p-4 border-b border-border flex justify-between items-center">
             <h2 className="text-sm font-semibold text-text">Live Clinical Activity</h2>
-            <Link href="/enterprise/admin" className="text-xs text-[var(--brand)] hover:underline flex items-center gap-1">
+            <Link href="/enterprise/admin" className="text-xs text-brand hover:underline flex items-center gap-1">
               <span>Audit Trail</span>
               <ArrowRight className="w-3 h-3" aria-hidden="true" />
             </Link>
@@ -242,6 +259,10 @@ export default function DashboardPage() {
                 <Skeleton height="36px" />
                 <Skeleton height="36px" />
                 <Skeleton height="36px" />
+              </div>
+            ) : recentAudit.length === 0 ? (
+              <div className="py-8 text-center text-xs text-text-muted">
+                No recent activity recorded in the audit log.
               </div>
             ) : (
               recentAudit.map((event) => (

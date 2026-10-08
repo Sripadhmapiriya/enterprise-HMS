@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { authenticateToken, requireModule, requirePermission } from '../middleware/auth';
 import { AppError } from '../utils/errors';
@@ -10,19 +11,19 @@ router.use(requireModule('procurement'));
 
 function generatePrNumber(): string {
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const rand = Math.floor(1000 + Math.random() * 9000);
+  const rand = crypto.randomInt(1000, 10000);
   return `PR-${dateStr}-${rand}`;
 }
 
 function generatePoNumber(): string {
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const rand = Math.floor(1000 + Math.random() * 9000);
+  const rand = crypto.randomInt(1000, 10000);
   return `PO-${dateStr}-${rand}`;
 }
 
 function generateGrnNumber(): string {
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const rand = Math.floor(1000 + Math.random() * 9000);
+  const rand = crypto.randomInt(1000, 10000);
   return `GRN-${dateStr}-${rand}`;
 }
 

@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 /**
  * HL7 FHIR R4 Resource Mapping & Ingestion Service
  */
@@ -104,7 +106,7 @@ export class FhirService {
   toObservationResource(obs: any): FhirObservation {
     return {
       resourceType: 'Observation',
-      id: obs.id || 'obs-' + Math.random().toString(36).substring(2, 8),
+      id: obs.id || 'obs-' + crypto.randomUUID().slice(0, 8),
       status: 'final',
       code: {
         coding: [

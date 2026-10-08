@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { authenticateToken, requireModule, requirePermission } from '../middleware/auth';
 import { AppError } from '../utils/errors';
@@ -47,7 +48,7 @@ const EnterReportSchema = z.object({
 
 function generateStudyNumber(): string {
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const rand = Math.floor(1000 + Math.random() * 9000);
+  const rand = crypto.randomInt(1000, 10000);
   return `RAD-${dateStr}-${rand}`;
 }
 
@@ -268,7 +269,7 @@ router.post('/orders', requirePermission('radiology.orders.create'), async (req,
           modality: itemConfig?.modality || body.modality || 'X-RAY',
           bodyPart: body.bodyPart || 'Diagnostic Field',
           status: 'SCHEDULED',
-          pacsReference: `1.2.840.10008.${Date.now()}.${Math.floor(Math.random() * 100000)}`,
+          pacsReference: `1.2.840.10008.${Date.now()}.${crypto.randomInt(10000, 100000)}`,
         },
       });
     }

@@ -2500,4 +2500,6 @@ Running 11 tests using 1 worker
                -   A d d e d   ' P A C S   v i e w e r   n o t   c o n f i g u r e d '   f a l l b a c k   s t a t e   i n   f r o n t e n d . 
                -   E n s u r e d   s e r v e r - s i d e   r e a c h a b i l i t y   v a l i d a t i o n s   f o r   P A C S   i n s t a n c e s . 
   
+  
+ -   [ x ]   I n i t i a l   h a r d c o d e   a u d i t   c r e a t e d ,   c l i n i c a l   s a f e t y   v i t a l s   i s s u e   f i x e d .  
  

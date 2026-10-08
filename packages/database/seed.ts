@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
+import { seedDemoDataset } from './seedDemo';
 
 const prisma = new PrismaClient();
 
@@ -14,6 +15,11 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 async function main() {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('CRITICAL: Seed execution is strictly prohibited when NODE_ENV=production');
+    process.exit(1);
+  }
+
   console.log('Seeding enterprise database...');
 
   // Tenants, Roles, Hospitals
@@ -111,6 +117,7 @@ async function main() {
   }
 
   const doctorUser = userMap['Doctor'];
+  const nurseUser = userMap['Nurse'];
 
   const doctor = await prisma.doctor.findFirst({ where: { userId: doctorUser.id } }) || await prisma.doctor.create({
     data: {
@@ -793,6 +800,22 @@ async function main() {
         status: 'SUCCESS',
         receivedById: doctorUser.id
       }
+    });
+  }
+
+  const isDemo = process.env.SEED_MODE === 'demo' || process.argv.includes('--demo');
+  if (isDemo) {
+    await seedDemoDataset(prisma, {
+      tenant,
+      hospital,
+      branch,
+      eastBranch,
+      userMap,
+      doctorUser,
+      nurseUser,
+      doctor,
+      cardiologyDept: cardiology,
+      erDept,
     });
   }
 

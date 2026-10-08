@@ -21,8 +21,8 @@ export default function BloodBankDashboard() {
     lastName: '',
     bloodGroup: 'O+',
     gender: 'MALE',
-    dateOfBirth: '1995-01-01',
-    mobile: '9876543210',
+    dateOfBirth: '',
+    mobile: '',
     eligibilityStatus: 'ELIGIBLE',
   });
 
@@ -31,7 +31,7 @@ export default function BloodBankDashboard() {
   const [donationVolume, setDonationVolume] = useState(450);
 
   // Crossmatch State
-  const [checkPatientGroup, setCheckPatientGroup] = useState('A+');
+  const [checkPatientGroup, setCheckPatientGroup] = useState('');
   const [checkComponentId, setCheckComponentId] = useState('');
   const [crossmatchResult, setCrossmatchResult] = useState<any>(null);
 

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { authenticateToken, requireModule, requirePermission } from '../middleware/auth';
 import { AppError } from '../utils/errors';
@@ -209,7 +210,7 @@ router.post('/', requirePermission('patients.create'), async (req, res, next) =>
     // Auto-generate MRN if not provided
     const mrn =
       validatedData.mrn ||
-      `MRN-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
+      `MRN-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${crypto.randomInt(1000, 10000)}`;
 
     const {
       emergencyContact: inputContact,

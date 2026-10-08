@@ -28,6 +28,10 @@ export interface IAbdmAdapter {
   isSimulator(): boolean;
 }
 
+export function areSimulatorsEnabled(): boolean {
+  return process.env.NODE_ENV !== 'production' && process.env.DEV_SIMULATORS === 'true';
+}
+
 /**
  * ABDM Simulator / Sandbox Adapter.
  * Emulates the National Health Authority (NHA) ABDM M1, M2, and M3 APIs.
@@ -42,13 +46,16 @@ export class AbdmSimulatorAdapter implements IAbdmAdapter {
 
   async getStatus(): Promise<{ status: string; gateway: string; sandbox: boolean }> {
     return {
-      status: 'ACTIVE_SIMULATOR',
+      status: areSimulatorsEnabled() ? 'ACTIVE_SIMULATOR' : 'SIMULATOR_DISABLED',
       gateway: 'NHA-ABDM-M1/M2/M3-GATEWAY',
       sandbox: true,
     };
   }
 
   async generateAbha(data: AbhaGenerateRequest): Promise<{ txnId: string; otpSent: boolean; message: string }> {
+    if (!areSimulatorsEnabled()) {
+      throw new Error('ABDM sandbox simulator is disabled in production or when DEV_SIMULATORS is not true');
+    }
     const txnId = 'txn-' + crypto.randomBytes(8).toString('hex');
     // Simulated fixed OTP '123456' for predictable sandbox testing
     this.activeTransactions.set(txnId, { data, expectedOtp: '123456' });
@@ -61,6 +68,9 @@ export class AbdmSimulatorAdapter implements IAbdmAdapter {
   }
 
   async verifyOtp(data: AbhaVerifyRequest): Promise<{ verified: boolean; abhaNumber: string; abhaAddress: string; token: string }> {
+    if (!areSimulatorsEnabled()) {
+      throw new Error('ABDM sandbox simulator is disabled in production or when DEV_SIMULATORS is not true');
+    }
     const txn = this.activeTransactions.get(data.txnId);
     if (!txn) {
       throw new Error('Transaction expired or invalid txnId');
@@ -71,8 +81,8 @@ export class AbdmSimulatorAdapter implements IAbdmAdapter {
     }
 
     const cleanName = txn.data.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const randSuffix = Math.floor(1000 + Math.random() * 9000);
-    const abhaNumber = `91-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}-${randSuffix}`;
+    const randSuffix = crypto.randomInt(1000, 10000);
+    const abhaNumber = `91-${crypto.randomInt(1000, 10000)}-${crypto.randomInt(1000, 10000)}-${randSuffix}`;
     const abhaAddress = `${cleanName}${randSuffix}@abdm`;
     const token = 'abdm-token-' + crypto.randomBytes(16).toString('hex');
 
@@ -87,6 +97,9 @@ export class AbdmSimulatorAdapter implements IAbdmAdapter {
   }
 
   async linkCareContext(data: CareContextLinkRequest): Promise<{ success: boolean; linkRefNumber: string; message: string }> {
+    if (!areSimulatorsEnabled()) {
+      throw new Error('ABDM sandbox simulator is disabled in production or when DEV_SIMULATORS is not true');
+    }
     const linkRefNumber = 'link-' + crypto.randomBytes(8).toString('hex');
     const existing = this.linkedContexts.get(data.abhaAddress) || [];
     existing.push(data);

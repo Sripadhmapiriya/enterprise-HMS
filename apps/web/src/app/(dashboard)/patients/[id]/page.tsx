@@ -38,7 +38,9 @@ import {
   File,
   X,
 } from 'lucide-react';
-import { patientsApi, opdApi } from '@/lib/api';
+import { patientsApi, opdApi, schedulingApi } from '@/lib/api';
+
+let toastSeq = 0;
 
 export default function PatientDetailPage({
   params,
@@ -65,15 +67,25 @@ export default function PatientDetailPage({
   const [isStartingEncounter, setIsStartingEncounter] = useState(false);
   const [isDoctorSelectOpen, setIsDoctorSelectOpen] = useState(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
+  const [activeDoctors, setActiveDoctors] = useState<any[]>([]);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   const showToast = (title: string, description?: string, variant: ToastVariant = 'info') => {
-    const id = Math.random().toString(36).substring(2, 9);
+    const id = `toast-${Date.now().toString(36)}-${++toastSeq}`;
     setToasts((prev) => [...prev, { id, title, description, variant }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 5000);
   };
+
+  useEffect(() => {
+    schedulingApi.getDoctors().then((res) => {
+      if (res?.data && res.data.length > 0) {
+        setActiveDoctors(res.data);
+        setSelectedDoctorId(res.data[0].id);
+      }
+    }).catch(() => {});
+  }, []);
 
   // Form states
   const [allergyForm, setAllergyForm] = useState({
@@ -287,13 +299,14 @@ export default function PatientDetailPage({
       return;
     }
 
+    const chosenDoctor = activeDoctors.find((d) => d.id === selectedDoctorId);
     try {
       setIsStartingEncounter(true);
       const res = await opdApi.startEncounter({
         patientId: patient.id,
         doctorId: selectedDoctorId,
-        branchId: patient.branchId || 'branch-default',
-        departmentId: patient.departmentId || 'dept-opd',
+        branchId: chosenDoctor?.branchId || patient.branchId,
+        departmentId: chosenDoctor?.departmentId || patient.departmentId,
         type: 'OPD',
       });
 
@@ -308,12 +321,6 @@ export default function PatientDetailPage({
       setIsStartingEncounter(false);
     }
   };
-
-  const MOCK_DOCTORS = [
-    { value: 'doc-123', label: 'Dr. Sarah Jenkins (Cardiology)' },
-    { value: 'doc-456', label: 'Dr. Michael Chen (General Medicine)' },
-    { value: 'doc-789', label: 'Dr. Emily Patel (Pediatrics)' },
-  ];
 
   if (loading) {
     return (
@@ -1134,7 +1141,10 @@ export default function PatientDetailPage({
         <div className="space-y-4">
           <Select
             label="Attending Doctor"
-            options={MOCK_DOCTORS}
+            options={activeDoctors.map((d: any) => ({
+              value: d.id,
+              label: `${d.name}${d.specialization ? ` (${d.specialization})` : ''}`,
+            }))}
             value={selectedDoctorId}
             onChange={(e) => setSelectedDoctorId(e.target.value)}
           />
