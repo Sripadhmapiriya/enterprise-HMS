@@ -303,7 +303,7 @@ export default function NursingStationPage() {
       </div>
       
       <Dialog 
-        open={handoverModalOpen} 
+        isOpen={handoverModalOpen} 
         onClose={() => setHandoverModalOpen(false)}
         title="Shift Handover Note"
       >

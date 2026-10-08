@@ -51,8 +51,33 @@ function generateStudyNumber(): string {
   return `RAD-${dateStr}-${rand}`;
 }
 
-function generatePacsUrl(uid: string): string {
-  return `https://pacs.hospital.internal/ohif/viewer?studyInstanceUIDs=${uid}`;
+async function getPacsConfig(prismaTenant: any, tenantId: string): Promise<{ baseUrl: string | null, isReachable: boolean }> {
+  try {
+    const setting = await prismaTenant.systemSetting.findFirst({
+      where: { tenantId, key: 'PACS_VIEWER_URL' }
+    });
+    let baseUrl = setting?.value || process.env.PACS_VIEWER_URL || null;
+
+    let isReachable = false;
+    if (baseUrl) {
+      const url = new URL(baseUrl);
+      if (url.protocol === 'http:' || url.protocol === 'https:') {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), 1500);
+        try {
+          const res = await fetch(url.origin, { method: 'HEAD', signal: controller.signal });
+          if (res.status < 500) isReachable = true;
+        } catch(e) {
+          isReachable = false;
+        } finally {
+          clearTimeout(id);
+        }
+      }
+    }
+    return { baseUrl, isReachable };
+  } catch (err) {
+    return { baseUrl: null, isReachable: false };
+  }
 }
 
 // =========================================================================
@@ -90,12 +115,23 @@ router.get('/worklist', requirePermission('radiology.worklist.read'), async (req
       take: 50,
     });
 
-    const enriched = studies.map((s: any) => ({
-      ...s,
-      pacsUrl: generatePacsUrl(s.studyInstanceUid || s.id),
-    }));
+    const pacs = await getPacsConfig(req.prismaTenant, tenantId);
 
-    res.json({ success: true, data: enriched });
+    const enriched = studies.map((s: any) => {
+      // Mock basic image viewer fallback for demo attachments
+      let attachmentUrl = null;
+      if (s.pacsReference && (s.pacsReference.endsWith('.jpg') || s.pacsReference.endsWith('.png'))) {
+        attachmentUrl = s.pacsReference;
+      }
+      
+      return {
+        ...s,
+        pacsUrl: pacs.isReachable && pacs.baseUrl ? `${pacs.baseUrl}?studyInstanceUIDs=${s.studyInstanceUid || s.pacsReference || s.id}` : null,
+        attachmentUrl,
+      };
+    });
+
+    res.json({ success: true, data: enriched, pacsConfigured: !!pacs.baseUrl });
   } catch (error) {
     next(error);
   }
@@ -277,7 +313,6 @@ router.post('/studies/:id/perform', requirePermission('radiology.perform'), asyn
       message: 'Study acquisition in progress / completed by radiographer',
       data: {
         ...updatedStudy,
-        pacsUrl: generatePacsUrl(updatedStudy.pacsReference || updatedStudy.id),
       },
     });
   } catch (error) {
@@ -344,7 +379,6 @@ router.post('/studies/:id/report', requirePermission('radiology.report.create'),
       data: {
         ...updatedStudy,
         report,
-        pacsUrl: generatePacsUrl(updatedStudy.pacsReference || updatedStudy.id),
       },
     });
   } catch (error) {
@@ -394,7 +428,6 @@ router.post('/studies/:id/verify', requirePermission('radiology.report.verify'),
       data: {
         ...updatedStudy,
         status: 'VERIFIED',
-        pacsUrl: generatePacsUrl(updatedStudy.pacsReference || updatedStudy.id),
       },
     });
   } catch (error) {
@@ -413,13 +446,21 @@ router.get('/studies/:id/pacs-url', requirePermission('radiology.worklist.read')
       throw AppError.notFound('Radiology study not found');
     }
 
-    const pacsUrl = generatePacsUrl(study.pacsReference || study.id);
+    const pacs = await getPacsConfig(req.prismaTenant, req.tenantId!);
+    const pacsUrl = pacs.isReachable && pacs.baseUrl ? `${pacs.baseUrl}?studyInstanceUIDs=${study.studyInstanceUid || study.pacsReference || study.id}` : null;
+    
+    let attachmentUrl = null;
+    if (study.pacsReference && (study.pacsReference.endsWith('.jpg') || study.pacsReference.endsWith('.png'))) {
+      attachmentUrl = study.pacsReference;
+    }
+
     res.json({
       success: true,
       data: {
         studyId: study.id,
         pacsReference: study.pacsReference,
         pacsUrl,
+        attachmentUrl,
       },
     });
   } catch (error) {

@@ -359,132 +359,144 @@ router.post('/pos', requirePermission('pharmacy.pos'), async (req, res, next) =>
   try {
     const tenantId = req.tenantId!;
     const userId = req.user!.userId;
-    const hospitalId = req.hospitalId || (req.user as any)?.hospitalId || '';
-    const branchId = req.branchId || (req.user as any)?.branchId || '';
+    const hospitalId = req.hospitalId || (req.user as any)?.hospitalId;
+    const branchId = req.branchId || (req.user as any)?.branchId;
+    
+    if (!hospitalId || !branchId) {
+      throw AppError.badRequest('Context error: hospitalId and branchId are required for POS sales.');
+    }
 
     const body = WalkInPosSchema.parse(req.body);
 
-    // If patientId is not provided, find or create generic Walk-in patient
-    let patientId: string = body.patientId || '';
-    if (!patientId) {
-      let walkInPatient = await req.prismaTenant.patient.findFirst({
-        where: { tenantId, mrn: 'WALK-IN-POS' },
-      });
-      if (!walkInPatient) {
-        walkInPatient = await req.prismaTenant.patient.create({
+    const result = await req.prismaTenant.$transaction(async (tx: any) => {
+      let patientId: string = body.patientId || '';
+      if (!patientId) {
+        const walkInPatient = await tx.patient.create({
           data: {
             tenantId,
             hospitalId,
-            mrn: 'WALK-IN-POS',
-            firstName: body.customerName,
-            lastName: '(OTC)',
+            mrn: `POS-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            firstName: body.customerName || 'Walk-in',
+            lastName: 'Customer',
             gender: 'UNKNOWN',
             dateOfBirth: new Date('1990-01-01'),
             mobile: body.customerPhone || '0000000000',
             status: 'ACTIVE',
           },
         });
-      }
-      patientId = walkInPatient.id;
-    }
-
-    const now = new Date();
-    let totalAmount = 0;
-    const itemsProcessed: any[] = [];
-
-    for (const item of body.items) {
-      const product = await req.prismaTenant.product.findFirst({
-        where: { tenantId, id: item.productId },
-      });
-      if (!product) throw AppError.notFound('Product not found');
-
-      // FEFO Batch Selection
-      const batch = await req.prismaTenant.inventoryBatch.findFirst({
-        where: {
-          tenantId,
-          productId: item.productId,
-          locationId: body.locationId,
-          availableQty: { gte: item.quantity },
-          expiryDate: { gt: now },
-          status: 'ACTIVE',
-        },
-        orderBy: { expiryDate: 'asc' }, // FEFO
-      });
-
-      if (!batch) {
-        throw AppError.badRequest(`Insufficient unexpired stock for "${product.name}"`);
+        patientId = walkInPatient.id;
       }
 
-      const unitPrice = item.unitPrice ?? batch.sellingRate;
-      const lineTotal = item.quantity * unitPrice;
-      totalAmount += lineTotal;
+      const now = new Date();
+      let totalAmount = 0;
+      const itemsProcessed: any[] = [];
+      const lineItemsForDb: any[] = [];
 
-      await req.prismaTenant.inventoryBatch.update({
-        where: { id: batch.id },
-        data: { availableQty: { decrement: item.quantity } },
-      });
+      for (const item of body.items) {
+        const product = await tx.product.findFirst({
+          where: { tenantId, id: item.productId },
+        });
+        if (!product) throw AppError.notFound(`Product not found: ${item.productId}`);
 
-      await req.prismaTenant.inventoryLedger.create({
-        data: {
-          tenantId,
+        const batch = await tx.inventoryBatch.findFirst({
+          where: {
+            tenantId,
+            productId: item.productId,
+            locationId: body.locationId,
+            availableQty: { gte: item.quantity },
+            expiryDate: { gt: now },
+            status: 'ACTIVE',
+          },
+          orderBy: { expiryDate: 'asc' },
+        });
+
+        if (!batch) {
+          throw AppError.badRequest(`Insufficient unexpired stock for "${product.name}"`);
+        }
+
+        const unitPrice = item.unitPrice ?? batch.sellingRate;
+        const lineTotal = item.quantity * unitPrice;
+        totalAmount += lineTotal;
+
+        await tx.inventoryBatch.update({
+          where: { id: batch.id },
+          data: { availableQty: { decrement: item.quantity } },
+        });
+
+        await tx.inventoryLedger.create({
+          data: {
+            tenantId,
+            productId: product.id,
+            batchId: batch.id,
+            locationId: body.locationId,
+            transactionType: 'DISPENSE',
+            quantity: -item.quantity,
+            userId,
+            notes: `Walk-in POS Sale (${body.paymentMethod})`,
+          },
+        });
+
+        lineItemsForDb.push({
           productId: product.id,
           batchId: batch.id,
+          quantity: item.quantity,
+          unitPrice,
+          totalPrice: lineTotal,
+        });
+
+        itemsProcessed.push({
+          productId: product.id,
+          productName: product.name,
+          batchNumber: batch.batchNumber,
+          quantity: item.quantity,
+          unitPrice,
+          totalPrice: lineTotal,
+        });
+      }
+
+      const dispensing = await tx.pharmacyDispensing.create({
+        data: {
+          tenantId,
           locationId: body.locationId,
-          transactionType: 'DISPENSE',
-          quantity: -item.quantity,
-          userId,
-          notes: `Walk-in POS Sale (${body.paymentMethod})`,
+          patientId,
+          dispensedById: userId,
+          status: 'COMPLETED',
+          totalAmount,
+          items: {
+            create: lineItemsForDb,
+          },
         },
+        include: { items: true },
       });
 
-      itemsProcessed.push({
-        productId: product.id,
-        productName: product.name,
-        batchNumber: batch.batchNumber,
-        quantity: item.quantity,
-        unitPrice,
-        totalPrice: lineTotal,
-      });
-    }
-
-    // Save dispensing record
-    const dispensing = await req.prismaTenant.pharmacyDispensing.create({
-      data: {
+      const charge = await chargeCaptureService.postCharge({
         tenantId,
-        locationId: body.locationId,
+        hospitalId,
+        branchId,
         patientId,
-        dispensedById: userId,
-        status: 'COMPLETED',
-        totalAmount,
-      },
-    });
+        chargeCode: 'PHARM-OTC-SALE',
+        description: `OTC Pharmacy Sale #${dispensing.id.slice(0, 8).toUpperCase()}`,
+        quantity: 1,
+        unitPrice: totalAmount,
+        sourceModule: 'PHARMACY',
+        sourceReferenceId: dispensing.id,
+        createdById: userId,
+      });
 
-    // Auto charge capture
-    const charge = await chargeCaptureService.postCharge({
-      tenantId,
-      hospitalId,
-      branchId,
-      patientId,
-      chargeCode: 'PHARM-OTC-SALE',
-      description: `OTC Pharmacy Sale #${dispensing.id.slice(0, 8).toUpperCase()}`,
-      quantity: 1,
-      unitPrice: totalAmount,
-      sourceModule: 'PHARMACY',
-      sourceReferenceId: dispensing.id,
-      createdById: userId,
+      return { dispensing, itemsProcessed, totalAmount, charge, patientId };
     });
 
     res.status(201).json({
       success: true,
       data: {
         receiptNumber: `POS-${Date.now().toString().slice(-6)}`,
-        dispensingId: dispensing.id,
+        dispensingId: result.dispensing.id,
         customerName: body.customerName,
         paymentMethod: body.paymentMethod,
-        totalAmount,
-        receiptMode: charge.receiptMode,
-        isBilled: charge.isBilled,
-        items: itemsProcessed,
+        totalAmount: result.totalAmount,
+        receiptMode: result.charge.receiptMode,
+        isBilled: result.charge.isBilled,
+        items: result.itemsProcessed,
       },
     });
   } catch (error) {

@@ -2481,3 +2481,23 @@ Running 11 tests using 1 worker
        - Updated GET /api/v1/laboratory/worklist to handle status tabs mapping, search, and pagination.
        - Designed a comprehensive UI in pps/web/src/app/(dashboard)/laboratory/worklist/page.tsx incorporating real Tabs, pagination controls, STAT priority filtering, search, and accurate status tags.
        - Removed misleading "PENDING" tags and unified order-to-validation workflow into a single table.
+
+ 
+     8 .   * * P h a r m a c y   D i s p e n s i n g   &   P O S   U p d a t e s * * 
+           -   * * R o o t   C a u s e : * *   P O S   s a l e s   d i d n ' t   e n f o r c e   t r a n s a c t i o n a l   c o n s i s t e n c y ,   s h a r e d   t h e   s a m e   p a t i e n t ,   a n d   p r e s c r i p t i o n   l o g i c   u s e d   w r o n g   p r o d u c t   m a p p i n g   r e s u l t i n g   i n   ' I n v a l i d   i n p u t   p a r a m e t e r s ' . 
+           -   * * S o l u t i o n : * *   
+               -   R e f a c t o r e d   p h a r m a c y   r o u t e s   ( P O S   a n d   d i s p e n s e )   t o   u s e   r o b u s t   d a t a b a s e   t r a n s a c t i o n s ,   r o l l i n g   b a c k   a l l   s t e p s   ( s t o c k   d e d u c t i o n ,   l e d g e r ,   d i s p e n s a t i o n   c r e a t i o n )   o n   a n y   f a i l u r e . 
+               -   P O S   s a l e   c r e a t e s   i n d i v i d u a l   w a l k - i n   r e c o r d s   f o r   a c c u r a t e   r e c e i p t i n g . 
+               -   P r e s c r i p t i o n   q u e u e   n o w   p r o p e r l y   m a t c h e s   i t e m s   b y   m e d i c a t i o n - t o - p r o d u c t   m a p p i n g   ( m e d i c a t i o n I d )   i n s t e a d   o f   d r u g N a m e . 
+               -   A d d e d   r o b u s t   q u a n t i t y   e x t r a c t i o n   a n d   a u t o m a t e d   F E F O   b a t c h   a l l o c a t i o n . 
+               -   D e t a i l e d   e r r o r   m e s s a g e s   a r e   b u b b l e d   u p   t o   t h e   U I   u s i n g   T o a s t   n o t i f i c a t i o n s   ( r e p l a c i n g   a l e r t s ) ,   a n d   s t o c k   v a l i d a t i o n   p r e v e n t s   d i s p e n s i n g   w i t h o u t   s u f f i c i e n t   i n v e n t o r y   w i t h   a   c l e a r   u s e r   m e s s a g e . 
+               -   A d d e d   s u p e r t e s t   i n t e g r a t i o n   t e s t s   f o r   a l l   n e w   e d g e   c a s e s ,   i n c l u d i n g   i n s u f f i c i e n t   s t o c k   s c e n a r i o s   f o r   b o t h   P O S   a n d   p r e s c r i p t i o n s . 
+               
+     9 .   * * R a d i o l o g y   P A C S   V i e w e r   U R L * * 
+           -   * * R o o t   C a u s e : * *   H a r d c o d e d   P A C S   h o s t   a n d   l a c k   o f   r e a c h a b i l i t y   v a l i d a t i o n . 
+           -   * * S o l u t i o n : * *   
+               -   R e f a c t o r e d   p a c s U r l   l o g i c   t o   p u l l   f r o m   i n t e g r a t i o n   s e t t i n g s   d y n a m i c a l l y . 
+               -   A d d e d   ' P A C S   v i e w e r   n o t   c o n f i g u r e d '   f a l l b a c k   s t a t e   i n   f r o n t e n d . 
+               -   E n s u r e d   s e r v e r - s i d e   r e a c h a b i l i t y   v a l i d a t i o n s   f o r   P A C S   i n s t a n c e s . 
+  
+ 

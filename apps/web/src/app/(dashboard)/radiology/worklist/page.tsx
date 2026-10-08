@@ -9,6 +9,7 @@ export default function RadiologyWorklist() {
   const [studies, setStudies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pacsConfigured, setPacsConfigured] = useState(true);
   const [search, setSearch] = useState('');
   const [modalityFilter, setModalityFilter] = useState('ALL');
 
@@ -35,6 +36,7 @@ export default function RadiologyWorklist() {
       const res: any = await radiologyApi.getWorklist();
       const list = res.data?.studies || res.data || [];
       setStudies(Array.isArray(list) ? list : []);
+      if (res.pacsConfigured !== undefined) setPacsConfigured(res.pacsConfigured);
     } catch (err: any) {
       setError(err.message || 'Failed to load radiology worklist.');
     } finally {
@@ -200,13 +202,22 @@ export default function RadiologyWorklist() {
                         <a
                           href={study.pacsUrl}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="inline-flex items-center text-xs font-semibold text-info hover:text-info-text underline"
                         >
                           Launch DICOM Web
                         </a>
+                      ) : study.attachmentUrl ? (
+                         <Button variant="outline" size="sm" onClick={() => setViewingStudy(study)}>View Attached Image</Button>
+                      ) : !pacsConfigured ? (
+                        <div className="flex flex-col gap-1">
+                          <span className="text-xs text-text-muted">PACS viewer not configured</span>
+                          <Link href="/enterprise/admin" className="text-xs text-brand hover:underline">
+                            Configure Integration
+                          </Link>
+                        </div>
                       ) : (
-                        <span className="text-xs text-text-muted">PACS not attached</span>
+                        <span className="text-xs text-text-muted">PACS unreachable</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
@@ -389,13 +400,20 @@ export default function RadiologyWorklist() {
                   {viewingStudy.report?.impression || 'No impression recorded'}
                 </p>
               </div>
+              
+              {viewingStudy.attachmentUrl && (
+                <div className="mt-4 border-t pt-4">
+                  <span className="font-semibold text-text text-xs uppercase block mb-2">Attached Image:</span>
+                  <img src={viewingStudy.attachmentUrl} alt="Radiology Attachment" className="max-w-full h-auto rounded-lg border border-border" />
+                </div>
+              )}
             </div>
             <div className="flex justify-between items-center pt-3 border-t">
               {viewingStudy.pacsUrl ? (
                 <a
                   href={viewingStudy.pacsUrl}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="text-xs font-semibold text-info hover:text-info-text underline"
                 >
                   Open in PACS DICOM Viewer

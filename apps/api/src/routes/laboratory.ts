@@ -169,7 +169,7 @@ router.get('/worklist', requirePermission('laboratory.worklist.read'), async (re
     ]);
 
     // Format the response to map `labSample` to `sample` for backward compatibility with UI if needed
-    const mappedItems = items.map(item => ({
+    const mappedItems = items.map((item: any) => ({
       ...item,
       sample: item.labSample,
     }));

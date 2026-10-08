@@ -814,8 +814,20 @@ export const insuranceApi = {
 // ==========================================
 
 export const laboratoryApi = {
-  getWorklist: async (status?: string) => {
-    const qs = status ? '?status=' + status : '';
+  getWorklist: async (params?: any) => {
+    let qs = '';
+    if (typeof params === 'string') {
+      qs = '?status=' + params;
+    } else if (params) {
+      const searchParams = new URLSearchParams();
+      if (params.status) searchParams.set('status', params.status);
+      if (params.page) searchParams.set('page', String(params.page));
+      if (params.limit) searchParams.set('limit', String(params.limit));
+      if (params.search) searchParams.set('search', params.search);
+      if (params.priority) searchParams.set('priority', params.priority);
+      const str = searchParams.toString();
+      if (str) qs = '?' + str;
+    }
     return request('/laboratory/worklist' + qs);
   },
   createOrder: async (data: any) => {

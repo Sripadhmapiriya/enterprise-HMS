@@ -11,6 +11,8 @@ import {
   EmptyState,
   ErrorState,
   Skeleton,
+  ToastContainer,
+  ToastMessage,
 } from '@enterprise-hms/ui';
 import {
   FileText,
@@ -35,6 +37,16 @@ export default function PrescriptionQueuePage() {
   const [locations, setLocations] = useState<any[]>([]);
   const [selectedLocationId, setSelectedLocationId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dispenseFormItems, setDispenseFormItems] = useState<Record<string, { quantity: number | string; batchId: string }>>({});
+
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const addToast = useCallback((toast: Omit<ToastMessage, 'id'>) => {
+    const id = Math.random().toString();
+    setToasts(prev => [...prev, { ...toast, id }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 5000);
+  }, []);
 
   const fetchQueue = useCallback(async () => {
     try {
@@ -65,9 +77,17 @@ export default function PrescriptionQueuePage() {
     try {
       const detail = await pharmacyApi.getPrescription(rx.id);
       setSelectedRx(detail.data);
+      const initial: any = {};
+      detail.data.items.forEach((item: any) => {
+        initial[item.id] = {
+          quantity: item.quantity || 1,
+          batchId: item.recommendedBatch?.id || (item.fefoBatches?.[0]?.id || ''),
+        };
+      });
+      setDispenseFormItems(initial);
       setIsDispenseOpen(true);
     } catch (err: any) {
-      alert(err?.message || 'Failed to load prescription details');
+      addToast({ title: 'Error', description: err?.message || 'Failed to load prescription details', variant: 'error' });
     }
   };
 
@@ -76,11 +96,33 @@ export default function PrescriptionQueuePage() {
 
     try {
       setIsSubmitting(true);
-      const itemsToDispense = selectedRx.items.map((item: any) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        instructions: item.instructions,
-      }));
+      const itemsToDispense = [];
+      
+      for (const item of selectedRx.items) {
+        const formItem = dispenseFormItems[item.id];
+        const qty = parseInt(String(formItem.quantity), 10);
+        
+        if (qty > 0) {
+           if (!item.productId) {
+              throw new Error(`Product mapping missing for "${item.drugName}". Please configure this medication in inventory.`);
+           }
+           const batch = item.fefoBatches?.find((b: any) => b.id === formItem.batchId);
+           if (batch && qty > batch.availableQty) {
+              throw new Error(`Not enough stock for ${item.drugName} in the selected batch. Available: ${batch.availableQty}, Requested: ${qty}`);
+           }
+           
+           itemsToDispense.push({
+             productId: item.productId,
+             batchId: formItem.batchId || undefined,
+             quantity: qty,
+             instructions: item.instructions,
+           });
+        }
+      }
+
+      if (itemsToDispense.length === 0) {
+         throw new Error("No valid items to dispense. Check quantities and stock.");
+      }
 
       await pharmacyApi.dispense({
         prescriptionId: selectedRx.id,
@@ -90,9 +132,10 @@ export default function PrescriptionQueuePage() {
       });
 
       setIsDispenseOpen(false);
+      addToast({ title: 'Success', description: 'Prescription dispensed successfully', variant: 'success' });
       await fetchQueue();
     } catch (err: any) {
-      alert(err?.message || 'Dispensing failed');
+      addToast({ title: 'Dispense Failed', description: err?.message || 'Dispensing failed', variant: 'error' });
     } finally {
       setIsSubmitting(false);
     }
@@ -109,6 +152,7 @@ export default function PrescriptionQueuePage() {
 
   return (
     <div className="space-y-6">
+      <ToastContainer toasts={toasts} onDismiss={(id) => setToasts(t => t.filter(x => x.id !== id))} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
@@ -246,33 +290,70 @@ export default function PrescriptionQueuePage() {
 
             <div>
               <label className="block text-xs font-semibold text-text uppercase mb-2">
-                Medication List (Auto-Allocating via FEFO)
+                Medication List
               </label>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {selectedRx.items?.map((item: any, idx: number) => (
-                  <div key={idx} className="p-3 bg-surface border border-border rounded-lg text-sm">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <span className="font-bold text-text">{item.drugName}</span>
-                        <div className="text-xs text-text-muted">
-                          {item.dosage} &bull; {item.frequency} &bull; {item.duration}
+              <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+                {selectedRx.items?.map((item: any) => {
+                  const formItem = dispenseFormItems[item.id] || { quantity: '', batchId: '' };
+                  const hasStock = item.fefoBatches && item.fefoBatches.length > 0;
+                  
+                  return (
+                    <div key={item.id} className="p-3 bg-surface border border-border rounded-lg text-sm">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
+                        <div>
+                          <span className="font-bold text-text">{item.drugName}</span>
+                          {!item.productId && (
+                            <Badge variant="critical" className="ml-2">Product Not Linked</Badge>
+                          )}
+                          <div className="text-xs text-text-muted mt-1">
+                            {item.dosage} &bull; {item.frequency} &bull; {item.duration}
+                          </div>
+                          <div className="text-xs text-text-muted italic mt-1">
+                            Rx Qty: {item.quantity === null || item.quantity === 0 ? 'As needed / unspecified' : item.quantity}
+                          </div>
+                        </div>
+                        <div className="w-24 shrink-0">
+                          <Input
+                            label="Dispense Qty"
+                            type="number"
+                            min="0"
+                            value={formItem.quantity}
+                            onChange={(e) => setDispenseFormItems(prev => ({
+                              ...prev,
+                              [item.id]: { ...prev[item.id], quantity: e.target.value }
+                            }))}
+                            disabled={!item.productId}
+                          />
                         </div>
                       </div>
-                      <Badge variant="info">Qty: {item.quantity}</Badge>
-                    </div>
 
-                    {item.recommendedBatch ? (
-                      <div className="mt-2 text-xs bg-stable-bg text-stable-text p-2 rounded border border-stable-border">
-                        FEFO Batch Allocated: <span className="font-mono font-bold">{item.recommendedBatch.batchNumber}</span> (Exp: {new Date(item.recommendedBatch.expiryDate).toLocaleDateString()}) &bull; Available: {item.recommendedBatch.availableQty}
-                      </div>
-                    ) : (
-                      <div className="mt-2 text-xs bg-warning-bg text-warning-text p-2 rounded border border-warning-border flex items-center">
-                        <AlertTriangle className="w-3.5 h-3.5 mr-1" />
-                        Stock check: {item.availableStock} in store
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      {hasStock && item.productId ? (
+                        <div className="bg-surface-subtle p-2 rounded border border-border">
+                          <Select
+                            label="Select Batch (Default is FEFO)"
+                            value={formItem.batchId}
+                            onChange={(e) => setDispenseFormItems(prev => ({
+                              ...prev,
+                              [item.id]: { ...prev[item.id], batchId: e.target.value }
+                            }))}
+                            options={[
+                              { value: '', label: 'Auto-select via FEFO' },
+                              ...item.fefoBatches.map((b: any) => ({
+                                value: b.id,
+                                label: `${b.batchNumber} (Exp: ${new Date(b.expiryDate).toLocaleDateString()}) - Qty: ${b.availableQty}`,
+                              })),
+                            ]}
+                          />
+                        </div>
+                      ) : (
+                        <div className="mt-2 text-xs bg-warning-bg text-warning-text p-2 rounded border border-warning-border flex items-center">
+                          <AlertTriangle className="w-3.5 h-3.5 mr-1 shrink-0" />
+                          {!item.productId ? 'Map product in inventory first.' : `Out of stock. Current store check: ${item.availableStock}`}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

@@ -11,6 +11,8 @@ import {
   EmptyState,
   ErrorState,
   Skeleton,
+  ToastContainer,
+  ToastMessage,
 } from '@enterprise-hms/ui';
 import {
   Pill,
@@ -20,6 +22,8 @@ import {
   ShoppingCart,
   CheckCircle2,
   RefreshCw,
+  Plus,
+  Trash2,
 } from 'lucide-react';
 import { pharmacyApi, inventoryApi } from '@/lib/api';
 
@@ -40,12 +44,22 @@ export default function PharmacyDashboard() {
   const [locations, setLocations] = useState<any[]>([]);
   const [posForm, setPosForm] = useState({
     customerName: 'Walk-in Customer',
+    customerPhone: '',
     locationId: '',
-    productId: '',
-    quantity: '1',
     paymentMethod: 'CASH' as 'CASH' | 'CARD' | 'UPI',
   });
+  const [posItems, setPosItems] = useState<{ productId: string; quantity: number }[]>([]);
+  const [currentItem, setCurrentItem] = useState({ productId: '', quantity: '1' });
   const [posSuccess, setPosSuccess] = useState<any | null>(null);
+  
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const addToast = useCallback((toast: Omit<ToastMessage, 'id'>) => {
+    const id = Math.random().toString();
+    setToasts(prev => [...prev, { ...toast, id }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 5000);
+  }, []);
 
   const loadData = useCallback(async () => {
     try {
@@ -79,27 +93,62 @@ export default function PharmacyDashboard() {
     loadData();
   }, [loadData]);
 
+  const handleAddItem = () => {
+    if (!currentItem.productId) {
+      addToast({ title: 'Validation Error', description: 'Please select a product', variant: 'error' });
+      return;
+    }
+    const qty = parseInt(currentItem.quantity, 10);
+    if (!qty || qty < 1) {
+      addToast({ title: 'Validation Error', description: 'Quantity must be at least 1', variant: 'error' });
+      return;
+    }
+    const prod = products.find(p => p.id === currentItem.productId);
+    if (prod && qty > prod.totalStock) {
+      addToast({ title: 'Validation Error', description: `Cannot exceed available stock of ${prod.totalStock}`, variant: 'error' });
+      return;
+    }
+
+    setPosItems(prev => {
+      const existing = prev.find(i => i.productId === currentItem.productId);
+      if (existing) {
+        return prev.map(i => i.productId === currentItem.productId ? { ...i, quantity: i.quantity + qty } : i);
+      }
+      return [...prev, { productId: currentItem.productId, quantity: qty }];
+    });
+    setCurrentItem({ productId: '', quantity: '1' });
+  };
+
   const handlePosSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!posForm.productId || !posForm.locationId) return;
+    if (!posForm.locationId) {
+      addToast({ title: 'Validation Error', description: 'Location is required', variant: 'error' });
+      return;
+    }
+    if (!posForm.customerName) {
+      addToast({ title: 'Validation Error', description: 'Customer name is required', variant: 'error' });
+      return;
+    }
+    if (posItems.length === 0) {
+      addToast({ title: 'Validation Error', description: 'Please add at least one item', variant: 'error' });
+      return;
+    }
 
     try {
       setIsSubmittingPos(true);
       const res = await pharmacyApi.posSale({
         customerName: posForm.customerName,
+        customerPhone: posForm.customerPhone,
         locationId: posForm.locationId,
         paymentMethod: posForm.paymentMethod,
-        items: [
-          {
-            productId: posForm.productId,
-            quantity: parseInt(posForm.quantity, 10) || 1,
-          },
-        ],
+        items: posItems,
       });
       setPosSuccess(res.data);
+      setPosItems([]);
+      addToast({ title: 'Success', description: 'Sale completed successfully', variant: 'success' });
       await loadData();
     } catch (err: any) {
-      alert(err?.message || 'POS sale failed');
+      addToast({ title: 'POS Sale Failed', description: err?.message || 'Unknown error occurred', variant: 'error' });
     } finally {
       setIsSubmittingPos(false);
     }
@@ -109,6 +158,7 @@ export default function PharmacyDashboard() {
 
   return (
     <div className="space-y-6">
+      <ToastContainer toasts={toasts} onDismiss={(id) => setToasts(t => t.filter(x => x.id !== id))} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
@@ -254,12 +304,19 @@ export default function PharmacyDashboard() {
           </div>
         ) : (
           <form onSubmit={handlePosSubmit} className="space-y-4">
-            <Input
-              label="Customer Name"
-              value={posForm.customerName}
-              onChange={(e) => setPosForm({ ...posForm, customerName: e.target.value })}
-              required
-            />
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                label="Customer Name"
+                value={posForm.customerName}
+                onChange={(e) => setPosForm({ ...posForm, customerName: e.target.value })}
+                required
+              />
+              <Input
+                label="Customer Phone"
+                value={posForm.customerPhone}
+                onChange={(e) => setPosForm({ ...posForm, customerPhone: e.target.value })}
+              />
+            </div>
 
             <Select
               label="Dispensing Location"
@@ -268,45 +325,76 @@ export default function PharmacyDashboard() {
               options={locations.map((loc) => ({ value: loc.id, label: loc.name }))}
             />
 
+            <div className="border border-border rounded-lg p-3 space-y-3 bg-surface-subtle/50">
+              <h4 className="text-xs font-semibold text-text uppercase">Line Items</h4>
+              {posItems.length > 0 && (
+                <div className="space-y-2 mb-3">
+                  {posItems.map((item, idx) => {
+                    const p = products.find(x => x.id === item.productId);
+                    return (
+                      <div key={idx} className="flex justify-between items-center text-sm bg-surface p-2 rounded border border-border">
+                        <span className="font-medium text-text">{p?.name}</span>
+                        <div className="flex items-center space-x-3">
+                          <span className="text-text-muted">Qty: {item.quantity}</span>
+                          <button
+                            type="button"
+                            className="text-critical hover:text-critical-text"
+                            onClick={() => setPosItems(prev => prev.filter((_, i) => i !== idx))}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              <div className="flex space-x-2 items-end">
+                <div className="flex-1">
+                  <Select
+                    label="Select Medicine / Product"
+                    value={currentItem.productId}
+                    onChange={(e) => setCurrentItem({ ...currentItem, productId: e.target.value })}
+                    options={[
+                      { value: '', label: '-- Select Item --' },
+                      ...products.map((p) => ({
+                        value: p.id,
+                        label: `${p.name} (${p.code}) - Stock: ${p.totalStock}`,
+                      })),
+                    ]}
+                  />
+                </div>
+                <div className="w-24">
+                  <Input
+                    label="Qty"
+                    type="number"
+                    min="1"
+                    value={currentItem.quantity}
+                    onChange={(e) => setCurrentItem({ ...currentItem, quantity: e.target.value })}
+                  />
+                </div>
+                <Button type="button" variant="secondary" onClick={handleAddItem}>
+                  <Plus className="w-4 h-4" /> Add
+                </Button>
+              </div>
+            </div>
+
             <Select
-              label="Select Medicine / Product"
-              value={posForm.productId}
-              onChange={(e) => setPosForm({ ...posForm, productId: e.target.value })}
+              label="Payment Method"
+              value={posForm.paymentMethod}
+              onChange={(e) => setPosForm({ ...posForm, paymentMethod: e.target.value as any })}
               options={[
-                { value: '', label: '-- Select Item --' },
-                ...products.map((p) => ({
-                  value: p.id,
-                  label: `${p.name} (${p.code}) - Stock: ${p.totalStock}`,
-                })),
+                { value: 'CASH', label: 'Cash' },
+                { value: 'CARD', label: 'Card' },
+                { value: 'UPI', label: 'UPI' },
               ]}
             />
-
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                label="Quantity"
-                type="number"
-                min="1"
-                value={posForm.quantity}
-                onChange={(e) => setPosForm({ ...posForm, quantity: e.target.value })}
-                required
-              />
-              <Select
-                label="Payment Method"
-                value={posForm.paymentMethod}
-                onChange={(e) => setPosForm({ ...posForm, paymentMethod: e.target.value as any })}
-                options={[
-                  { value: 'CASH', label: 'Cash' },
-                  { value: 'CARD', label: 'Card' },
-                  { value: 'UPI', label: 'UPI' },
-                ]}
-              />
-            </div>
 
             <div className="flex justify-end space-x-3 pt-3 border-t border-border">
               <Button variant="secondary" type="button" onClick={() => setIsPosOpen(false)}>
                 Cancel
               </Button>
-              <Button variant="primary" type="submit" disabled={isSubmittingPos || !posForm.productId}>
+              <Button variant="primary" type="submit" disabled={isSubmittingPos || posItems.length === 0}>
                 {isSubmittingPos ? 'Processing...' : 'Complete POS Sale'}
               </Button>
             </div>

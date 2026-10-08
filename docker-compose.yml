@@ -12,5 +12,25 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  orthanc:
+    image: orthancteam/orthanc
+    profiles:
+      - pacs
+    ports:
+      - "8042:8042"
+      - "4242:4242"
+    environment:
+      - ORTHANC_NAME=EnterpriseHMS-PACS
+    volumes:
+      - orthanc_data:/var/lib/orthanc/db
+
+  ohif:
+    image: ohif/viewer:latest
+    profiles:
+      - pacs
+    ports:
+      - "3000:80"
+
 volumes:
   postgres_data:
+  orthanc_data:

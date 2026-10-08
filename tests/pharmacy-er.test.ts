@@ -372,6 +372,48 @@ describe('Workstream E: Inventory, Pharmacy, Emergency & pharmacy-er Edition', (
       expect(rxCheck?.status).toBe('DISPENSED');
     });
 
+    it('blocks a prescription line with no stock with a clear message', async () => {
+      // Create a dummy prescription to fail
+      const dummyRx = await prisma.prescription.create({
+        data: {
+          tenantId,
+          patientId,
+          doctorId,
+          status: 'ACTIVE',
+          items: {
+            create: [
+              {
+                medicationName: 'Paracetamol 500mg IV',
+                dosage: '500mg',
+                frequency: 'TDS',
+                duration: '3 days',
+                quantity: 1000, // Very large quantity
+                instructions: 'Infuse over 15 minutes',
+              },
+            ],
+          },
+        },
+      });
+
+      const res = await request(app)
+        .post('/api/v1/pharmacy/dispense')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          prescriptionId: dummyRx.id,
+          patientId,
+          locationId: pharmacyLocationId,
+          items: [
+            {
+              productId,
+              quantity: 1000, // Exceeds stock
+            },
+          ],
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain('Insufficient');
+    });
+
     it('handles walk-in OTC point-of-sale without doctor prescription', async () => {
       const res = await request(app)
         .post('/api/v1/pharmacy/pos')
@@ -392,8 +434,35 @@ describe('Workstream E: Inventory, Pharmacy, Emergency & pharmacy-er Edition', (
       expect(res.body.data.receiptNumber).toMatch(/^POS-/);
       expect(res.body.data.totalAmount).toBe(60.0); // 5 * 12.0
       expect(res.body.data.receiptMode).toBe('POS');
+      expect(res.body.data.patient.firstName).toBe('Retail Walk-in Customer');
 
       // Verify batch stock decremented from 35 to 30
+      const batchCheck = await prisma.inventoryBatch.findUnique({
+        where: { id: batchEarlyId },
+      });
+      expect(batchCheck?.availableQty).toBe(30);
+    });
+
+    it('blocks a failed sale and leaves stock unchanged', async () => {
+      const res = await request(app)
+        .post('/api/v1/pharmacy/pos')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          customerName: 'Customer Two',
+          locationId: pharmacyLocationId,
+          paymentMethod: 'CASH',
+          items: [
+            {
+              productId,
+              quantity: 100, // Exceeds available 30
+            },
+          ],
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain('Insufficient');
+
+      // Stock should still be 30
       const batchCheck = await prisma.inventoryBatch.findUnique({
         where: { id: batchEarlyId },
       });
