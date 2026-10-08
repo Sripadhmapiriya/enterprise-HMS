@@ -197,10 +197,13 @@ export default function IpdChartPage() {
     }
   };
 
+  const [isSubmittingIo, setIsSubmittingIo] = useState(false);
   // Add Intake / Output
   const handleSaveIo = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingIo) return;
     try {
+      setIsSubmittingIo(true);
       await ipdApi.createIntakeOutput(id, {
         ...ioForm,
         amount: Number(ioForm.amount),
@@ -210,17 +213,21 @@ export default function IpdChartPage() {
       await loadAllData();
     } catch (err: any) {
       setMsg({ type: 'error', text: err.message || 'Failed to record intake/output' });
+    } finally {
+      setIsSubmittingIo(false);
     }
   };
 
+  const [isSubmittingRound, setIsSubmittingRound] = useState(false);
   // Add Doctor Round
   const handleSaveRound = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!roundForm.progressNote) {
+    if (!roundForm.progressNote || isSubmittingRound) {
       setMsg({ type: 'error', text: 'Progress note is required' });
       return;
     }
     try {
+      setIsSubmittingRound(true);
       await ipdApi.createRound(id, roundForm);
       setMsg({ type: 'success', text: 'Doctor round progress note recorded' });
       setShowRoundModal(false);
@@ -228,17 +235,22 @@ export default function IpdChartPage() {
       await loadAllData();
     } catch (err: any) {
       setMsg({ type: 'error', text: err.message || 'Failed to save round note' });
+    } finally {
+      setIsSubmittingRound(false);
     }
   };
+
+  const [isSubmittingMed, setIsSubmittingMed] = useState(false);
 
   // Add Medication Order
   const handleSaveMed = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!medForm.medicationName) {
+    if (!medForm.medicationName || isSubmittingMed) {
       setMsg({ type: 'error', text: 'Medication name is required' });
       return;
     }
     try {
+      setIsSubmittingMed(true);
       await ipdApi.createMedicationOrder(id, medForm);
       setMsg({ type: 'success', text: 'Medication order placed on MAR' });
       setShowMedModal(false);
@@ -246,18 +258,25 @@ export default function IpdChartPage() {
       await loadAllData();
     } catch (err: any) {
       setMsg({ type: 'error', text: err.message || 'Failed to place order' });
+    } finally {
+      setIsSubmittingMed(false);
     }
   };
 
+  const [isSubmittingSummary, setIsSubmittingSummary] = useState(false);
   // Save Discharge Summary
   const handleSaveSummary = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingSummary) return;
     try {
+      setIsSubmittingSummary(true);
       await ipdApi.saveDischargeSummary(id, summaryForm);
       setMsg({ type: 'success', text: 'Discharge summary saved successfully' });
       await loadAllData();
     } catch (err: any) {
       setMsg({ type: 'error', text: err.message || 'Failed to save discharge summary' });
+    } finally {
+      setIsSubmittingSummary(false);
     }
   };
 
@@ -1017,9 +1036,10 @@ export default function IpdChartPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold"
+                  disabled={isSubmittingMed}
+                  className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-foreground rounded-lg text-xs font-semibold disabled:opacity-50"
                 >
-                  Save Medication Order
+                  {isSubmittingMed ? 'Saving...' : 'Save Medication Order'}
                 </button>
               </div>
             </form>

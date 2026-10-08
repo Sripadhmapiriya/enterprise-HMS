@@ -107,7 +107,7 @@ export default function OTDashboard() {
       // Find or create encounter
       const encRes = await encountersApi.create({
         patientId: selectedPatientId,
-        type: 'INPATIENT',
+        type: 'IPD',
         priority,
       });
 
@@ -222,15 +222,16 @@ export default function OTDashboard() {
         </div>
       </div>
 
+      {/* Toast Notification */}
       {notice && (
         <div
-          className={`p-3.5 rounded-lg text-xs font-medium flex justify-between items-center ${ notice.type ==='success'
-              ? 'bg-stable-bg border border-stable-border text-stable-text'
-              : 'bg-critical-bg border border-critical-border text-critical-text'
+          className={`fixed top-4 right-4 z-[9999] p-4 rounded-xl shadow-xl font-medium text-sm flex justify-between items-center min-w-[300px] animate-in slide-in-from-top-2 ${ notice.type ==='success'
+              ? 'bg-stable text-white border border-stable-border'
+              : 'bg-critical text-white border border-critical-border'
           }`}
         >
           <span>{notice.text}</span>
-          <button onClick={() => setNotice(null)} className="font-bold">x</button>
+          <button onClick={() => setNotice(null)} className="font-bold ml-4 opacity-80 hover:opacity-100">X</button>
         </div>
       )}
 

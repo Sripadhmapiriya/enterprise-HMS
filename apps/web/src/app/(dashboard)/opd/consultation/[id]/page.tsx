@@ -43,14 +43,14 @@ export default function ConsultationWorkspacePage({
 
   // Vitals form
   const [vitals, setVitals] = useState({
-    temperature: 98.6,
-    pulse: 76,
-    bpSystolic: 120,
-    bpDiastolic: 80,
-    respiratoryRate: 16,
-    spo2: 99,
-    height: 172,
-    weight: 70,
+    temperature: undefined as number | undefined,
+    pulse: undefined as number | undefined,
+    bpSystolic: undefined as number | undefined,
+    bpDiastolic: undefined as number | undefined,
+    respiratoryRate: undefined as number | undefined,
+    spo2: undefined as number | undefined,
+    height: undefined as number | undefined,
+    weight: undefined as number | undefined,
   });
 
   // SOAP form
@@ -98,14 +98,14 @@ export default function ConsultationWorkspacePage({
       if (res.data?.vitals?.[0]) {
         const v = res.data.vitals[0];
         setVitals({
-          temperature: v.temperature || 98.6,
-          pulse: v.pulse || 76,
-          bpSystolic: v.bpSystolic || 120,
-          bpDiastolic: v.bpDiastolic || 80,
-          respiratoryRate: v.respiratoryRate || 16,
-          spo2: v.spo2 || 99,
-          height: v.height || 172,
-          weight: v.weight || 70,
+          temperature: v.temperature,
+          pulse: v.pulse,
+          bpSystolic: v.bpSystolic,
+          bpDiastolic: v.bpDiastolic,
+          respiratoryRate: v.respiratoryRate,
+          spo2: v.spo2,
+          height: v.height,
+          weight: v.weight,
         });
       }
 

@@ -321,11 +321,11 @@ export const patientsApi = {
 // ==========================================
 
 export const encountersApi = {
-  create: async (data: any) => request('/encounters', { method: 'POST', body: JSON.stringify(data) }),
-  get: async (id: string) => request('/encounters/' + id),
+  create: async (data: any) => request('/opd/encounters', { method: 'POST', body: JSON.stringify(data) }),
+  get: async (id: string) => request('/opd/encounters/' + id),
   list: async (params?: any) => {
     const qs = new URLSearchParams(params).toString();
-    return request('/encounters' + (qs ? '?' + qs : ''));
+    return request('/opd/encounters' + (qs ? '?' + qs : ''));
   },
 };
 

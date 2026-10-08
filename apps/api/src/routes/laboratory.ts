@@ -407,7 +407,7 @@ router.get('/samples', requirePermission('laboratory.samples.read'), async (req,
         },
         results: true,
       },
-      orderBy: { collectedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
       take: 50,
     });
 

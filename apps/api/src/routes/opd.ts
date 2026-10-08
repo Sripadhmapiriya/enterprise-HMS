@@ -9,9 +9,9 @@ const chargeCapturePort = new StandaloneChargeCapturePort();
 
 const StartEncounterSchema = z.object({
   patientId: z.string().min(1),
-  doctorId: z.string().min(1),
-  branchId: z.string().min(1),
-  departmentId: z.string().min(1),
+  doctorId: z.string().optional(),
+  branchId: z.string().optional(),
+  departmentId: z.string().optional(),
   hospitalId: z.string().optional(),
   appointmentId: z.string().optional(),
   type: z
@@ -223,20 +223,28 @@ router.post('/encounters', requirePermission('opd.consultation.create'), async (
     let actualBranchId = validatedData.branchId;
     if (actualBranchId) {
       const branchExists = await req.prismaTenant.branch.findFirst({ where: { id: actualBranchId } });
-      if (!branchExists) {
-        const fallbackBranch = await req.prismaTenant.branch.findFirst();
-        if (fallbackBranch) actualBranchId = fallbackBranch.id;
-      }
+      if (!branchExists) actualBranchId = undefined;
+    }
+    if (!actualBranchId) {
+      const fallbackBranch = await req.prismaTenant.branch.findFirst();
+      if (fallbackBranch) actualBranchId = fallbackBranch.id;
+    }
+    if (!actualBranchId) {
+      return res.status(422).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'No branches exist.' } });
     }
 
     // Validate departmentId explicitly
     let actualDepartmentId = validatedData.departmentId;
     if (actualDepartmentId) {
       const deptExists = await req.prismaTenant.department.findFirst({ where: { id: actualDepartmentId } });
-      if (!deptExists) {
-        const fallbackDept = await req.prismaTenant.department.findFirst();
-        if (fallbackDept) actualDepartmentId = fallbackDept.id;
-      }
+      if (!deptExists) actualDepartmentId = undefined;
+    }
+    if (!actualDepartmentId) {
+      const fallbackDept = await req.prismaTenant.department.findFirst();
+      if (fallbackDept) actualDepartmentId = fallbackDept.id;
+    }
+    if (!actualDepartmentId) {
+      return res.status(422).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'No departments exist.' } });
     }
 
     const encounter = await req.prismaTenant.encounter.create({
