@@ -32,21 +32,16 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const [demoAccounts, setDemoAccounts] = useState<any[]>([]);
+  const DEFAULT_DEMO_ACCOUNTS = [
+    { role: 'Hospital Admin', email: 'admin@demo.com', description: 'Full access to hospital settings and modules' },
+    { role: 'Doctor', email: 'doctor@demo.com', description: 'Clinical access, consultations, and prescriptions' },
+    { role: 'Nurse', email: 'nurse@demo.com', description: 'Inpatient care, vitals, and MAR' },
+    { role: 'Receptionist', email: 'reception@demo.com', description: 'Patient registration and appointments' },
+    { role: 'Pharmacist', email: 'pharmacy@demo.com', description: 'Dispensary and inventory management' },
+    { role: 'Billing Clerk', email: 'billing@demo.com', description: 'Invoicing, receipts, and claims' },
+  ];
 
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
-      authApi.getDemoAccounts()
-        .then((res) => {
-          if (res.success && res.data) {
-            setDemoAccounts(res.data);
-          }
-        })
-        .catch(() => {
-          // Silent catch
-        });
-    }
-  }, []);
+  const [demoAccounts, setDemoAccounts] = useState<any[]>(DEFAULT_DEMO_ACCOUNTS);
 
   const applyCredentials = (demoEmail: string, demoPass: string) => {
     setEmail(demoEmail);
