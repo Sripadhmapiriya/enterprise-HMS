@@ -181,3 +181,4 @@ export function createTenantClient(tenantId: string, basePrisma: PrismaClient) {
     },
   });
 }
+// Trigger Vercel rebuild with TS fix
