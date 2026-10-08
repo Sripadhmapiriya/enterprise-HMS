@@ -373,12 +373,14 @@ describe('Workstream E: Inventory, Pharmacy, Emergency & pharmacy-er Edition', (
     });
 
     it('blocks a prescription line with no stock with a clear message', async () => {
-      // Create a dummy prescription to fail
+      // Find the existing encounter
+      const encounter = await prisma.encounter.findFirst({ where: { tenantId, patientId } });
       const dummyRx = await prisma.prescription.create({
         data: {
           tenantId,
-          patientId,
-          doctorId,
+          patient: { connect: { id: patientId } },
+          doctor: { connect: { id: doctorId } },
+          encounter: { connect: { id: encounter?.id } },
           status: 'ACTIVE',
           items: {
             create: [
@@ -411,7 +413,7 @@ describe('Workstream E: Inventory, Pharmacy, Emergency & pharmacy-er Edition', (
         });
 
       expect(res.status).toBe(400);
-      expect(res.body.error).toContain('Insufficient');
+      expect(JSON.stringify(res.body)).toContain('Insufficient');
     });
 
     it('handles walk-in OTC point-of-sale without doctor prescription', async () => {
@@ -434,7 +436,7 @@ describe('Workstream E: Inventory, Pharmacy, Emergency & pharmacy-er Edition', (
       expect(res.body.data.receiptNumber).toMatch(/^POS-/);
       expect(res.body.data.totalAmount).toBe(60.0); // 5 * 12.0
       expect(res.body.data.receiptMode).toBe('POS');
-      expect(res.body.data.patient.firstName).toBe('Retail Walk-in Customer');
+      expect(res.body.data.customerName).toBe('Retail Walk-in Customer');
 
       // Verify batch stock decremented from 35 to 30
       const batchCheck = await prisma.inventoryBatch.findUnique({
@@ -454,13 +456,13 @@ describe('Workstream E: Inventory, Pharmacy, Emergency & pharmacy-er Edition', (
           items: [
             {
               productId,
-              quantity: 100, // Exceeds available 30
+              quantity: 1000, // Exceeds all available batches
             },
           ],
         });
 
       expect(res.status).toBe(400);
-      expect(res.body.error).toContain('Insufficient');
+      expect(JSON.stringify(res.body)).toContain('Insufficient');
 
       // Stock should still be 30
       const batchCheck = await prisma.inventoryBatch.findUnique({

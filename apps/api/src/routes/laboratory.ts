@@ -151,7 +151,6 @@ router.get('/worklist', requirePermission('laboratory.worklist.read'), async (re
             include: {
               patient: { select: { id: true, mrn: true, firstName: true, lastName: true, gender: true, dateOfBirth: true } },
               doctor: { include: { user: { select: { firstName: true, lastName: true } } } },
-              department: true,
             },
           },
           labSample: {
