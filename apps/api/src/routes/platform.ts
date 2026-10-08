@@ -172,7 +172,7 @@ router.post('/notifications/send', async (req, res, next) => {
     const payload: NotificationPayload = {
       tenantId,
       ...input,
-    };
+    } as any;
 
     const result = await notificationService.dispatch(payload);
     res.status(201).json({ success: true, data: result });
