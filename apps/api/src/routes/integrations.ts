@@ -100,7 +100,7 @@ const AbhaGenerateSchema = z.object({
 router.post('/abdm/generate-abha', requirePermission('integrations.manage'), async (req, res, next) => {
   try {
     const input = AbhaGenerateSchema.parse(req.body);
-    const result = await abdmAdapter.generateAbha(input);
+    const result = await abdmAdapter.generateAbha(input as any);
     res.json({ success: true, data: result });
   } catch (err) {
     next(err);
@@ -115,7 +115,7 @@ const AbhaVerifySchema = z.object({
 router.post('/abdm/verify-otp', requirePermission('integrations.manage'), async (req, res, next) => {
   try {
     const input = AbhaVerifySchema.parse(req.body);
-    const result = await abdmAdapter.verifyOtp(input);
+    const result = await abdmAdapter.verifyOtp(input as any);
     res.json({ success: true, data: result });
   } catch (err) {
     next(err);
@@ -133,7 +133,7 @@ const CareContextSchema = z.object({
 router.post('/abdm/link-care-context', requirePermission('integrations.manage'), async (req, res, next) => {
   try {
     const input = CareContextSchema.parse(req.body);
-    const result = await abdmAdapter.linkCareContext(input);
+    const result = await abdmAdapter.linkCareContext(input as any);
     res.json({ success: true, data: result });
   } catch (err) {
     next(err);
@@ -246,7 +246,7 @@ const AnalyzerFeedSchema = z.object({
 router.post('/analyzers/feed', requirePermission('integrations.manage'), async (req, res, next) => {
   try {
     const payload = AnalyzerFeedSchema.parse(req.body);
-    const result = await analyzerService.processAnalyzerFeed(payload);
+    const result = await analyzerService.processAnalyzerFeed(payload as any);
     res.status(201).json({ success: true, data: result });
   } catch (err) {
     next(err);
@@ -273,7 +273,7 @@ router.post('/payments/create-order', requirePermission('integrations.manage'), 
     const order = await paymentGateway.createOrder({
       tenantId,
       ...input,
-    });
+    } as any);
 
     res.status(201).json({ success: true, data: order });
   } catch (err) {
@@ -290,7 +290,7 @@ const VerifyPaymentSchema = z.object({
 router.post('/payments/verify', requirePermission('integrations.manage'), async (req, res, next) => {
   try {
     const input = VerifyPaymentSchema.parse(req.body);
-    const verification = await paymentGateway.verifyPayment(input);
+    const verification = await paymentGateway.verifyPayment(input as any);
     res.json({ success: true, data: verification });
   } catch (err) {
     next(err);
@@ -314,7 +314,7 @@ router.post('/biometric/punch', requirePermission('integrations.manage'), async 
     const punch = BiometricPunchSchema.parse(req.body);
     const tenantId = req.tenantId!;
 
-    const result = await biometricService.processPunch(req.prismaTenant, tenantId, punch);
+    const result = await biometricService.processPunch(req.prismaTenant, tenantId, punch as any);
     res.json({ success: true, data: result });
   } catch (err) {
     next(err);
