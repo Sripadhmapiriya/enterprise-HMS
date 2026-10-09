@@ -303,15 +303,14 @@ export default function LaboratoryWorklist() {
                           </>
                         )}
                         {sample && status === 'VERIFIED' && (
-                          <a
-                            href={laboratoryApi.getReportPdfUrl(sample.id)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex justify-center items-center text-xs font-semibold px-3 py-1.5 rounded-lg border border-border text-text hover:bg-surface-subtle transition-colors shadow-sm bg-surface"
+                          <button
+                            type="button"
+                            onClick={() => laboratoryApi.downloadReportPdf(sample.id, `LabReport-${sample.sampleId || sample.id}.pdf`)}
+                            className="inline-flex justify-center items-center text-xs font-semibold px-3 py-1.5 rounded-lg border border-border text-text hover:bg-surface-subtle transition-colors shadow-sm bg-surface cursor-pointer"
                           >
                             <Download className="w-3.5 h-3.5 mr-1" />
                             Report
-                          </a>
+                          </button>
                         )}
                       </td>
                     </tr>

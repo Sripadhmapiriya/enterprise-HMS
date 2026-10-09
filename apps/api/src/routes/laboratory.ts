@@ -78,7 +78,7 @@ function generateSampleId(): string {
 }
 
 // In-memory / DB synced critical alert store for rapid notification tracking
-interface CriticalAlertItem {
+export interface CriticalAlertItem {
   id: string;
   sampleId: string;
   patientId: string;
@@ -93,7 +93,11 @@ interface CriticalAlertItem {
   acknowledgedBy?: string;
 }
 
-const criticalAlerts: CriticalAlertItem[] = [];
+export const criticalAlerts: CriticalAlertItem[] = [];
+
+export function getUnacknowledgedCriticalAlertsCount(): number {
+  return criticalAlerts.filter((a) => a.status === 'UNACKNOWLEDGED').length;
+}
 
 // =========================================================================
 // 1. LAB ORDERS & WORKLIST
@@ -120,11 +124,11 @@ router.get('/worklist', requirePermission('laboratory.worklist.read'), async (re
       } else if (status === 'IN_PROCESS') {
         whereClause.status = 'SAMPLE_COLLECTED';
       } else if (status === 'TO_VALIDATE') {
-        whereClause.sample = { status: { in: ['TESTED', 'CRITICAL'] } };
+        whereClause.labSample = { status: { in: ['TESTED', 'CRITICAL'] } };
       } else if (status === 'COMPLETED') {
         whereClause.status = 'VERIFIED';
       } else if (status === 'CRITICAL') {
-        whereClause.sample = { status: 'CRITICAL' };
+        whereClause.labSample = { status: 'CRITICAL' };
       } else {
         whereClause.status = String(status);
       }

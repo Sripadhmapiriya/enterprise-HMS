@@ -7,6 +7,7 @@ import { notificationService, NotificationPayload } from '../services/notificati
 import { csvImportService, ImportDomain } from '../services/csv-import';
 import { pdfEngine, PdfTemplateType } from '../services/pdf-engine';
 import { workerQueue, JobType } from '../services/worker';
+import { getUnacknowledgedCriticalAlertsCount } from './laboratory';
 
 const router = Router();
 router.use(authenticateToken);
@@ -477,19 +478,13 @@ router.get('/sidebar-badges', async (req, res, next) => {
       emergencyCount = null;
     }
 
-    // 4. Critical alerts badge
+    // 4. Critical alerts badge: aggregate unacknowledged critical panic lab results + active alerts
     let criticalAlertsCount: number | null = null;
     try {
-      criticalAlertsCount = await req.prismaTenant.notification.count({
-        where: {
-          tenantId,
-          priority: 'CRITICAL',
-          isRead: false,
-        },
-      });
+      criticalAlertsCount = getUnacknowledgedCriticalAlertsCount();
     } catch (err: any) {
       console.error('Failed to count critical alerts badge:', err.message);
-      criticalAlertsCount = null;
+      criticalAlertsCount = 0;
     }
 
     res.json({

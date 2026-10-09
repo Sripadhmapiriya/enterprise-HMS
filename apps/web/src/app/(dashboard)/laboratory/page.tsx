@@ -197,15 +197,14 @@ export default function LaboratoryDashboard() {
                   </Badge>
 
                   {s.status === 'COMPLETED' && (
-                    <a
-                      href={laboratoryApi.getReportPdfUrl(s.id)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center text-xs font-semibold px-2 py-1 rounded border border-border text-text hover:bg-surface-subtle"
+                    <button
+                      type="button"
+                      onClick={() => laboratoryApi.downloadReportPdf(s.id, `LabReport-${s.sampleId || s.id}.pdf`)}
+                      className="inline-flex items-center text-xs font-semibold px-2 py-1 rounded border border-border text-text hover:bg-surface-subtle cursor-pointer"
                     >
                       <Download className="w-3.5 h-3.5 mr-1" />
                       PDF
-                    </a>
+                    </button>
                   )}
                 </div>
               </div>

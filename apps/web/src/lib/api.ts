@@ -871,7 +871,15 @@ export const laboratoryApi = {
   },
   getReportPdfUrl: (sampleId: string) => {
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
-    return `${base}/laboratory/samples/${sampleId}/report-pdf`;
+    const token = getStoredToken();
+    return `${base}/laboratory/samples/${sampleId}/report-pdf${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+  },
+  downloadReportPdf: async (sampleId: string, filename?: string) => {
+    return patientsApi.downloadDocument(
+      `/laboratory/samples/${sampleId}/report-pdf`,
+      filename || `LabReport-${sampleId}.pdf`,
+      true
+    );
   },
 };
 
