@@ -1,8 +1,15 @@
+import path from 'path';
+import fs from 'fs';
 import dotenv from 'dotenv';
 import { Worker, Job } from 'bullmq';
 import IORedis from 'ioredis';
 
-dotenv.config();
+const rootEnv = path.resolve(__dirname, '../../../.env');
+if (fs.existsSync(rootEnv)) {
+  dotenv.config({ path: rootEnv });
+} else {
+  dotenv.config();
+}
 
 export interface ProcessedJobResult {
   jobId: string;

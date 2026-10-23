@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -47,7 +49,12 @@ import analyticsRoutes from './routes/analytics';
 import integrationRoutes from './routes/integrations';
 import platformRoutes from './routes/platform';
 
-dotenv.config();
+const rootEnv = path.resolve(__dirname, '../../../.env');
+if (fs.existsSync(rootEnv)) {
+  dotenv.config({ path: rootEnv });
+} else {
+  dotenv.config();
+}
 
 const env = getEnv();
 export const app = express();

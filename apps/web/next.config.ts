@@ -1,4 +1,12 @@
+import path from 'path';
+import fs from 'fs';
+import dotenv from 'dotenv';
 import type { NextConfig } from "next";
+
+const rootEnv = path.resolve(__dirname, '../../.env');
+if (fs.existsSync(rootEnv)) {
+  dotenv.config({ path: rootEnv });
+}
 
 const nextConfig: NextConfig = {
   transpilePackages: ['motion', 'motion-dom', 'framer-motion', '@enterprise-hms/ui'],

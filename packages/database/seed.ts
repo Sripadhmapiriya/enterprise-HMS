@@ -1,6 +1,16 @@
+import path from 'path';
+import fs from 'fs';
+import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import { seedDemoDataset } from './seedDemo';
+
+const rootEnv = path.resolve(__dirname, '../../.env');
+if (fs.existsSync(rootEnv)) {
+  dotenv.config({ path: rootEnv });
+} else {
+  dotenv.config();
+}
 
 const prisma = new PrismaClient();
 

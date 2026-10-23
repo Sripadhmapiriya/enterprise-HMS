@@ -1,7 +1,20 @@
+import path from 'path';
+import fs from 'fs';
 import dotenv from 'dotenv';
 import { z } from 'zod';
 
-dotenv.config();
+// Load from current working directory or search upward for root .env
+const envCandidates = [
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(__dirname, '../../../.env'),
+  path.resolve(__dirname, '../../.env'),
+];
+for (const envPath of envCandidates) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    break;
+  }
+}
 
 export const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
