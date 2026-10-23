@@ -226,7 +226,7 @@ export default function IntegrationsDashboardPage() {
                 <span className="font-semibold text-text text-sm">{a.name}</span>
                 <div className="flex items-center gap-1.5 shrink-0">
                   {a.isSimulator && (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-600 border border-amber-500/30">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-warning-bg text-warning-text border border-warning-border">
                       SIMULATED
                     </span>
                   )}
@@ -240,7 +240,7 @@ export default function IntegrationsDashboardPage() {
                 <p>Version: <span className="font-medium text-text">{a.version}</span></p>
                 <p>
                   Adapter Mode:{' '}
-                  <span className={`font-semibold ${a.isSimulator ? 'text-amber-600' : 'text-brand'}`}>
+                  <span className={`font-semibold ${a.isSimulator ? 'text-warning-text' : 'text-brand'}`}>
                     {a.isSimulator ? 'DEV_SIMULATORS Sandbox' : 'Live Gateway'}
                   </span>
                 </p>
@@ -305,7 +305,7 @@ export default function IntegrationsDashboardPage() {
             <div className="space-y-4 max-w-xl">
               <div className="flex items-center gap-2">
                 <h4 className="font-bold text-text text-sm">ABDM Sandbox ABHA Registration & OTP Flow</h4>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-600 border border-amber-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-warning-bg text-warning-text border border-warning-border">
                   SIMULATED
                 </span>
               </div>
@@ -402,7 +402,7 @@ export default function IntegrationsDashboardPage() {
             <div className="space-y-4 max-w-xl">
               <div className="flex items-center gap-2">
                 <h4 className="font-bold text-text text-sm">Automated Laboratory Instrument Ingestion</h4>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-600 border border-amber-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-warning-bg text-warning-text border border-warning-border">
                   SIMULATED
                 </span>
               </div>
@@ -449,7 +449,7 @@ export default function IntegrationsDashboardPage() {
             <div className="space-y-4 max-w-xl">
               <div className="flex items-center gap-2">
                 <h4 className="font-bold text-text text-sm">Payment Gateway Checkout & Verification</h4>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-600 border border-amber-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-warning-bg text-warning-text border border-warning-border">
                   SIMULATED
                 </span>
               </div>

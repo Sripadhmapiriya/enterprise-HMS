@@ -226,8 +226,8 @@ export default function OTDashboard() {
       {notice && (
         <div
           className={`fixed top-4 right-4 z-[9999] p-4 rounded-xl shadow-xl font-medium text-sm flex justify-between items-center min-w-[300px] animate-in slide-in-from-top-2 ${ notice.type ==='success'
-              ? 'bg-stable text-white border border-stable-border'
-              : 'bg-critical text-white border border-critical-border'
+              ? 'bg-stable-bg text-stable-text border border-stable-border'
+              : 'bg-critical-bg text-critical-text border border-critical-border'
           }`}
         >
           <span>{notice.text}</span>
