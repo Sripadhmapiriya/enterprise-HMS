@@ -22,7 +22,7 @@ export interface IPaymentGateway {
 }
 
 export function areSimulatorsEnabled(): boolean {
-  return process.env.NODE_ENV !== 'production' && process.env.DEV_SIMULATORS === 'true';
+  return process.env.NODE_ENV !== 'production' && (process.env.DEV_SIMULATORS ?? 'true') === 'true';
 }
 
 export class PaymentGatewaySimulator implements IPaymentGateway {
