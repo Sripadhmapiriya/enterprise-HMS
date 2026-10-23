@@ -36,7 +36,6 @@ export function checkNoPhase(): CheckResult {
     const rel = path.relative(ROOT_DIR, f).replace(/\\/g, '/');
     return (
       !rel.includes('docs/redesign/PROGRESS.md') &&
-      !rel.includes('HMS_REDESIGN_PROMPT.md') &&
       !rel.includes('tests/shell-a11y.test.ts') &&
       !rel.includes('scripts/verify-integrity.ts')
     );
